@@ -13,14 +13,21 @@ var (
 	app = kingpin.New("dntk", "A dntk application.")
 )
 
-func init() {
-	app.HelpFlag.Short('h')
-	app.Version(fmt.Sprint("dntk's version: ", version))
-	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+type bufferLine struct {
+	RuneByte   []byte
+	LineBuffer []byte
+}
+
+func newbufferLine() *bufferLine {
+	var r []byte = make([]byte, 1)
+	var l []byte = make([]byte, 32)
+	return &bufferLine{
+		RuneByte:   r,
+		LineBuffer: l,
 	}
 }
 
-func main() {
+func ttyctl() {
 	// disable input buffering
 	exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
 	// delete \n
@@ -29,10 +36,22 @@ func main() {
 	exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
 	// restore the echoing state when exiting
 	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
+}
 
-	var b []byte = make([]byte, 1)
+func init() {
+	app.HelpFlag.Short('h')
+	app.Version(fmt.Sprint("dntk's version: ", version))
+	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+	}
+}
+
+func main() {
+	ttyctl()
+
+	b := newbufferLine()
 	for {
-		os.Stdin.Read(b)
-		fmt.Print(string(b))
+		os.Stdin.Read(b.RuneByte)
+		b.LineBuffer = append(b.LineBuffer, b.RuneByte...)
+		fmt.Print("\r", string(b.LineBuffer))
 	}
 }

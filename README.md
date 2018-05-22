@@ -1,2 +1,2 @@
 # dntk
-dntk is command line's calculato, like GNU bc.
+dntk is command line's calculator, like GNU bc.

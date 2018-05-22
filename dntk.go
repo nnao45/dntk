@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/MarinX/keylogger"
+	//	"github.com/MarinX/keylogger"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"os/exec"
@@ -14,19 +14,21 @@ var (
 	app = kingpin.New("dntk", "A dntk application.")
 )
 
-type bufferLine struct {
-	RuneByte   []byte
-	LineBuffer []byte
+type line struct {
+	RuneByte []byte
+	Buffer   []byte
 }
 
-func newbufferLine() *bufferLine {
+func newline() *line {
 	var r []byte = make([]byte, 1)
 	var l []byte = make([]byte, 32)
-	return &bufferLine{
-		RuneByte:   r,
-		LineBuffer: l,
+	return &line{
+		RuneByte: r,
+		Buffer:   l,
 	}
 }
+
+//func bufferLine
 
 func ttyctl() {
 	// disable input buffering
@@ -39,11 +41,11 @@ func ttyctl() {
 	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 }
 
-func keyHook(devs []*keylogger.InputDevice) {
-	for _, val := range devs {
-		fmt.Println("Id->", val.Id, "Device->", val.Name)
-	}
-}
+//func keyHook(devs []*keylogger.InputDevice) {
+//	for _, val := range devs {
+//		fmt.Println("Id->", val.Id, "Device->", val.Name)
+//	}
+//}
 
 func init() {
 	app.HelpFlag.Short('h')
@@ -55,18 +57,21 @@ func init() {
 func main() {
 	ttyctl()
 
-	b := newbufferLine()
+	l := newline()
 
-	devs, err := keylogger.NewDevices()
-	if err != nil {
-		panic(err)
-	}
+	//devs, err := keylogger.NewDevices()
+	//if err != nil {
+	//	panic(err)
+	//}
 
-	go keyHook(devs)
+	//go keyHook(devs)
 
 	for {
-		os.Stdin.Read(b.RuneByte)
-		b.LineBuffer = append(b.LineBuffer, b.RuneByte...)
-		//fmt.Print("\r", string(b.LineBuffer))
+		os.Stdin.Read(l.RuneByte)
+		l.Buffer = append(l.Buffer, l.RuneByte...)
+		//if string(b.RuneByte) == "" {
+
+		//}
+		fmt.Print("\r", string(l.Buffer))
 	}
 }

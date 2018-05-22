@@ -20,5 +20,5 @@ func init() {
 }
 
 func main() {
-	fmt.Println("vim-go")
+	fmt.Println("hello dntk")
 }

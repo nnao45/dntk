@@ -3,11 +3,8 @@ package main
 import (
 	"fmt"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"io/ioutil"
 	"os"
-	"syscall"
-
-	"golang.org/x/crypto/ssh/terminal"
+	"os/exec"
 )
 
 var version string
@@ -24,19 +21,16 @@ func init() {
 }
 
 func main() {
-	if terminal.IsTerminal(syscall.Stdin) {
-		// Execute: go run main.go
-		fmt.Print("Type something then press the enter key: ")
-		var stdin string
-		fmt.Scan(&stdin)
-		fmt.Printf("Result: %s\n", stdin)
-		return
-	}
+	// disable input buffering
+	exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+	// do not display entered characters on the screen
+	exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
+	// restore the echoing state when exiting
+	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 
-	// Execute: echo "foo" | go run main.go
-	body, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		panic(err)
+	var b []byte = make([]byte, 1)
+	for {
+		os.Stdin.Read(b)
+		fmt.Println(string(b))
 	}
-	fmt.Printf("Result: %s\n", string(body))
 }

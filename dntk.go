@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/MarinX/keylogger"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"os/exec"
@@ -31,11 +32,17 @@ func ttyctl() {
 	// disable input buffering
 	exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
 	// delete \n
-	exec.Command("stty", "-F", "/dev/tty", "erase", "\n")
+	exec.Command("stty", "-F", "/dev/tty", "erase", "\n").Run()
 	// do not display entered characters on the screen
 	exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
 	// restore the echoing state when exiting
 	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
+}
+
+func keyHook(devs []*keylogger.InputDevice) {
+	for _, val := range devs {
+		fmt.Println("Id->", val.Id, "Device->", val.Name)
+	}
 }
 
 func init() {
@@ -49,9 +56,17 @@ func main() {
 	ttyctl()
 
 	b := newbufferLine()
+
+	devs, err := keylogger.NewDevices()
+	if err != nil {
+		panic(err)
+	}
+
+	go keyHook(devs)
+
 	for {
 		os.Stdin.Read(b.RuneByte)
 		b.LineBuffer = append(b.LineBuffer, b.RuneByte...)
-		fmt.Print("\r", string(b.LineBuffer))
+		//fmt.Print("\r", string(b.LineBuffer))
 	}
 }

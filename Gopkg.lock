@@ -3,6 +3,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/MarinX/keylogger"
+  packages = ["."]
+  revision = "8da8cc3ff65f3a40d50d76e75392a641e993f595"
+
+[[projects]]
+  branch = "master"
   name = "github.com/alecthomas/template"
   packages = [
     ".",
@@ -25,6 +31,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0c899ef1c2b73754cc8738b6c1f4b586936b67e3454eda39f3d43599b8d47b7d"
+  inputs-digest = "bb8f68cf529d60333a8a0829b2fcd0866152ddc2c1023311a70354dfdf3bc978"
   solver-name = "gps-cdcl"
   solver-version = 1

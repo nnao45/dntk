@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	//	"github.com/MarinX/keylogger"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"os/exec"
+
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var version string
@@ -19,6 +21,20 @@ type line struct {
 	Buffer   []byte
 }
 
+func addog(text string, filename string) {
+	var writer *bufio.Writer
+	textData := []byte(text)
+
+	writeFile, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0755)
+	writer = bufio.NewWriter(writeFile)
+	writer.Write(textData)
+	writer.Flush()
+	if err != nil {
+		panic(err)
+	}
+	defer writeFile.Close()
+}
+
 func newline() *line {
 	var r []byte = make([]byte, 1)
 	var l []byte = make([]byte, 32)
@@ -28,7 +44,7 @@ func newline() *line {
 	}
 }
 
-func (l *line) remove() {
+func (l *line) remove() []byte {
 	var ary []byte = make([]byte, 32)
 	for i, b := range l.Buffer {
 		if i == len(l.Buffer)-1 {
@@ -36,17 +52,7 @@ func (l *line) remove() {
 		}
 		ary = append(ary, b)
 	}
-	copy(ary, l.Buffer)
-}
-func ttyctl() {
-	// disable input buffering
-	exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
-	// delete \n
-	exec.Command("stty", "-F", "/dev/tty", "erase", "\n").Run()
-	// do not display entered characters on the screen
-	exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
-	// restore the echoing state when exiting
-	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
+	return ary
 }
 
 func init() {
@@ -58,18 +64,34 @@ func init() {
 }
 
 func main() {
-	ttyctl()
+	// disable input buffering
+	exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+	// delete \n
+	exec.Command("stty", "-F", "/dev/tty", "erase", "\n").Run()
+	// do not display entered characters on the screen
+	exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
+	// restore the echoing state when exiting
+	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 
 	l := newline()
 
 	for {
-		os.Stdin.Read(l.RuneByte)
-		l.Buffer = append(l.Buffer, l.RuneByte...)
 
-		if string(l.RuneByte) == "\b" {
-			l.remove()
+		os.Stdin.Read(l.RuneByte)
+
+		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
+
+		if fmt.Sprint(l.RuneByte) == "[127]" {
+			l.Buffer = l.remove()
+			continue
+		} else if string(l.RuneByte) == "q" {
+			break
 		}
 
-		fmt.Print("\r", string(l.Buffer))
+		l.Buffer = append(l.Buffer, l.RuneByte...)
+
+		//fmt.Print("\r", string(l.Buffer))
+
 	}
+	fmt.Println(string(l.Buffer))
 }

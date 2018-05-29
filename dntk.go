@@ -3,9 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
-	//	"github.com/MarinX/keylogger"
 	"os"
 	"os/exec"
+	"strings"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -37,15 +37,15 @@ func addog(text string, filename string) {
 
 func newline() *line {
 	var r []byte = make([]byte, 1)
-	var l []byte = make([]byte, 32)
+	var l []byte = make([]byte, 0)
 	return &line{
 		RuneByte: r,
 		Buffer:   l,
 	}
 }
 
-func (l *line) remove() []byte {
-	var ary []byte = make([]byte, 32)
+func (l *line) remove() (ary []byte) {
+	//var ary []byte = make([]byte, 32)
 	for i, b := range l.Buffer {
 		if i == len(l.Buffer)-1 {
 			break
@@ -78,20 +78,20 @@ func main() {
 	for {
 
 		os.Stdin.Read(l.RuneByte)
+		fmt.Print("\r", strings.Repeat(" ", len(l.Buffer)))
 
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
 
 		if fmt.Sprint(l.RuneByte) == "[127]" {
 			l.Buffer = l.remove()
+			fmt.Print("\r", string(l.Buffer))
 			continue
-		} else if string(l.RuneByte) == "q" {
+		} else if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" {
+			fmt.Print("\n")
 			break
 		}
 
 		l.Buffer = append(l.Buffer, l.RuneByte...)
-
-		//fmt.Print("\r", string(l.Buffer))
-
+		fmt.Print("\r", string(l.Buffer))
 	}
-	fmt.Println(string(l.Buffer))
 }

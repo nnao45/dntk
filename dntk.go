@@ -45,7 +45,6 @@ func newline() *line {
 }
 
 func (l *line) remove() (ary []byte) {
-	//var ary []byte = make([]byte, 32)
 	for i, b := range l.Buffer {
 		if i == len(l.Buffer)-1 {
 			break
@@ -53,6 +52,9 @@ func (l *line) remove() (ary []byte) {
 		ary = append(ary, b)
 	}
 	return ary
+}
+
+func (l *line) calcBuffer() {
 }
 
 func init() {

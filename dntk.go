@@ -16,11 +16,6 @@ var (
 	app = kingpin.New("dntk", "A dntk application.")
 )
 
-type line struct {
-	RuneByte []byte
-	Buffer   []byte
-}
-
 func addog(text string, filename string) {
 	var writer *bufio.Writer
 	textData := []byte(text)
@@ -33,6 +28,36 @@ func addog(text string, filename string) {
 		panic(err)
 	}
 	defer writeFile.Close()
+}
+
+/*
+type operator struct {
+	Plus         string
+	Minus        string
+	MultipliedBy string
+	DividedBy    string
+}
+
+func newoperator() *operator {
+	return &operator{
+		Plus:         "+",
+		Minus:        "-",
+		MultipliedBy: "*",
+		DividedBy:    "/",
+	}
+}
+*/
+
+var operator map[string]string = map[string]string{
+	"Plus":         "+",
+	"Minus":        "-",
+	"MultipliedBy": "*",
+	"DividedBy":    "/",
+}
+
+type line struct {
+	RuneByte []byte
+	Buffer   []byte
 }
 
 func newline() *line {
@@ -61,7 +86,7 @@ func init() {
 	app.HelpFlag.Short('h')
 	app.Version(fmt.Sprint("dntk's version: ", version))
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
-	//
+	// TODO
 	}
 }
 
@@ -80,6 +105,13 @@ func main() {
 	for {
 
 		os.Stdin.Read(l.RuneByte)
+
+		if _, err := strconv.Atoi(string(l.RuneByte)); err != nil {
+			// TODO
+		} else if _, ok := operator[string(l.RuneByte)]; ok {
+			// TODO
+		}
+
 		fmt.Print("\r", strings.Repeat(" ", len(l.Buffer)))
 
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")

@@ -49,10 +49,10 @@ func newoperator() *operator {
 */
 
 var operator map[string]string = map[string]string{
-	"Plus":         "+",
-	"Minus":        "-",
-	"MultipliedBy": "*",
-	"DividedBy":    "/",
+	"+": "Plus",
+	"-": "Minus",
+	"*": "MultipliedBy",
+	"/": "DividedBy",
 }
 
 type line struct {

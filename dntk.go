@@ -77,10 +77,6 @@ func (p *pallet) printCyan(s string) string {
 	return p.Cyan + fmt.Sprint(s) + p.Plain
 }
 
-func dntkPrint(s string) {
-	fmt.Print(s)
-}
-
 var operator map[string]string = map[string]string{
 	"+": "Plus",
 	"-": "Minus",
@@ -146,14 +142,13 @@ func main() {
 			// TODO
 		}
 
-		//fmt.Print("\r", strings.Repeat(" ", len(l.Buffer)))
-		dntkPrint(p.printMagenta("\r" + strings.Repeat(" ", len(l.Buffer))))
+		fmt.Print(p.printMagenta("\r" + strings.Repeat(" ", len(l.Buffer))))
 
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
 
 		if fmt.Sprint(l.RuneByte) == "[127]" {
 			l.Buffer = l.remove()
-			dntkPrint(p.printMagenta("\r" + string(l.Buffer)))
+			fmt.Print(p.printMagenta("\r" + string(l.Buffer)))
 			continue
 		} else if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" {
 			fmt.Print("\n")
@@ -161,7 +156,6 @@ func main() {
 		}
 
 		l.Buffer = append(l.Buffer, l.RuneByte...)
-		//fmt.Print("\r", string(l.Buffer))
-		dntkPrint(p.printMagenta("\r" + string(l.Buffer)))
+		fmt.Print(p.printMagenta("\r" + string(l.Buffer)))
 	}
 }

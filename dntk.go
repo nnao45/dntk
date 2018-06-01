@@ -85,8 +85,10 @@ var operator map[string]string = map[string]string{
 }
 
 type line struct {
-	RuneByte []byte
-	Buffer   []byte
+	RuneByte       []byte
+	Buffer         []byte
+	BufferAndEqual []byte
+	Flag           []int
 }
 
 func newline() *line {
@@ -106,6 +108,11 @@ func (l *line) remove() (ary []byte) {
 		ary = append(ary, b)
 	}
 	return ary
+}
+
+func (l *line) appendEqual() []byte {
+	l.Buffer = append(l.Buffer, []byte(" = ")...)
+	return l.Buffer
 }
 
 func (l *line) calcBuffer() {
@@ -142,13 +149,16 @@ func main() {
 			// TODO
 		}
 
-		fmt.Print(p.printMagenta("\r" + strings.Repeat(" ", len(l.Buffer))))
+		//fmt.Print(p.printMagenta("\r" + strings.Repeat(" ", len(l.Buffer))))
+		fmt.Print(p.printMagenta("\r" + strings.Repeat(" ", len(l.BufferAndEqual))))
+		l.BufferAndEqual = nil
 
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
 
 		if fmt.Sprint(l.RuneByte) == "[127]" {
 			l.Buffer = l.remove()
-			fmt.Print(p.printMagenta("\r" + string(l.Buffer)))
+			l.BufferAndEqual = append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...)
+			fmt.Print(p.printMagenta("\r" + string(l.BufferAndEqual)))
 			continue
 		} else if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" {
 			fmt.Print("\n")
@@ -156,6 +166,7 @@ func main() {
 		}
 
 		l.Buffer = append(l.Buffer, l.RuneByte...)
-		fmt.Print(p.printMagenta("\r" + string(l.Buffer)))
+		l.BufferAndEqual = append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...)
+		fmt.Print(p.printMagenta("\r" + string(l.BufferAndEqual)))
 	}
 }

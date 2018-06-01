@@ -149,7 +149,6 @@ func main() {
 			// TODO
 		}
 
-		//fmt.Print(p.printMagenta("\r" + strings.Repeat(" ", len(l.Buffer))))
 		fmt.Print(p.printMagenta("\r" + strings.Repeat(" ", len(l.BufferAndEqual))))
 		l.BufferAndEqual = nil
 

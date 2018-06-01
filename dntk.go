@@ -49,6 +49,44 @@ func newoperator() *operator {
 }
 */
 
+const (
+	COLOR_BLACK_HEADER   = "\x1b[30m"
+	COLOR_RED_HEADER     = "\x1b[31m"
+	COLOR_GREEN_HEADER   = "\x1b[32m"
+	COLOR_YELLOW_HEADER  = "\x1b[33m"
+	COLOR_BLUE_HEADER    = "\x1b[34m"
+	COLOR_MAGENDA_HEADER = "\x1b[35m"
+	COLOR_CYAN_HEADER    = "\x1b[36m"
+	COLOR_WHITE_HEADER   = "\x1b[37m"
+	COLOR_PLAIN_HEADER   = "\x1b[0m"
+)
+
+type Pallet struct {
+	Black   string
+	Red     string
+	Green   string
+	Yellow  string
+	Blue    string
+	Magenda string
+	Cyan    string
+	White   string
+	Plain   string
+}
+
+func NewPallet() *Pallet {
+	return &Pallet{
+		Black:   COLOR_BLACK_HEADER,
+		Red:     COLOR_RED_HEADER,
+		Green:   COLOR_GREEN_HEADER,
+		Yellow:  COLOR_YELLOW_HEADER,
+		Blue:    COLOR_BLUE_HEADER,
+		Magenda: COLOR_MAGENDA_HEADER,
+		Cyan:    COLOR_CYAN_HEADER,
+		White:   COLOR_WHITE_HEADER,
+		Plain:   COLOR_PLAIN_HEADER,
+	}
+}
+
 var operator map[string]string = map[string]string{
 	"+": "Plus",
 	"-": "Minus",

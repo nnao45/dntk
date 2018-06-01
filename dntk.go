@@ -31,24 +31,6 @@ func addog(text string, filename string) {
 	defer writeFile.Close()
 }
 
-/*
-type operator struct {
-	Plus         string
-	Minus        string
-	MultipliedBy string
-	DividedBy    string
-}
-
-func newoperator() *operator {
-	return &operator{
-		Plus:         "+",
-		Minus:        "-",
-		MultipliedBy: "*",
-		DividedBy:    "/",
-	}
-}
-*/
-
 const (
 	COLOR_BLACK_HEADER   = "\x1b[30m"
 	COLOR_RED_HEADER     = "\x1b[31m"

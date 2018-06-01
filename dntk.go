@@ -55,7 +55,7 @@ type Pallet struct {
 	Plain   string
 }
 
-func NewPallet() *Pallet {
+func newPallet() *Pallet {
 	return &Pallet{
 		Black:   COLOR_BLACK_HEADER,
 		Red:     COLOR_RED_HEADER,

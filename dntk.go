@@ -43,7 +43,7 @@ const (
 	COLOR_PLAIN_HEADER   = "\x1b[0m"
 )
 
-type Pallet struct {
+type pallet struct {
 	Black   string
 	Red     string
 	Green   string
@@ -55,8 +55,8 @@ type Pallet struct {
 	Plain   string
 }
 
-func NewPallet() *Pallet {
-	return &Pallet{
+func newpallet() *pallet {
+	return &pallet{
 		Black:   COLOR_BLACK_HEADER,
 		Red:     COLOR_RED_HEADER,
 		Green:   COLOR_GREEN_HEADER,
@@ -67,6 +67,18 @@ func NewPallet() *Pallet {
 		White:   COLOR_WHITE_HEADER,
 		Plain:   COLOR_PLAIN_HEADER,
 	}
+}
+
+func (p *pallet) printMagenta(s string) string {
+	return p.Magenda + fmt.Sprint(s) + p.Plain
+}
+
+func (p *pallet) printCyan(s string) string {
+	return p.Cyan + fmt.Sprint(s) + p.Plain
+}
+
+func dntkPrint(s string) {
+	fmt.Print(s)
 }
 
 var operator map[string]string = map[string]string{
@@ -122,6 +134,7 @@ func main() {
 	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 
 	l := newline()
+	p := newpallet()
 
 	for {
 
@@ -133,13 +146,14 @@ func main() {
 			// TODO
 		}
 
-		fmt.Print("\r", strings.Repeat(" ", len(l.Buffer)))
+		//fmt.Print("\r", strings.Repeat(" ", len(l.Buffer)))
+		dntkPrint(p.printMagenta("\r" + strings.Repeat(" ", len(l.Buffer))))
 
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
 
 		if fmt.Sprint(l.RuneByte) == "[127]" {
 			l.Buffer = l.remove()
-			fmt.Print("\r", string(l.Buffer))
+			dntkPrint(p.printMagenta("\r" + string(l.Buffer)))
 			continue
 		} else if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" {
 			fmt.Print("\n")
@@ -147,6 +161,7 @@ func main() {
 		}
 
 		l.Buffer = append(l.Buffer, l.RuneByte...)
-		fmt.Print("\r", string(l.Buffer))
+		//fmt.Print("\r", string(l.Buffer))
+		dntkPrint(p.printMagenta("\r" + string(l.Buffer)))
 	}
 }

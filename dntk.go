@@ -171,6 +171,14 @@ func (l *line) judgeFlag() {
 			}
 		} else if k == "[32]" {
 			continue
+		} else if k == "[46]" && k != "[32]" {
+			//TODO
+			if last == numberFlag {
+				last = numberFlag
+				continue
+			} else {
+				break
+			}
 		} else {
 			last = anotherFlag
 			continue

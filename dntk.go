@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	sh "github.com/codeskyblue/go-sh"
@@ -203,7 +204,7 @@ func trimSpaceFromByte(s []byte) (byt []byte) {
 }
 
 func (l *line) calcBuffer() []byte {
-	result, err := sh.Command("echo", "scale=3;", fmt.Sprint(string(trimSpaceFromByte(l.Buffer)))).Command("bc").Output()
+	result, err := sh.Command("echo", "scale=10;", fmt.Sprint(string(trimSpaceFromByte(l.Buffer)))).Command("bc").Output()
 	if err != nil {
 		panic(err)
 	}
@@ -213,6 +214,9 @@ func (l *line) calcBuffer() []byte {
 			break
 		}
 		reresult = append(reresult, r)
+	}
+	if _, err = strconv.ParseFloat(string(reresult), 64); err != nil {
+		panic(err)
 	}
 	return reresult
 }

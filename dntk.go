@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 
@@ -204,10 +205,13 @@ func trimSpaceFromByte(s []byte) (byt []byte) {
 }
 
 func (l *line) calcBuffer() []byte {
+	//stdin := "echo scale=10;" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "| bc"
 	result, err := sh.Command("echo", "scale=10;", fmt.Sprint(string(trimSpaceFromByte(l.Buffer)))).Command("bc").Output()
+	//cmd := exec.Command("sh", "-c", "echo", "scale=10;", fmt.Sprint(string(trimSpaceFromByte(l.Buffer))), "| bc")
+	/*_, err := cmd.StderrPipe()
 	if err != nil {
 		panic(err)
-	}
+	}*/
 	var reresult []byte
 	for i, r := range result {
 		if i == len(result)-1 {
@@ -231,13 +235,13 @@ func init() {
 
 func main() {
 	// disable input buffering
-	sh.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+	exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
 	// delete \n
-	sh.Command("stty", "-F", "/dev/tty", "erase", "\n").Run()
+	exec.Command("stty", "-F", "/dev/tty", "erase", "\n").Run()
 	// do not display entered characters on the screen
-	sh.Command("stty", "-F", "/dev/tty", "-echo").Run()
+	exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
 	// restore the echoing state when exiting
-	defer sh.Command("stty", "-F", "/dev/tty", "echo").Run()
+	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 
 	l := newline()
 	var result []byte

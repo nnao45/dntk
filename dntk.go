@@ -133,9 +133,11 @@ const (
 	firstFlag
 )
 
+/*this logical is hell 😅*/
 func (l *line) judgeFlag() {
 	last := firstFlag
 	var consecutiveFlag bool
+	var decimalFlag bool
 	for _, k := range l.KeyList {
 		l.Flag = false
 		if _, ok := numberKeyMap[k]; ok {
@@ -171,10 +173,14 @@ func (l *line) judgeFlag() {
 			}
 		} else if k == "[32]" {
 			continue
-		} else if k == "[46]" && k != "[32]" {
+		} else if k == "[46]" {
 			//TODO
+			if decimalFlag {
+				break
+			}
 			if last == numberFlag {
 				last = numberFlag
+				decimalFlag = true
 				continue
 			} else {
 				break
@@ -186,8 +192,18 @@ func (l *line) judgeFlag() {
 	}
 }
 
+func trimSpaceFromByte(s []byte) (byt []byte) {
+	for _, b := range s {
+		if string(b) == " " {
+			continue
+		}
+		byt = append(byt, b)
+	}
+	return
+}
+
 func (l *line) calcBuffer() []byte {
-	result, err := sh.Command("echo", "scale=3;", fmt.Sprint(string(l.Buffer))).Command("bc").Output()
+	result, err := sh.Command("echo", "scale=3;", fmt.Sprint(string(trimSpaceFromByte(l.Buffer)))).Command("bc").Output()
 	if err != nil {
 		panic(err)
 	}

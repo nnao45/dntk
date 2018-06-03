@@ -3,17 +3,8 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/MarinX/keylogger"
-  packages = ["."]
-  revision = "8da8cc3ff65f3a40d50d76e75392a641e993f595"
-
-[[projects]]
-  branch = "master"
   name = "github.com/alecthomas/template"
-  packages = [
-    ".",
-    "parse"
-  ]
+  packages = [".","parse"]
   revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
 
 [[projects]]
@@ -21,6 +12,18 @@
   name = "github.com/alecthomas/units"
   packages = ["."]
   revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
+
+[[projects]]
+  name = "github.com/codegangsta/inject"
+  packages = ["."]
+  revision = "37d7f8432a3e684eef9b2edece76bdfa6ac85b39"
+  version = "v1.0-rc1"
+
+[[projects]]
+  name = "github.com/codeskyblue/go-sh"
+  packages = ["."]
+  revision = "b097669b1569203c3ce05a6b8717d43140fdb3d5"
+  version = "0.2"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
@@ -31,6 +34,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bb8f68cf529d60333a8a0829b2fcd0866152ddc2c1023311a70354dfdf3bc978"
+  inputs-digest = "296f35b9066d5e55b3c6009b937f9f1d9861b1f40e1b722737a57794cf88c491"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -179,7 +179,7 @@ func (l *line) judgeFlag() {
 }
 
 func (l *line) calcBuffer() []byte {
-	result, err := sh.Command("echo", fmt.Sprint(string(l.Buffer))).Command("bc").Output()
+	result, err := sh.Command("echo", "scale=3;", fmt.Sprint(string(l.Buffer))).Command("bc").Output()
 	if err != nil {
 		panic(err)
 	}

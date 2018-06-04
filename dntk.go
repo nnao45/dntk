@@ -139,7 +139,7 @@ func trimSpaceFromByte(s []byte) (byt []byte) {
 func (l *line) calcBuffer() []byte {
 	var stdout, stderr bytes.Buffer
 	l.Flag = true
-	stdin := "echo \"scale=10;" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc"
+	stdin := "echo \"scale=10;" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc -l"
 	cmd := exec.Command("sh", "-c", stdin)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -168,6 +168,8 @@ func init() {
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	// TODO
 	}
+
+	os.Setenv("BC_LINE_LENGTH", "999")
 }
 
 func main() {

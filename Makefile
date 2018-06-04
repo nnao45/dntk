@@ -19,13 +19,19 @@ install:
 clean:
 	rm -rf bin/*
 	rm -rf vendor/*
-	rm -rf dist/*
 
+.PHONY: run
+run:
+	go run $(NAME).go
+
+.PHONY: upde
 upde:
 	dep ensure -update
 
+.PHONY: dep
 dep:
 	dep ensure
 
+.PHONY: dep-install
 dep-install:
 	go get github.com/golang/dep/cmd/dep

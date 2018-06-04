@@ -2,13 +2,12 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 
-	sh "github.com/codeskyblue/go-sh"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -205,24 +204,28 @@ func trimSpaceFromByte(s []byte) (byt []byte) {
 }
 
 func (l *line) calcBuffer() []byte {
-	//stdin := "echo scale=10;" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "| bc"
-	result, err := sh.Command("echo", "scale=10;", fmt.Sprint(string(trimSpaceFromByte(l.Buffer)))).Command("bc").Output()
-	//cmd := exec.Command("sh", "-c", "echo", "scale=10;", fmt.Sprint(string(trimSpaceFromByte(l.Buffer))), "| bc")
-	/*_, err := cmd.StderrPipe()
+	var stdout, stderr bytes.Buffer
+	stdin := "echo \"scale=10;" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc"
+	//cmd := exec.Command("sh", "-c", "echo "+fmt.Sprint(string(trimSpaceFromByte(l.Buffer)))+" | bc")
+	cmd := exec.Command("sh", "-c", stdin)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
 	if err != nil {
 		panic(err)
-	}*/
-	var reresult []byte
-	for i, r := range result {
-		if i == len(result)-1 {
+	}
+	var result []byte
+
+	for i, r := range stdout.Bytes() {
+		if i == len(stdout.Bytes())-1 {
 			break
 		}
-		reresult = append(reresult, r)
+		result = append(result, r)
 	}
-	if _, err = strconv.ParseFloat(string(reresult), 64); err != nil {
-		panic(err)
+	if len(stderr.Bytes()) > 0 {
+		result = []byte("nil")
 	}
-	return reresult
+	return result
 }
 
 func init() {

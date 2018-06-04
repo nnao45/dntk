@@ -206,7 +206,6 @@ func trimSpaceFromByte(s []byte) (byt []byte) {
 func (l *line) calcBuffer() []byte {
 	var stdout, stderr bytes.Buffer
 	stdin := "echo \"scale=10;" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc"
-	//cmd := exec.Command("sh", "-c", "echo "+fmt.Sprint(string(trimSpaceFromByte(l.Buffer)))+" | bc")
 	cmd := exec.Command("sh", "-c", stdin)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr

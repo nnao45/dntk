@@ -126,14 +126,6 @@ func (l *line) appendEqual() []byte {
 	return l.Buffer
 }
 
-const (
-	numberFlag = iota
-	operatorFlag
-	otherFlag
-	anotherFlag
-	firstFlag
-)
-
 func trimSpaceFromByte(s []byte) (byt []byte) {
 	for _, b := range s {
 		if string(b) == " " {

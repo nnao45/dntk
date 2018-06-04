@@ -51,31 +51,22 @@ func printCyan(s string) string {
 	return COLOR_CYAN_HEADER + fmt.Sprint(s) + COLOR_PLAIN_HEADER
 }
 
-var numberKeyMap map[string]string = map[string]string{
-	"[48]": "0",
-	"[49]": "1",
-	"[50]": "2",
-	"[51]": "3",
-	"[52]": "4",
-	"[53]": "5",
-	"[54]": "6",
-	"[55]": "7",
-	"[56]": "8",
-	"[57]": "9",
-}
+const (
+	SIN_FUNCTION_KEY    = "[115]"
+	COS_FUNCTION_KEY    = "[99]"
+	ATAN_FUNCTION_KEY   = "[97]"
+	LOG_FUNCTION_KEY    = "[108]"
+	EXP_FUNCTION_KEY    = "[101]"
+	BESSEL_FUNCTION_KEY = "[106]"
+)
 
-var operatorKeyMap map[string]string = map[string]string{
-	"[43]": "+",
-	"[45]": "-",
-	"[42]": "*",
-	"[47]": "/",
-}
-
-var otherOpe map[string]string = map[string]string{
-	"sin": "Sin",
-	"cos": "Cosin",
-	"tan": "Tangent",
-	// ...TODO
+var funcMap map[string]string = map[string]string{
+	SIN_FUNCTION_KEY:    "SIN_FUNCTION_KEY",
+	COS_FUNCTION_KEY:    "COS_FUNCTION_KEY",
+	ATAN_FUNCTION_KEY:   "ATAN_FUNCTION_KEY",
+	LOG_FUNCTION_KEY:    "LOG_FUNCTION_KEY",
+	EXP_FUNCTION_KEY:    "EXP_FUNCTION_KEY",
+	BESSEL_FUNCTION_KEY: "BESSEL_FUNCTION_KEY",
 }
 
 type line struct {
@@ -196,6 +187,8 @@ func main() {
 			// send "q" key OR escape key OR Enter key
 			fmt.Println("\r" + string(l.BufferAndEqual))
 			break
+		} else if _, ok := funcMap[string(l.RuneByte)]; ok {
+			//TODO
 		} else if string(l.RuneByte) == "[9]" {
 			// send tab key
 			// TODO

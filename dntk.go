@@ -134,65 +134,6 @@ const (
 	firstFlag
 )
 
-/*this logical is hell 😅*/
-func (l *line) judgeFlag() {
-	last := firstFlag
-	var consecutiveFlag bool
-	var decimalFlag bool
-	for _, k := range l.KeyList {
-		l.Flag = false
-		if _, ok := numberKeyMap[k]; ok {
-			if last == numberFlag {
-				if consecutiveFlag {
-					l.Flag = true
-				}
-				last = numberFlag
-				continue
-			} else if last == operatorFlag {
-				l.Flag = true
-				consecutiveFlag = true
-				last = numberFlag
-				continue
-			} else if last == firstFlag {
-				last = numberFlag
-				continue
-			} else {
-				// ???
-				break
-			}
-		} else if _, ok := operatorKeyMap[k]; ok {
-			if last == numberFlag {
-				last = operatorFlag
-				continue
-			} else if last == operatorFlag {
-				break
-			} else if last == firstFlag {
-				break
-			} else {
-				// ???
-				break
-			}
-		} else if k == "[32]" {
-			continue
-		} else if k == "[46]" {
-			//TODO
-			if decimalFlag {
-				break
-			}
-			if last == numberFlag {
-				last = numberFlag
-				decimalFlag = true
-				continue
-			} else {
-				break
-			}
-		} else {
-			last = anotherFlag
-			continue
-		}
-	}
-}
-
 func trimSpaceFromByte(s []byte) (byt []byte) {
 	for _, b := range s {
 		if string(b) == " " {
@@ -205,6 +146,7 @@ func trimSpaceFromByte(s []byte) (byt []byte) {
 
 func (l *line) calcBuffer() []byte {
 	var stdout, stderr bytes.Buffer
+	l.Flag = true
 	stdin := "echo \"scale=10;" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc"
 	cmd := exec.Command("sh", "-c", stdin)
 	cmd.Stdout = &stdout
@@ -222,6 +164,7 @@ func (l *line) calcBuffer() []byte {
 		result = append(result, r)
 	}
 	if len(stderr.Bytes()) > 0 {
+		l.Flag = false
 		result = []byte("nil")
 	}
 	return result
@@ -260,10 +203,7 @@ func main() {
 		if fmt.Sprint(l.RuneByte) == "[127]" {
 			// send delete key OR backspace key
 			l.Buffer, l.KeyList = l.remove()
-			l.judgeFlag()
-			if l.Flag {
-				result = l.calcBuffer()
-			}
+			result = l.calcBuffer()
 			l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
 			fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
 			continue
@@ -280,10 +220,7 @@ func main() {
 
 		l.Buffer = append(l.Buffer, l.RuneByte...)
 		l.KeyList = append(l.KeyList, fmt.Sprint(l.RuneByte))
-		l.judgeFlag()
-		if l.Flag {
-			result = l.calcBuffer()
-		}
+		result = l.calcBuffer()
 		l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
 		fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
 	}

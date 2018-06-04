@@ -83,32 +83,23 @@ type line struct {
 	Buffer         []byte
 	BufferAndEqual []byte
 	Flag           bool
-	KeyList        []string
 }
 
 func newline() *line {
 	var r []byte = make([]byte, 1)
 	var l []byte = make([]byte, 0)
-	var k []string = make([]string, 0)
 	return &line{
 		RuneByte: r,
 		Buffer:   l,
-		KeyList:  k,
 	}
 }
 
-func (l *line) remove() (bary []byte, kary []string) {
+func (l *line) remove() (bary []byte) {
 	for i, b := range l.Buffer {
 		if i == len(l.Buffer)-1 {
 			break
 		}
 		bary = append(bary, b)
-	}
-	for i, k := range l.KeyList {
-		if i == len(l.KeyList)-1 {
-			break
-		}
-		kary = append(kary, k)
 	}
 
 	return
@@ -196,7 +187,7 @@ func main() {
 
 		if fmt.Sprint(l.RuneByte) == "[127]" {
 			// send delete key OR backspace key
-			l.Buffer, l.KeyList = l.remove()
+			l.Buffer = l.remove()
 			result = l.calcBuffer()
 			l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
 			fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
@@ -213,7 +204,6 @@ func main() {
 		}
 
 		l.Buffer = append(l.Buffer, l.RuneByte...)
-		l.KeyList = append(l.KeyList, fmt.Sprint(l.RuneByte))
 		result = l.calcBuffer()
 		l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
 		fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))

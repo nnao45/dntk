@@ -180,13 +180,17 @@ func (l *line) calcBuffer() []byte {
 	return result
 }
 
+func (l *line) printPrompt() {
+	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
+	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+}
+
 func (l *line) printBuffer() {
 	if fmt.Sprint(l.RuneByte) != "[127]" {
 		l.Buffer = append(l.Buffer, l.RuneByte...)
 	}
 
-	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
-	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+	l.printPrompt()
 }
 
 func (l *line) printFuncBuffer() {
@@ -196,14 +200,12 @@ func (l *line) printFuncBuffer() {
 	if l.FuncMode {
 		l.Buffer = append(l.Buffer, []byte("(")...)
 	}
-	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
-	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+	l.printPrompt()
 }
 
 func (l *line) printFuncQuitBuffer() {
 	l.Buffer = append(l.Buffer, []byte(")")...)
-	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
-	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+	l.printPrompt()
 	l.FuncMode = false
 }
 
@@ -211,17 +213,10 @@ func (l *line) printAlert() {
 	l.Alert = true
 	alertString := fmt.Sprintf("%v \"%v\" %v", "Sorry,", string(l.RuneByte), "is Danger word. Please not use.")
 	fmt.Print(l.dntkPrint("\r" + alertString))
+	l.Alert = false
 	time.Sleep(time.Second)
 	fmt.Print(l.dntkPrint("\r" + strings.Repeat(" ", len(alertString))))
-	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
-	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
-	l.Alert = false
-}
-
-func (l *line) printPipeBuffer() {
-	l.Buffer = append(l.Buffer, l.RuneByte...)
-	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
-	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+	l.printPrompt()
 }
 
 func init() {

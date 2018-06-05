@@ -288,8 +288,6 @@ func main() {
 		}
 
 		if string(l.RuneByte) == REBASE_KEY {
-			l.Flag = false
-			l.FuncMode = false
 			l = newline()
 			fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): "))))
 			continue

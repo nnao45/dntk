@@ -186,6 +186,10 @@ func main() {
 
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
 
+		if len(l.Buffer) < 1 {
+			l.FuncMode = false
+		}
+
 		if l.FuncMode {
 			if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" || fmt.Sprint(l.RuneByte) == "[10]" || fmt.Sprint(l.RuneByte) == ")" {
 				// send "q" key OR escape key OR Enter key

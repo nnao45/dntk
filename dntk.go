@@ -55,7 +55,10 @@ func printCyan(s string) string {
 	return COLOR_CYAN_HEADER + fmt.Sprint(s) + COLOR_PLAIN_HEADER
 }
 
-const DELETE_KEY = "[127]"
+const (
+	REBASE_KEY = "r"
+	DELETE_KEY = "[127]"
+)
 
 const (
 	SIN_FUNCTION_KEY      = "s" //s
@@ -94,17 +97,15 @@ var dangerSlice []string = []string{
 }
 
 const (
-	Q_KEY            = "[113]"
-	ENTER_KEY        = "[10]"
-	ESCAPE_KEY       = "[27]"
-	RBRACKET_FIN_KEY = "[41]"
+	Q_KEY      = "[113]"
+	ENTER_KEY  = "[10]"
+	ESCAPE_KEY = "[27]"
 )
 
 var killSlice []string = []string{
 	Q_KEY,
 	ENTER_KEY,
 	ESCAPE_KEY,
-	RBRACKET_FIN_KEY,
 }
 
 type line struct {
@@ -280,7 +281,13 @@ func main() {
 			l.FuncMode = false
 		}
 
-		if fmt.Sprint(l.RuneByte) == DELETE_KEY {
+		if string(l.RuneByte) == REBASE_KEY {
+			l.Flag = false
+			l.FuncMode = false
+			l = newline()
+			fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): "))))
+			continue
+		} else if fmt.Sprint(l.RuneByte) == DELETE_KEY {
 			// send delete key OR backspace key
 			l.Buffer = l.remove()
 			l.printBuffer()

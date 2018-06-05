@@ -244,10 +244,10 @@ func main() {
 	if !terminal.IsTerminal(0) {
 		for {
 			os.Stdin.Read(l.RuneByte)
-			l.Buffer = append(l.Buffer, l.RuneByte...)
-			if fmt.Sprint(l.RuneByte) == "[10]" {
+			if _, ok := dangerMap[string(l.RuneByte)]; ok || fmt.Sprint(l.RuneByte) == "[10]" {
 				break
 			}
+			l.Buffer = append(l.Buffer, l.RuneByte...)
 		}
 		fmt.Println(string(l.calcBuffer()))
 		return

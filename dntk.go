@@ -254,7 +254,10 @@ func main() {
 	if !terminal.IsTerminal(0) {
 		for {
 			os.Stdin.Read(l.RuneByte)
-			if sliceContains(string(l.RuneByte), dangerSlice) || fmt.Sprint(l.RuneByte) == "[10]" {
+			if sliceContains(string(l.RuneByte), dangerSlice) {
+				fmt.Fprintln(os.Stderr, fmt.Sprintf("%v \"%v\" %v", "Sorry,", string(l.RuneByte), "is Danger word. Please not use."))
+				os.Exit(1)
+			} else if fmt.Sprint(l.RuneByte) == "[10]" {
 				break
 			}
 			l.Buffer = append(l.Buffer, l.RuneByte...)

@@ -260,8 +260,6 @@ func main() {
 
 		fmt.Print(l.dntkPrint("\r" + strings.Repeat(" ", len(l.BufferAndEqual))))
 
-		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
-
 		if len(l.Buffer) < 1 {
 			l.Flag = false
 			l.FuncMode = false

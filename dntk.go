@@ -43,6 +43,10 @@ const (
 	COLOR_PLAIN_HEADER   = "\x1b[0m"
 )
 
+func printGreen(s string) string {
+	return COLOR_GREEN_HEADER + fmt.Sprint(s) + COLOR_PLAIN_HEADER
+}
+
 func printMagenta(s string) string {
 	return COLOR_MAGENDA_HEADER + fmt.Sprint(s) + COLOR_PLAIN_HEADER
 }
@@ -52,13 +56,13 @@ func printCyan(s string) string {
 }
 
 const (
-	SIN_FUNCTION_KEY      = "[115]" //s
-	COS_FUNCTION_KEY      = "[99]"  //c
-	ATAN_FUNCTION_KEY     = "[97]"  //a
-	LOG_FUNCTION_KEY      = "[108]" //l
-	EXP_FUNCTION_KEY      = "[101]" //e
-	BESSEL_FUNCTION_KEY   = "[106]" //j
-	RBRACKET_FUNCTION_KEY = "[40]"  //(
+	SIN_FUNCTION_KEY      = "s" //s
+	COS_FUNCTION_KEY      = "c" //c
+	ATAN_FUNCTION_KEY     = "a" //a
+	LOG_FUNCTION_KEY      = "l" //l
+	EXP_FUNCTION_KEY      = "e" //e
+	BESSEL_FUNCTION_KEY   = "j" //j
+	RBRACKET_FUNCTION_KEY = "(" //(
 )
 
 var funcMap map[string]string = map[string]string{
@@ -100,6 +104,9 @@ func (l *line) remove() (bary []byte) {
 }
 
 func (l *line) dntkPrint(s string) string {
+	if l.FuncMode {
+		return printGreen(s)
+	}
 	if l.Flag {
 		return printCyan(s)
 	}
@@ -180,7 +187,28 @@ func main() {
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
 
 		if l.FuncMode {
+			if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" || fmt.Sprint(l.RuneByte) == "[10]" || fmt.Sprint(l.RuneByte) == ")" {
+				// send "q" key OR escape key OR Enter key
+				l.Buffer = append(l.Buffer, []byte(")")...)
+				result = l.calcBuffer()
+				l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
+				fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+				l.FuncMode = false
+				continue
+			} else if fmt.Sprint(l.RuneByte) == "[127]" {
+				// send delete key OR backspace key
+				l.Buffer = l.remove()
+				result = l.calcBuffer()
+				l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
+				fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+				continue
+			}
 			//TODO
+			l.Buffer = append(l.Buffer, l.RuneByte...)
+			result = l.calcBuffer()
+			l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
+			fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+			continue
 		}
 
 		if fmt.Sprint(l.RuneByte) == "[127]" {
@@ -189,6 +217,7 @@ func main() {
 			result = l.calcBuffer()
 			l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
 			fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+			l.FuncMode = false
 			continue
 		} else if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" || fmt.Sprint(l.RuneByte) == "[10]" {
 			// send "q" key OR escape key OR Enter key
@@ -196,11 +225,14 @@ func main() {
 			break
 		} else if _, ok := funcMap[string(l.RuneByte)]; ok {
 			//TODO
-			if string(l.RuneByte) != "[40]" {
+			if string(l.RuneByte) != "(" {
 				l.Buffer = append(l.Buffer, l.RuneByte...)
 			}
 			l.FuncMode = true
+			l.Buffer = append(l.Buffer, []byte("(")...)
+			result = l.calcBuffer()
 			l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
+			fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
 			continue
 		} else if string(l.RuneByte) == "[9]" {
 			// send tab key
@@ -213,5 +245,6 @@ func main() {
 		result = l.calcBuffer()
 		l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
 		fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+		l.FuncMode = false
 	}
 }

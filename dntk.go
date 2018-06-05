@@ -115,6 +115,7 @@ type line struct {
 	Flag           bool
 	Alert          bool
 	FuncMode       bool
+	FuncCounter    int
 }
 
 func newline() *line {
@@ -210,16 +211,20 @@ func (l *line) printFuncBuffer() {
 	if string(l.RuneByte) != "(" {
 		l.Buffer = append(l.Buffer, l.RuneByte...)
 	}
-	if l.FuncMode {
-		l.Buffer = append(l.Buffer, []byte("(")...)
-	}
+	l.Buffer = append(l.Buffer, []byte("(")...)
+	l.FuncCounter++
+
 	l.printPrompt()
 }
 
 func (l *line) printFuncQuitBuffer() {
 	l.Buffer = append(l.Buffer, []byte(")")...)
+	l.FuncCounter--
+
 	l.printPrompt()
-	l.FuncMode = false
+	if l.FuncCounter < 1 {
+		l.FuncMode = false
+	}
 }
 
 func (l *line) printAlert() {
@@ -279,6 +284,7 @@ func main() {
 		if len(l.Buffer) < 1 {
 			l.Flag = false
 			l.FuncMode = false
+			l.FuncCounter = 0
 		}
 
 		if string(l.RuneByte) == REBASE_KEY {

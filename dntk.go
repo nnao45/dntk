@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -43,6 +44,10 @@ const (
 	COLOR_PLAIN_HEADER   = "\x1b[0m"
 )
 
+func printYellow(s string) string {
+	return COLOR_YELLOW_HEADER + fmt.Sprint(s) + COLOR_PLAIN_HEADER
+}
+
 func printGreen(s string) string {
 	return COLOR_GREEN_HEADER + fmt.Sprint(s) + COLOR_PLAIN_HEADER
 }
@@ -75,11 +80,28 @@ var funcMap map[string]string = map[string]string{
 	RBRACKET_FUNCTION_KEY: "RBRACKET_FUNCTION_KEY",
 }
 
+const (
+	SINGLE_QUOTE_KEY = `'`
+	DOUBLE_QUOTE_KEY = `"`
+	BACK_QUOTE_KEY   = "`"
+	BACK_SLASH_KEY   = `\`
+	PIPE_KEY         = `|`
+)
+
+var dangerMap map[string]string = map[string]string{
+	SINGLE_QUOTE_KEY: SINGLE_QUOTE_KEY,
+	DOUBLE_QUOTE_KEY: DOUBLE_QUOTE_KEY,
+	BACK_QUOTE_KEY:   BACK_QUOTE_KEY,
+	BACK_SLASH_KEY:   BACK_SLASH_KEY,
+	PIPE_KEY:         PIPE_KEY,
+}
+
 type line struct {
 	RuneByte       []byte
 	Buffer         []byte
 	BufferAndEqual []byte
 	Flag           bool
+	Alert          bool
 	FuncMode       bool
 }
 
@@ -104,6 +126,9 @@ func (l *line) remove() (bary []byte) {
 }
 
 func (l *line) dntkPrint(s string) string {
+	if l.Alert {
+		return printYellow(s)
+	}
 	if l.FuncMode {
 		return printGreen(s)
 	}
@@ -154,6 +179,44 @@ func (l *line) calcBuffer() []byte {
 	return result
 }
 
+func (l *line) printBuffer() {
+	if fmt.Sprint(l.RuneByte) != "[127]" {
+		l.Buffer = append(l.Buffer, l.RuneByte...)
+	}
+
+	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
+	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+}
+
+func (l *line) printFuncBuffer() {
+	if string(l.RuneByte) != "(" {
+		l.Buffer = append(l.Buffer, l.RuneByte...)
+	}
+	if l.FuncMode {
+		l.Buffer = append(l.Buffer, []byte("(")...)
+	}
+	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
+	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+}
+
+func (l *line) printFuncQuitBuffer() {
+	l.Buffer = append(l.Buffer, []byte(")")...)
+	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
+	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+	l.FuncMode = false
+}
+
+func (l *line) printAlert() {
+	l.Alert = true
+	alertString := fmt.Sprintf("%v \"%v\" %v", "Sorry,", string(l.RuneByte), "is Danger word. Please not use.")
+	fmt.Print(l.dntkPrint("\r" + alertString))
+	time.Sleep(time.Second)
+	fmt.Print(l.dntkPrint("\r" + strings.Repeat(" ", len(alertString))))
+	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
+	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+	l.Alert = false
+}
+
 func init() {
 	app.HelpFlag.Short('h')
 	app.Version(fmt.Sprint("dntk's version: ", version))
@@ -175,7 +238,6 @@ func main() {
 	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 
 	l := newline()
-	var result []byte
 
 	fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): "))))
 
@@ -187,68 +249,32 @@ func main() {
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")
 
 		if len(l.Buffer) < 1 {
+			l.Flag = false
 			l.FuncMode = false
-		}
-
-		if l.FuncMode {
-			if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" || fmt.Sprint(l.RuneByte) == "[10]" || fmt.Sprint(l.RuneByte) == ")" {
-				// send "q" key OR escape key OR Enter key
-				l.Buffer = append(l.Buffer, []byte(")")...)
-				result = l.calcBuffer()
-				l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
-				fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
-				l.FuncMode = false
-				continue
-			} else if fmt.Sprint(l.RuneByte) == "[127]" {
-				// send delete key OR backspace key
-				l.Buffer = l.remove()
-				result = l.calcBuffer()
-				l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
-				fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
-				continue
-			}
-			//TODO
-			l.Buffer = append(l.Buffer, l.RuneByte...)
-			result = l.calcBuffer()
-			l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
-			fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
-			continue
 		}
 
 		if fmt.Sprint(l.RuneByte) == "[127]" {
 			// send delete key OR backspace key
 			l.Buffer = l.remove()
-			result = l.calcBuffer()
-			l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
-			fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
-			l.FuncMode = false
+			l.printBuffer()
 			continue
-		} else if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" || fmt.Sprint(l.RuneByte) == "[10]" {
+		} else if _, ok := dangerMap[string(l.RuneByte)]; ok {
+			l.printAlert()
+			continue
+		} else if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" || fmt.Sprint(l.RuneByte) == "[10]" || fmt.Sprint(l.RuneByte) == ")" {
 			// send "q" key OR escape key OR Enter key
-			fmt.Println("\r" + string(l.BufferAndEqual))
+			if l.FuncMode {
+				l.printFuncQuitBuffer()
+				continue
+			}
+			fmt.Println(l.dntkPrint("\r" + string(l.BufferAndEqual)))
 			break
 		} else if _, ok := funcMap[string(l.RuneByte)]; ok {
-			//TODO
-			if string(l.RuneByte) != "(" {
-				l.Buffer = append(l.Buffer, l.RuneByte...)
-			}
 			l.FuncMode = true
-			l.Buffer = append(l.Buffer, []byte("(")...)
-			result = l.calcBuffer()
-			l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
-			fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+			l.printFuncBuffer()
 			continue
-		} else if string(l.RuneByte) == "[9]" {
-			// send tab key
-			// TODO
-			fmt.Print("\n")
-			break
 		}
 
-		l.Buffer = append(l.Buffer, l.RuneByte...)
-		result = l.calcBuffer()
-		l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), result...)
-		fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
-		l.FuncMode = false
+		l.printBuffer()
 	}
 }

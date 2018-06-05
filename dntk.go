@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -19,18 +18,13 @@ var (
 	app = kingpin.New("dntk", "A dntk application.")
 )
 
-func addog(text string, filename string) {
-	var writer *bufio.Writer
-	textData := []byte(text)
-
-	writeFile, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0755)
-	writer = bufio.NewWriter(writeFile)
-	writer.Write(textData)
-	writer.Flush()
-	if err != nil {
-		panic(err)
+func sliceContains(str string, slice []string) bool {
+	for _, v := range slice {
+		if v == str {
+			return true
+		}
 	}
-	defer writeFile.Close()
+	return false
 }
 
 const (
@@ -71,14 +65,14 @@ const (
 	RBRACKET_FUNCTION_KEY = "(" //(
 )
 
-var funcMap map[string]string = map[string]string{
-	SIN_FUNCTION_KEY:      "SIN_FUNCTION_KEY",
-	COS_FUNCTION_KEY:      "COS_FUNCTION_KEY",
-	ATAN_FUNCTION_KEY:     "ATAN_FUNCTION_KEY",
-	LOG_FUNCTION_KEY:      "LOG_FUNCTION_KEY",
-	EXP_FUNCTION_KEY:      "EXP_FUNCTION_KEY",
-	BESSEL_FUNCTION_KEY:   "BESSEL_FUNCTION_KEY",
-	RBRACKET_FUNCTION_KEY: "RBRACKET_FUNCTION_KEY",
+var funcSlice []string = []string{
+	SIN_FUNCTION_KEY,
+	COS_FUNCTION_KEY,
+	ATAN_FUNCTION_KEY,
+	LOG_FUNCTION_KEY,
+	EXP_FUNCTION_KEY,
+	BESSEL_FUNCTION_KEY,
+	RBRACKET_FUNCTION_KEY,
 }
 
 const (
@@ -89,12 +83,26 @@ const (
 	PIPE_KEY         = `|`
 )
 
-var dangerMap map[string]string = map[string]string{
-	SINGLE_QUOTE_KEY: SINGLE_QUOTE_KEY,
-	DOUBLE_QUOTE_KEY: DOUBLE_QUOTE_KEY,
-	BACK_QUOTE_KEY:   BACK_QUOTE_KEY,
-	BACK_SLASH_KEY:   BACK_SLASH_KEY,
-	PIPE_KEY:         PIPE_KEY,
+var dangerSlice []string = []string{
+	SINGLE_QUOTE_KEY,
+	DOUBLE_QUOTE_KEY,
+	BACK_QUOTE_KEY,
+	BACK_SLASH_KEY,
+	PIPE_KEY,
+}
+
+const (
+	Q_KEY            = "[113]"
+	ENTER_KEY        = "[10]"
+	ESCAPE_KEY       = "[27]"
+	RBRACKET_FIN_KEY = "[41]"
+)
+
+var killSlice []string = []string{
+	Q_KEY,
+	ENTER_KEY,
+	ESCAPE_KEY,
+	RBRACKET_FIN_KEY,
 }
 
 type line struct {
@@ -244,7 +252,7 @@ func main() {
 	if !terminal.IsTerminal(0) {
 		for {
 			os.Stdin.Read(l.RuneByte)
-			if _, ok := dangerMap[string(l.RuneByte)]; ok || fmt.Sprint(l.RuneByte) == "[10]" {
+			if sliceContains(string(l.RuneByte), dangerSlice) || fmt.Sprint(l.RuneByte) == "[10]" {
 				break
 			}
 			l.Buffer = append(l.Buffer, l.RuneByte...)
@@ -270,10 +278,10 @@ func main() {
 			l.Buffer = l.remove()
 			l.printBuffer()
 			continue
-		} else if _, ok := dangerMap[string(l.RuneByte)]; ok {
+		} else if sliceContains(string(l.RuneByte), dangerSlice) {
 			l.printAlert()
 			continue
-		} else if string(l.RuneByte) == "q" || fmt.Sprint(l.RuneByte) == "[27]" || fmt.Sprint(l.RuneByte) == "[10]" || fmt.Sprint(l.RuneByte) == ")" {
+		} else if sliceContains(fmt.Sprint(l.RuneByte), killSlice) {
 			// send "q" key OR escape key OR Enter key
 			if l.FuncMode {
 				l.printFuncQuitBuffer()
@@ -281,7 +289,7 @@ func main() {
 			}
 			fmt.Println(l.dntkPrint("\r" + string(l.BufferAndEqual)))
 			break
-		} else if _, ok := funcMap[string(l.RuneByte)]; ok {
+		} else if sliceContains(string(l.RuneByte), funcSlice) {
 			l.FuncMode = true
 			l.printFuncBuffer()
 			continue

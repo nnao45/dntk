@@ -118,10 +118,12 @@ type line struct {
 
 func newline() *line {
 	var r []byte = make([]byte, 1)
-	var l []byte = make([]byte, 0)
+	var b []byte = make([]byte, 0)
+	var e []byte = make([]byte, 0)
 	return &line{
-		RuneByte: r,
-		Buffer:   l,
+		RuneByte:       r,
+		Buffer:         b,
+		BufferAndEqual: e,
 	}
 }
 

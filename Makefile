@@ -18,6 +18,10 @@ install:
 .PHONY: clean
 clean:
 	rm -rf bin/*
+
+.PHONY: clean-all
+clean-all:
+	rm -rf bin/*
 	rm -rf vendor/*
 
 .PHONY: run

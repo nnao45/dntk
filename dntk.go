@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -217,6 +218,12 @@ func (l *line) printAlert() {
 	l.Alert = false
 }
 
+func (l *line) printPipeBuffer() {
+	l.Buffer = append(l.Buffer, l.RuneByte...)
+	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
+	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+}
+
 func init() {
 	app.HelpFlag.Short('h')
 	app.Version(fmt.Sprint("dntk's version: ", version))
@@ -239,11 +246,23 @@ func main() {
 
 	l := newline()
 
-	fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): "))))
+	if !terminal.IsTerminal(0) {
+		for {
+			os.Stdin.Read(l.RuneByte)
+			l.Buffer = append(l.Buffer, l.RuneByte...)
+			if fmt.Sprint(l.RuneByte) == "[10]" {
+				break
+			}
+		}
+		fmt.Println(string(l.calcBuffer()))
+		return
+	}
 
+	fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): "))))
 	for {
 
 		os.Stdin.Read(l.RuneByte)
+
 		fmt.Print(l.dntkPrint("\r" + strings.Repeat(" ", len(l.BufferAndEqual))))
 
 		addog(fmt.Sprintln(l.RuneByte), "./test.txt")

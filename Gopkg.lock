@@ -14,16 +14,16 @@
   revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
 
 [[projects]]
-  name = "github.com/codegangsta/inject"
-  packages = ["."]
-  revision = "37d7f8432a3e684eef9b2edece76bdfa6ac85b39"
-  version = "v1.0-rc1"
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "df8d4716b3472e4a531c33cedbe537dae921a1a9"
 
 [[projects]]
-  name = "github.com/codeskyblue/go-sh"
-  packages = ["."]
-  revision = "b097669b1569203c3ce05a6b8717d43140fdb3d5"
-  version = "0.2"
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix","windows"]
+  revision = "c11f84a56e43e20a78cee75a7c034031ecf57d1f"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
@@ -34,6 +34,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "296f35b9066d5e55b3c6009b937f9f1d9861b1f40e1b722737a57794cf88c491"
+  inputs-digest = "404ddcbeabd110d4a03b08c80931cb8eed7d514ca7174020fe4852e0a47a8f41"
   solver-name = "gps-cdcl"
   solver-version = 1

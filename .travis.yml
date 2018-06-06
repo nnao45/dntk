@@ -7,7 +7,7 @@ os:
 before_script:
 - make clean
 - make dep-install
-- make dep
+- make deps
 - make cross-build
 - make dist
 - make

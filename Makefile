@@ -2,7 +2,7 @@ GO15VENDOREXPERIMENT=1
 
 NAME	 := dntk
 TARGET	 := bin/$(NAME)
-VERSION  := 1.0.4
+VERSION  := v1.0.5
 DIST_DIRS := find * -type d -exec
 
 SRCS	:= $(shell find . -type f -name '*.go')
@@ -23,6 +23,7 @@ clean:
 clean-all:
 	rm -rf bin/*
 	rm -rf vendor/*
+	rm -rf dist/*
 
 .PHONY: run
 run:
@@ -48,6 +49,7 @@ cross-build: deps
 		done; \
 	done
 
+.PHONY: dist
 dist:
 	cd dist && \
 		$(DIST_DIRS) cp ../LICENSE {} \; && \

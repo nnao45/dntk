@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/nnao45/dntk)](https://goreportcard.com/report/github.com/nnao45/dntk)
 
 # dntk
-dntk is command line's calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
+dntk is command line's **Interactive** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
 ![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-v105.gif)
 
 ## ***Current dntk's version: v1.0.5***

@@ -2,7 +2,7 @@ GO15VENDOREXPERIMENT=1
 
 NAME	 := dntk
 TARGET	 := bin/$(NAME)
-VERSION  := 1.0.2
+VERSION  := 1.0.3
 DIST_DIRS := find * -type d -exec
 
 SRCS	:= $(shell find . -type f -name '*.go')
@@ -32,7 +32,7 @@ run:
 upde:
 	dep ensure -update
 
-.PHONY: dep
+.PHONY: deps
 dep:
 	dep ensure
 

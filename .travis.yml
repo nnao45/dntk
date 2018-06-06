@@ -12,7 +12,7 @@ before_script:
 - make dist
 - make
 script:
-- bin/dntk -v
+- bin/dntk --version
 deploy:
   provider: releases
   skip_cleanup: true

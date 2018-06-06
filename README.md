@@ -22,6 +22,11 @@ $ wget https://github.com/nnao45/dntk/releases/download/v1.0.5/dntk-linux-amd64-
 $ tar xvfz dntk-linux-amd64-v1.0.5.tar.gz
 ```
 
+### zplug
+```bash
+$ zplug 'nnao45/dntk', as:command, from:gh-r
+```
+
 ***Have a nice go hacking days***:sparkles::wink:
 ## Writer & License
 dntk was writed by nnao45 (WORK:Infrastructure Engineer, Twitter:@nnao45, MAIL:n4sekai5y@gmail.com).  

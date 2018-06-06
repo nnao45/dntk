@@ -4,4 +4,21 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/nnao45/dntk)](https://goreportcard.com/report/github.com/nnao45/dntk)
 
 # dntk
-dntk is command line's calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.
+dntk is command line's calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
+[![asciicast](https://asciinema.org/a/WlMryU2e5UIEegI6W73I7bHfS.png)](https://asciinema.org/a/WlMryU2e5UIEegI6W73I7bHfS)
+
+## ***Current dntk's version: v1.0.5***
+Download Page: https://github.com/nnao45/dntk/releases/latest
+
+## Install
+### Mac
+```bash
+$ brew install nnao45/dntk/dntk
+```
+
+### Linux
+```bash
+$ wget https://github.com/nnao45/dntk/releases/download/v1.0.5/dntk-linux-amd64-v1.0.5.tar.gz
+$ tar xvfz dntk-linux-amd64-v1.0.5.tar.gz
+```
+

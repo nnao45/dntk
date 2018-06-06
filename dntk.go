@@ -237,6 +237,28 @@ func (l *line) printAlert() {
 	l.printPrompt()
 }
 
+func (l *line) funcJudge() {
+	var funcCount int
+	var bracketCount int
+	var k int
+	for _, b := range string(l.Buffer) {
+		if sliceContains(string(b), funcSlice) {
+			funcCount++
+		}
+	}
+	for i, b := range string(l.Buffer) {
+		if string(b) == "(" {
+			k = i
+		}
+		if string(b) == ")" && k < i {
+			bracketCount++
+		}
+	}
+	if funcCount == bracketCount {
+		l.FuncMode = true
+	}
+}
+
 func init() {
 	app.HelpFlag.Short('h')
 	app.Version(fmt.Sprint("dntk's version: ", version))
@@ -294,6 +316,7 @@ func main() {
 		} else if fmt.Sprint(l.RuneByte) == DELETE_KEY {
 			// send delete key OR backspace key
 			l.Buffer = l.remove()
+			l.funcJudge()
 			l.printBuffer()
 			continue
 		} else if sliceContains(string(l.RuneByte), dangerSlice) {

@@ -39,3 +39,19 @@ dep:
 .PHONY: dep-install
 dep-install:
 	go get github.com/golang/dep/cmd/dep
+
+.PHONY: cross-build
+cross-build: deps
+	for os in darwin linux; do \
+		for arch in amd64 386; do \
+			GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$(NAME)-$$os-$$arch/$(NAME); \
+		done; \
+	done
+
+dist:
+	cd dist && \
+		$(DIST_DIRS) cp ../LICENSE {} \; && \
+		$(DIST_DIRS) cp ../README.md {} \; && \
+		$(DIST_DIRS) tar -zcf {}-$(VERSION).tar.gz {} \; && \
+		$(DIST_DIRS) zip -r {}-$(VERSION).zip {} \; && \
+		cd ..

@@ -34,6 +34,13 @@ $ echo 'alias bc=dntk' > ~/.zshrc'
 ```
 All OK!! 😎
 
+## Pipe use...
+```bash
+$ echo "123 * 2" | dntk | xargs echo
+246
+```
+behave, like bc.
+
 ***Have a nice go hacking days***:sparkles::wink:
 ## Writer & License
 dntk was writed by nnao45 (WORK:Infrastructure Engineer, Twitter:@nnao45, MAIL:n4sekai5y@gmail.com).  

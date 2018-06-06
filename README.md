@@ -27,6 +27,13 @@ $ tar xvfz dntk-linux-amd64-v1.0.5.tar.gz
 $ zplug 'nnao45/dntk', as:command, from:gh-r
 ```
 
+### And...
+```bash
+$ echo 'alias bc=dntk' > ~/.bashrc'
+$ echo 'alias bc=dntk' > ~/.zshrc'
+```
+All OK!! 😎
+
 ***Have a nice go hacking days***:sparkles::wink:
 ## Writer & License
 dntk was writed by nnao45 (WORK:Infrastructure Engineer, Twitter:@nnao45, MAIL:n4sekai5y@gmail.com).  

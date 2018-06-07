@@ -29,8 +29,8 @@ $ zplug 'nnao45/dntk', as:command, from:gh-r
 
 ### And...
 ```bash
-$ echo 'alias bc=dntk' > ~/.bashrc'
-$ echo 'alias bc=dntk' > ~/.zshrc'
+$ echo 'alias bc=dntk' >> ~/.bashrc'
+$ echo 'alias bc=dntk' >> ~/.zshrc'
 ```
 All OK!! 😎
 

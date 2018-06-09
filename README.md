@@ -1,5 +1,5 @@
 [![Travis CI](https://travis-ci.org/nnao45/dntk.svg?branch=master)](https://travis-ci.org/nnao45/dntk)
-[![v1.0.6](https://img.shields.io/badge/package-v1.0.6-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v1.0.6)
+[![v1.0.7](https://img.shields.io/badge/package-v1.0.7-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v1.0.7)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nnao45/dntk)](https://goreportcard.com/report/github.com/nnao45/dntk)
 
@@ -7,7 +7,7 @@
 dntk is command line's **Interactive** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
 ![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-v105.gif)
 
-## ***Current dntk's version: v1.0.6***
+## ***Current dntk's version: v1.0.7***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## Install
@@ -18,8 +18,8 @@ $ brew install nnao45/dntk/dntk
 
 ### Linux
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v1.0.6/dntk-linux-amd64-v1.0.6.tar.gz
-$ tar xvfz dntk-linux-amd64-v1.0.6.tar.gz
+$ wget https://github.com/nnao45/dntk/releases/download/v1.0.7/dntk-linux-amd64-v1.0.7.tar.gz
+$ tar xvfz dntk-linux-amd64-v1.0.7.tar.gz
 ```
 
 ### zplug

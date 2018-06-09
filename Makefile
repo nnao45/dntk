@@ -44,7 +44,8 @@ dep-install:
 
 .PHONY: readme-upde
 readme-upde:
-	sed -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
+	sed -i -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
+	rm -f README.md-e 
 
 .PHONY: release
 release:

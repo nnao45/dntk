@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,6 +23,7 @@ var (
 	unit      = app.Flag("unit", "Set the unit of result").Short('u').String()
 	white     = app.Flag("white", "Set non color in a output").Default("false").Short('w').Bool()
 	fixed     = app.Flag("fixed", "Add the fixed statement").Short('f').String()
+	alias     = app.Flag("alias", "Add the custum variable").Short('a').String()
 )
 
 func sliceContains(str string, slice []string) bool {
@@ -114,6 +116,11 @@ var killSlice []string = []string{
 	ESCAPE_KEY,
 }
 
+type lineAlias struct {
+	Alias string
+	Value string
+}
+
 type line struct {
 	RuneByte       []byte
 	Buffer         []byte
@@ -122,6 +129,7 @@ type line struct {
 	Alert          bool
 	FuncMode       bool
 	FuncCounter    int
+	LineAliasList  []lineAlias
 }
 
 func newline() *line {
@@ -220,9 +228,24 @@ func (l *line) printPrompt() {
 	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
 }
 
+func (l *line) appnedBuffer() {
+	var x int
+	for _, v := range l.LineAliasList {
+		if string(l.RuneByte) == v.Alias {
+			l.Buffer = append(l.Buffer, []byte(v.Value)...)
+			x++
+		}
+	}
+	if x != 0 {
+		return
+	}
+	l.Buffer = append(l.Buffer, l.RuneByte...)
+
+}
+
 func (l *line) printBuffer() {
 	if fmt.Sprint(l.RuneByte) != DELETE_KEY {
-		l.Buffer = append(l.Buffer, l.RuneByte...)
+		l.appnedBuffer()
 	}
 
 	l.printPrompt()
@@ -230,7 +253,7 @@ func (l *line) printBuffer() {
 
 func (l *line) printFuncBuffer() {
 	if string(l.RuneByte) != "(" {
-		l.Buffer = append(l.Buffer, l.RuneByte...)
+		l.appnedBuffer()
 	}
 	l.Buffer = append(l.Buffer, []byte("(")...)
 	l.FuncCounter++
@@ -258,6 +281,54 @@ func (l *line) printAlert() {
 	l.printPrompt()
 }
 
+func (l *line) parseAliasOpt() {
+	var runeSlice []rune
+	var runeSilceList [][]rune
+	for _, r := range *alias {
+		if r == ',' {
+			runeSilceList = append(runeSilceList, runeSlice)
+			runeSlice = []rune{}
+		} else {
+			runeSlice = append(runeSlice, r)
+		}
+	}
+	runeSilceList = append(runeSilceList, runeSlice)
+	for _, rs := range runeSilceList {
+		l.appendLineAliasList(rs)
+	}
+}
+
+func (l *line) appendLineAliasList(rs []rune) {
+	var vari, valu []rune
+	var afterEqrual bool
+	for _, r := range rs {
+		if r == ' ' {
+			continue
+		}
+		if afterEqrual {
+			valu = append(valu, r)
+		} else {
+			if r == '=' {
+				afterEqrual = true
+				continue
+			}
+			vari = append(vari, r)
+		}
+	}
+	fValu, err := strconv.ParseFloat(string(valu), 64)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, fmt.Sprintf("%v \"%v\" %v", "Sorry,", string(valu), "is not number. Please not use."))
+		os.Exit(1)
+	}
+
+	l.LineAliasList = append(l.LineAliasList, lineAlias{
+		Alias: string(vari),
+		Value: fmt.Sprint(fValu),
+	})
+	//fmt.Println(l.LineVariable.Varialbe)
+}
+
+/*
 func (l *line) funcJudge() {
 	var funcCount int
 	var bracketCount int
@@ -278,7 +349,7 @@ func (l *line) funcJudge() {
 	if funcCount == bracketCount {
 		l.FuncMode = true
 	}
-}
+}*/
 
 func init() {
 	app.HelpFlag.Short('h')
@@ -301,6 +372,9 @@ func main() {
 	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 
 	l := newline()
+	if *alias != "" {
+		l.parseAliasOpt()
+	}
 
 	if !terminal.IsTerminal(0) {
 		for {
@@ -317,7 +391,11 @@ func main() {
 		return
 	}
 
-	fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): "))))
+	var fixedStr string
+	if *fixed != "" {
+		fixedStr = *fixed + " "
+	}
+	fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): ")) + fixedStr))
 	for {
 
 		os.Stdin.Read(l.RuneByte)
@@ -332,6 +410,9 @@ func main() {
 
 		if string(l.RuneByte) == REBASE_KEY {
 			l = newline()
+			if *alias != "" {
+				l.parseAliasOpt()
+			}
 			fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): "))))
 			continue
 		} else if fmt.Sprint(l.RuneByte) == DELETE_KEY {

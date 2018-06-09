@@ -104,7 +104,7 @@ you can use under function.
     </tr>
 </table>
 
-example, if you want to write `(123 + 2) * 3`, you push,
+example, if you want to write `(123 + 2) * 3`, you type,
 
 ```
 (
@@ -119,7 +119,7 @@ Enter
 Enter
 ```
 
-if you want to write `a(123)`, you push,
+if you want to write `a(123)`, you type,
 
 ```
 a
@@ -130,7 +130,7 @@ Enter
 Enter
 ```
 
-if you want to write`a(123) * c(678 * 123)`, you push,
+if you want to write`a(123) * c(678 * 123)`, you type,
 
 ```
 a
@@ -167,7 +167,7 @@ $ dntk -a '<alias char>=<value>,<alias char>=<value>,...'
 
 ![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo03.gif)
 
-☝️ push,
+☝️ type,
 
 ```
 x
@@ -180,7 +180,7 @@ y
 you can write long long value very easy 😁
 
 ## clean buffer
-if you want to clean buffer, very easy, push `r`
+if you want to clean buffer, very easy, type `r`
 
 ![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo05.gif)
 

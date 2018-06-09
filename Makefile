@@ -41,6 +41,10 @@ dep:
 dep-install:
 	go get github.com/golang/dep/cmd/dep
 
+.PHONY: tag-release
+tag-release:
+	git tag -a $(VERSION) -m 'version $(VERSION)' ; git push --tags origin master
+
 .PHONY: cross-build
 cross-build: deps
 	for os in darwin linux; do \

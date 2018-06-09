@@ -315,6 +315,11 @@ func (l *line) appendLineAliasList(rs []rune) {
 			vari = append(vari, r)
 		}
 	}
+	if len(vari) > 1 {
+		fmt.Fprintln(os.Stderr, "Sorry, alias option is allowed one character only. Please not use.")
+		os.Exit(1)
+	}
+
 	fValu, err := strconv.ParseFloat(string(valu), 64)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, fmt.Sprintf("%v \"%v\" %v", "Sorry,", string(valu), "is not number. Please not use."))

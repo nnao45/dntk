@@ -3,6 +3,7 @@ GO15VENDOREXPERIMENT=1
 NAME	 := dntk
 TARGET	 := bin/$(NAME)
 VERSION  := v1.0.7
+PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
 DIST_DIRS := find * -type d -exec
 
 SRCS	:= $(shell find . -type f -name '*.go')
@@ -40,6 +41,10 @@ dep:
 .PHONY: dep-install
 dep-install:
 	go get github.com/golang/dep/cmd/dep
+
+.PHONY: readme-upde
+readme-upde:
+	sed -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
 
 .PHONY: release
 release:

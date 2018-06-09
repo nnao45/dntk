@@ -5,7 +5,7 @@
 
 # dntk
 dntk is command line's **Interactive** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
-![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-v105.gif)
+![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo01.gif)
 
 ## ***Current dntk's version: v1.0.7***
 Download Page: https://github.com/nnao45/dntk/releases/latest

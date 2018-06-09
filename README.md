@@ -68,6 +68,11 @@ you can use under function.
         <td>detail</td>
     </tr>
     <tr>
+        <td>(x)</td>
+        <td>(</td>
+        <td>Simple round bracket</td>
+    </tr>
+    <tr>
         <td>sin(x)</td>
         <td>s</td>
         <td>Sin of trigonometric function</td>
@@ -109,20 +114,21 @@ Enter
 Enter
 ```
 
-if you use `e(123) * a (189 * 23)`, you push,
+if you use `a(123) * c(678 * 123)`, you push,
 
 ```
-e
+a
 1
 2
 3
 Enter
 *
-a
-1
+c
+6
+7
 8
-9
 *
+1
 2
 3
 Enter

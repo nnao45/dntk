@@ -160,7 +160,7 @@ you can use alias
 $ dntk -a '<alias char>=<value>,<alias char>=<value>,...'
 ```
 
-![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo02.gif)
+![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo03.gif)
 
 ☝️ push,
 

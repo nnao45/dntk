@@ -15,7 +15,13 @@ import (
 var version string
 
 var (
-	app = kingpin.New("dntk", "A dntk application.")
+	app = kingpin.New("dntk", "This application is command line's Interactive calculator, GNU bc wrapper.")
+
+	scale     = app.Flag("scale", "Number of truncated after the decimal point").Default("10").Short('s').Int()
+	maxresult = app.Flag("maxresult", "Number of truncated after the result number").Default("999").Short('m').Int()
+	unit      = app.Flag("unit", "Set the unit of result").Short('u').String()
+	white     = app.Flag("white", "Set non color in a output").Default("false").Short('w').Bool()
+	fixed     = app.Flag("fixed", "Add the fixed statement").Short('f').String()
 )
 
 func sliceContains(str string, slice []string) bool {
@@ -141,6 +147,9 @@ func (l *line) remove() (bary []byte) {
 }
 
 func (l *line) dntkPrint(s string) string {
+	if *white {
+		return fmt.Sprint(s)
+	}
 	if l.Alert {
 		return printYellow(s)
 	}
@@ -171,7 +180,7 @@ func trimSpaceFromByte(s []byte) (byt []byte) {
 func (l *line) calcBuffer() []byte {
 	var stdout, stderr bytes.Buffer
 	l.Flag = true
-	stdin := "echo \"scale=10;" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc -l"
+	stdin := "echo \"scale=" + fmt.Sprint(*scale) + ";" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc -l"
 	cmd := exec.Command("sh", "-c", stdin)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -195,7 +204,11 @@ func (l *line) calcBuffer() []byte {
 }
 
 func (l *line) printPrompt() {
-	l.BufferAndEqual = append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...)
+	var unitStr string
+	if *unit != "" {
+		unitStr = "(" + *unit + ")"
+	}
+	l.BufferAndEqual = append(append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...), []byte(unitStr)...)
 	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
 }
 
@@ -266,7 +279,7 @@ func init() {
 	// TODO
 	}
 
-	os.Setenv("BC_LINE_LENGTH", "999")
+	os.Setenv("BC_LINE_LENGTH", fmt.Sprint(*maxresult))
 }
 
 func main() {

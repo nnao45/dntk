@@ -329,7 +329,7 @@ func main() {
 		} else if fmt.Sprint(l.RuneByte) == DELETE_KEY {
 			// send delete key OR backspace key
 			l.Buffer = l.remove()
-			l.funcJudge()
+			//l.funcJudge()
 			l.printBuffer()
 			continue
 		} else if sliceContains(string(l.RuneByte), dangerSlice) {

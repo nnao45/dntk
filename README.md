@@ -153,6 +153,11 @@ Enter
 
 very easy 😘
 
+## set fixed value
+example, excange calculate AWS Billing, JPY -> USD, put fixed statement
+
+![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo04.gif)
+
 ## set alias
 you can use alias
 

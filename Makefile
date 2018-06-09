@@ -42,7 +42,7 @@ dep-install:
 	go get github.com/golang/dep/cmd/dep
 
 .PHONY: release
-tag-release:
+release:
 	git tag -a $(VERSION) -m 'version $(VERSION)' ; git push --tags origin master
 
 .PHONY: cross-build

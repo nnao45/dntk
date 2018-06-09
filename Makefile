@@ -2,7 +2,7 @@ GO15VENDOREXPERIMENT=1
 
 NAME	 := dntk
 TARGET	 := bin/$(NAME)
-VERSION  := v1.0.7
+VERSION  := v1.0.8
 PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
 DIST_DIRS := find * -type d -exec
 

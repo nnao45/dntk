@@ -23,7 +23,7 @@ var (
 	unit      = app.Flag("unit", "Set the unit of result").Short('u').String()
 	white     = app.Flag("white", "Set non color in a output").Default("false").Short('w').Bool()
 	fixed     = app.Flag("fixed", "Add the fixed statement").Short('f').String()
-	alias     = app.Flag("alias", "Add the custum variable").Short('a').String()
+	alias     = app.Flag("alias", "Add the custum alias").Short('a').String()
 )
 
 func sliceContains(str string, slice []string) bool {

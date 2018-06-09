@@ -34,6 +34,103 @@ $ echo 'alias bc=dntk' >> ~/.zshrc
 ```
 All OK!! 😎
 
+## Option
+
+```
+$ dntk -h                                              
+usage: dntk [<flags>]
+
+This application is command line's Interactive calculator, GNU bc wrapper.
+
+Flags:
+  -h, --help           Show context-sensitive help (also try --help-long and
+                       --help-man).
+  -s, --scale=10       Number of truncated after the decimal point
+  -m, --maxresult=999  Number of truncated after the result number
+  -u, --unit=UNIT      Set the unit of result
+  -w, --white          Set non color in a output
+  -f, --fixed=FIXED    Add the fixed statement
+  -a, --alias=ALIAS    Add the custum alias
+      --version        Show application version.
+```
+
+## function input easy
+dntk can use function.
+
+![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo02.gif)
+
+you can use under function.
+
+<table>
+    <tr>
+        <td>function</td>
+        <td>command</td>
+        <td>detail</td>
+    </tr>
+    <tr>
+        <td>sin(x)</td>
+        <td>s</td>
+        <td>Sin of trigonometric function</td>
+    </tr>
+    <tr>
+        <td>cos(x)</td>
+        <td>c</td>
+        <td>Cosin of trigonometric function</td>
+    </tr>
+    <tr>
+        <td>atan(x)</td>
+        <td>a</td>
+        <td>Tangent of inverse trigonometric function</td>
+    </tr>
+    <tr>
+        <td>log(x)</td>
+        <td>l</td>
+        <td>Logarithm function</td>
+    </tr>
+    <tr>
+        <td>exp(x)</td>
+        <td>e</td>
+        <td>Exponential function</td>
+    </tr>
+    <tr>
+        <td>j(n,x)</td>
+        <td>j</td>
+        <td>The n-order Bessel function</td>
+    </tr>
+</table>
+example, if you use `a(123)`, you push,
+
+```
+a
+1
+2
+3
+Enter
+Enter
+```
+
+if you use `e(123) * a (189 * 23)`, you push,
+
+```
+e
+1
+2
+3
+Enter
+*
+a
+1
+8
+9
+*
+2
+3
+Enter
+Enter
+```
+
+very easy 😘
+
 ## Pipe use...
 ```bash
 $ echo "123 * 2" | dntk | xargs echo

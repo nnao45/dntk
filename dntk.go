@@ -180,7 +180,11 @@ func trimSpaceFromByte(s []byte) (byt []byte) {
 func (l *line) calcBuffer() []byte {
 	var stdout, stderr bytes.Buffer
 	l.Flag = true
-	stdin := "echo \"scale=" + fmt.Sprint(*scale) + ";" + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc -l"
+	var fixedStr string
+	if *fixed != "" {
+		fixedStr = *fixed + " "
+	}
+	stdin := "echo \"scale=" + fmt.Sprint(*scale) + ";" + fixedStr + fmt.Sprint(string(trimSpaceFromByte(l.Buffer))) + "\" | bc -l"
 	cmd := exec.Command("sh", "-c", stdin)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -208,7 +212,11 @@ func (l *line) printPrompt() {
 	if *unit != "" {
 		unitStr = "(" + *unit + ")"
 	}
-	l.BufferAndEqual = append(append(append([]byte("(dntk): "), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...), []byte(unitStr)...)
+	var fixedStr string
+	if *fixed != "" {
+		fixedStr = *fixed + " "
+	}
+	l.BufferAndEqual = append(append(append(append([]byte("(dntk): "), []byte(fixedStr)...), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...), []byte(unitStr)...)
 	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
 }
 
@@ -329,7 +337,6 @@ func main() {
 		} else if fmt.Sprint(l.RuneByte) == DELETE_KEY {
 			// send delete key OR backspace key
 			l.Buffer = l.remove()
-			//l.funcJudge()
 			l.printBuffer()
 			continue
 		} else if sliceContains(string(l.RuneByte), dangerSlice) {

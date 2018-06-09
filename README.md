@@ -153,6 +153,27 @@ Enter
 
 very easy 😘
 
+## set alias
+you can use alias
+
+```
+$ dntk -a '<alias char>=<value>,<alias char>=<value>,...'
+```
+
+![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo02.gif)
+
+☝️ push,
+
+```
+x
+*
+y
+*
+y
+```
+
+you can write long long value very easy 😁
+
 ## Pipe use...
 ```bash
 $ echo "123 * 2" | dntk | xargs echo

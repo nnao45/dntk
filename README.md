@@ -103,6 +103,22 @@ you can use under function.
         <td>The n-order Bessel function</td>
     </tr>
 </table>
+
+example, if you use `(123 + 2) * 3`, you push,
+
+```
+(
+1
+2
+3
++
+2
+Enter
+*
+3
+Enter
+```
+
 example, if you use `a(123)`, you push,
 
 ```

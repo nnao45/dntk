@@ -104,7 +104,7 @@ you can use under function.
     </tr>
 </table>
 
-example, if you use `(123 + 2) * 3`, you push,
+example, if you want to write `(123 + 2) * 3`, you push,
 
 ```
 (
@@ -119,7 +119,7 @@ Enter
 Enter
 ```
 
-example, if you use `a(123)`, you push,
+if you want to write `a(123)`, you push,
 
 ```
 a
@@ -130,7 +130,7 @@ Enter
 Enter
 ```
 
-if you use `a(123) * c(678 * 123)`, you push,
+if you want to write`a(123) * c(678 * 123)`, you push,
 
 ```
 a

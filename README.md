@@ -179,6 +179,11 @@ y
 
 you can write long long value very easy 😁
 
+## clean buffer
+if you want to clean buffer, very easy, push `r`
+
+![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo05.gif)
+
 ## Pipe use...
 ```bash
 $ echo "123 * 2" | dntk | xargs echo

@@ -6,10 +6,10 @@
 # dntk
 dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
 ![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo01.gif)
-
-✅ 'dntk' means calculator　in a japanese.  
-✅ dntk is gnu bc wrapper. so, syntax is equal to gnu bc. [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)  
-✅ dntk write color means,  
+  
+✔︎ dntk means calculator in a japanese.  
+✔︎ dntk is gnu bc wrapper. so, syntax is equal to gnu bc. [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)  
+✔︎ dntk write color means,  
 <table>
     <tr>
         <td>color</td>

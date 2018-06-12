@@ -330,31 +330,7 @@ func (l *line) appendLineAliasList(rs []rune) {
 		Alias: string(vari),
 		Value: fmt.Sprint(fValu),
 	})
-	//fmt.Println(l.LineVariable.Varialbe)
 }
-
-/*
-func (l *line) funcJudge() {
-	var funcCount int
-	var bracketCount int
-	var k int
-	for _, b := range string(l.Buffer) {
-		if sliceContains(string(b), funcSlice) {
-			funcCount++
-		}
-	}
-	for i, b := range string(l.Buffer) {
-		if string(b) == "(" {
-			k = i
-		}
-		if string(b) == ")" && k < i {
-			bracketCount++
-		}
-	}
-	if funcCount == bracketCount {
-		l.FuncMode = true
-	}
-}*/
 
 func init() {
 	app.HelpFlag.Short('h')

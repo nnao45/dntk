@@ -2,7 +2,7 @@ GO15VENDOREXPERIMENT=1
 
 NAME	 := dntk
 TARGET	 := bin/$(NAME)
-VERSION  := v1.0.8
+VERSION  := v1.0.9
 PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
 DIST_DIRS := find * -type d -exec
 
@@ -19,6 +19,7 @@ install:
 .PHONY: clean
 clean:
 	rm -rf bin/*
+	rm -rf dist/*
 
 .PHONY: clean-all
 clean-all:

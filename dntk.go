@@ -344,13 +344,13 @@ func init() {
 
 func main() {
 	// disable input buffering
-	exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+	exec.Command("stty", "-f", "/dev/tty", "cbreak", "min", "1").Run()
 	// delete \n
-	exec.Command("stty", "-F", "/dev/tty", "erase", "\n").Run()
+	exec.Command("stty", "-f", "/dev/tty", "erase", "\n").Run()
 	// do not display entered characters on the screen
-	exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
+	exec.Command("stty", "-f", "/dev/tty", "-echo").Run()
 	// restore the echoing state when exiting
-	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
+	defer exec.Command("stty", "-f", "/dev/tty", "echo").Run()
 
 	l := newline()
 	if *alias != "" {

@@ -40,7 +40,7 @@ dep:
 
 .PHONY: dep-install
 dep-install:
-	go get github.com/golang/dep/cmd/dep
+	go get -u github.com/golang/dep/cmd/dep
 
 .PHONY: readme-upde
 readme-upde:

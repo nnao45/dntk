@@ -6,12 +6,11 @@ TARGET	 := bin/$(NAME)
 PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
 DIST_DIRS := find * -type d -exec
 SRCS	:= $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-X \"main.version=$(VERSION)\""
-OPTS := -a -tags netgo -installsuffix netgo -buildmode=c-archive
-#LDFLAGS := -ldflags="-X \"main.version=$(VERSION)\" -extldflags \"-static\""
+LDFLAGS := -ldflags="-s -X \"main.version=$(VERSION)\""
+OPTS :=-a -installsuffix cgo
 
 $(TARGET): $(SRCS)
-	go build $(OPTS) $(LDFLAGS) -o bin/$(NAME) src/dntk.go
+	go build $(OPTS) $(LDFLAGS) -o bin/$(NAME) src/dntk.go 
 
 .PHONY: install
 install:
@@ -55,11 +54,8 @@ release:
 
 .PHONY: cross-build
 cross-build: deps
-	for os in darwin linux; do \
-		for arch in amd64 386; do \
-			GOOS=$$os GOARCH=$$arch CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-$$os-$$arch/$(NAME) src/dntk.go; \
-		done; \
-	done
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) src/dntk.go
+	CC=x86_64-pc-linux-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
 .PHONY: dist
 dist:
 	cd dist && \

@@ -12,7 +12,6 @@ before_script:
 - make cross-build
 - make dist
 - make
-- chmod 700 bin/dntk
 script:
 - bin/dntk --version
 deploy:

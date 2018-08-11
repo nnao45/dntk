@@ -3,7 +3,6 @@ package cursor
 // https://www.linuxquestions.org/questions/programming-9/get-cursor-position-in-c-947833/
 
 /*
-#cgo LDFLAGS: -L/usr/lib
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>

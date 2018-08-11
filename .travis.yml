@@ -11,8 +11,10 @@ before_script:
 - make deps
 - make cross-build
 - make dist
+- make
+- chmod 700 bin/dntk
 script:
-- go run src/dntk.go --version
+- bin/dntk --version
 deploy:
   provider: releases
   skip_cleanup: true

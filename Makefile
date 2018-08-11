@@ -6,10 +6,12 @@ TARGET	 := bin/$(NAME)
 PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
 DIST_DIRS := find * -type d -exec
 SRCS	:= $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -w -X \"main.version=$(VERSION)\" -extldflags \"-static\""
+LDFLAGS := -ldflags="-X \"main.version=$(VERSION)\""
+OPTS := -a -tags netgo -installsuffix netgo -buildmode=c-archive
+#LDFLAGS := -ldflags="-X \"main.version=$(VERSION)\" -extldflags \"-static\""
 
 $(TARGET): $(SRCS)
-	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$(NAME) src/dntk.go
+	go build $(OPTS) $(LDFLAGS) -o bin/$(NAME) src/dntk.go
 
 .PHONY: install
 install:
@@ -55,10 +57,9 @@ release:
 cross-build: deps
 	for os in darwin linux; do \
 		for arch in amd64 386; do \
-			GOOS=$$os GOARCH=$$arch CGO_ENABLED=1 go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$(NAME)-$$os-$$arch/$(NAME) src/dntk.go; \
+			GOOS=$$os GOARCH=$$arch CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-$$os-$$arch/$(NAME) src/dntk.go; \
 		done; \
 	done
-
 .PHONY: dist
 dist:
 	cd dist && \

@@ -9,8 +9,6 @@ before_script:
 - make clean
 - make dep-install
 - make deps
-- make cross-build
-- make dist
 - make
 script:
 - bin/dntk --version

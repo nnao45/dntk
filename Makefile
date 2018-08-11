@@ -19,12 +19,10 @@ install:
 .PHONY: clean
 clean:
 	rm -rf bin/*
-	rm -rf dist/*
 
 .PHONY: clean-all
 clean-all:
 	rm -rf bin/*
-	rm -rf vendor/*
 	rm -rf dist/*
 
 .PHONY: run
@@ -66,4 +64,4 @@ dist:
 		cd ..
 
 .PHONY: deploy
-deploy: clean readme-upde cross-build dist release clean
+deploy: clean readme-upde cross-build dist release clean-all

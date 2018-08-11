@@ -7,7 +7,7 @@ os:
 - linux
 - osx
 before_install:
-  - sudo apt-get install -y libc6 libc6-dev
+  - sudo apt-get install -y libc6 libc6-dev gcc-multilib g++-multilib
 before_script:
 - make clean
 - make dep-install

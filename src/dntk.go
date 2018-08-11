@@ -358,7 +358,7 @@ func main() {
 	var sttyOSFlag string
 	if runtime.GOOS == DARWIN_OSNAME {
 		sttyOSFlag = "-f"
-	} else if runtime.GOOS == DARWIN_OSNAME {
+	} else if runtime.GOOS == LINUX_OSNAME {
 		sttyOSFlag = "-F"
 	} else {
 		// freebsd?

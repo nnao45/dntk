@@ -1,16 +1,15 @@
-GO15VENDOREXPERIMENT=1
+GO15VENDOREXPERIMENT = 1
+VERSION = 
 
 NAME	 := dntk
 TARGET	 := bin/$(NAME)
-VERSION  := v1.0.9
 PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
 DIST_DIRS := find * -type d -exec
-
 SRCS	:= $(shell find . -type f -name '*.go')
 LDFLAGS := -ldflags="-s -w -X \"main.version=$(VERSION)\" -extldflags \"-static\""
 
 $(TARGET): $(SRCS)
-	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$(NAME)
+	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$(NAME) src/dntk.go
 
 .PHONY: install
 install:
@@ -68,3 +67,6 @@ dist:
 		$(DIST_DIRS) tar -zcf {}-$(VERSION).tar.gz {} \; && \
 		$(DIST_DIRS) zip -r {}-$(VERSION).zip {} \; && \
 		cd ..
+
+.PHONY: deploy
+deploy: clean readme-upde cross-build dist release clean

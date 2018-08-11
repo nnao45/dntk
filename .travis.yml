@@ -6,6 +6,8 @@ go:
 os:
 - linux
 - osx
+before_install:
+  - sudo apt-get install -y libc6 libc6-dev
 before_script:
 - make clean
 - make dep-install

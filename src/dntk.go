@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -348,15 +349,30 @@ func init() {
 	os.Setenv("BC_LINE_LENGTH", fmt.Sprint(*maxresult))
 }
 
+const (
+	DARWIN_OSNAME = "darwin"
+	LINUX_OSNAME  = "linux"
+)
+
 func main() {
+	var sttyOSFlag string
+	if runtime.GOOS == DARWIN_OSNAME {
+		sttyOSFlag = "-f"
+	} else if runtime.GOOS == DARWIN_OSNAME {
+		sttyOSFlag = "-F"
+	} else {
+		// freebsd?
+		sttyOSFlag = "-f"
+	}
+
 	// disable input buffering
-	exec.Command("stty", "-f", "/dev/tty", "cbreak", "min", "1").Run()
+	exec.Command("stty", sttyOSFlag, "/dev/tty", "cbreak", "min", "1").Run()
 	// delete \n
-	exec.Command("stty", "-f", "/dev/tty", "erase", "\n").Run()
+	exec.Command("stty", sttyOSFlag, "/dev/tty", "erase", "\n").Run()
 	// do not display entered characters on the screen
-	exec.Command("stty", "-f", "/dev/tty", "-echo").Run()
+	exec.Command("stty", sttyOSFlag, "/dev/tty", "-echo").Run()
 	// restore the echoing state when exiting
-	defer exec.Command("stty", "-f", "/dev/tty", "echo").Run()
+	defer exec.Command("stty", sttyOSFlag, "/dev/tty", "echo").Run()
 
 	l := newline()
 	if *alias != "" {

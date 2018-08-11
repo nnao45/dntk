@@ -399,7 +399,7 @@ func main() {
 		fixedStr = *fixed + " "
 	}
 	fmt.Print(l.dntkPrint(string([]byte(PROMPT)) + fixedStr))
-	fmt.Print("\033[" + fmt.Sprint(cursor.GetCursorRow()) + ";" + fmt.Sprint(len([]byte(PROMPT))) + "H")
+	fmt.Print("\033[" + fmt.Sprint(cursor.GetCursorRow()) + ";" + fmt.Sprint(len([]byte(PROMPT))+1) + "H")
 	fmt.Print("\033[s")
 	for {
 

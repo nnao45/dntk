@@ -1,15 +1,14 @@
 language: go
+env:
+- GIMME_CGO_ENABLED=1
 go:
 - master
 os:
-- linux
 - osx
 before_script:
 - make clean
 - make dep-install
 - make deps
-- make cross-build
-- make dist
 - make
 script:
 - bin/dntk --version

@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/nnao45/dntk/src/cursor"
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -66,6 +68,7 @@ func printCyan(s string) string {
 const (
 	REBASE_KEY = "r"
 	DELETE_KEY = "[127]"
+	PROMPT     = " (dntk): "
 )
 
 const (
@@ -133,9 +136,9 @@ type line struct {
 }
 
 func newline() *line {
-	var r []byte = make([]byte, 1)
-	var b []byte = make([]byte, 0)
-	var e []byte = make([]byte, 0)
+	var r []byte = make([]byte, 1, 100)
+	var b []byte = make([]byte, 0, 100)
+	var e []byte = make([]byte, 0, 100)
 	return &line{
 		RuneByte:       r,
 		Buffer:         b,
@@ -155,6 +158,8 @@ func (l *line) remove() (bary []byte) {
 }
 
 func (l *line) dntkPrint(s string) string {
+	s = s + "\r"
+
 	if *white {
 		return fmt.Sprint(s)
 	}
@@ -224,8 +229,10 @@ func (l *line) printPrompt() {
 	if *fixed != "" {
 		fixedStr = *fixed + " "
 	}
-	l.BufferAndEqual = append(append(append(append([]byte("(dntk): "), []byte(fixedStr)...), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...), []byte(unitStr)...)
-	fmt.Print(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+	l.BufferAndEqual = append(append(append(append([]byte(PROMPT), []byte(fixedStr)...), append(l.Buffer, []byte(" = ")...)...), l.calcBuffer()...), []byte(unitStr)...)
+	fmt.Print(l.dntkPrint(string(l.BufferAndEqual)))
+	fmt.Print(" \033[" + fmt.Sprint(len(l.Buffer)+len([]byte(PROMPT))-1) + "C")
+	fmt.Print("\033[s")
 }
 
 func (l *line) appnedBuffer() {
@@ -274,10 +281,10 @@ func (l *line) printFuncQuitBuffer() {
 func (l *line) printAlert() {
 	l.Alert = true
 	alertString := fmt.Sprintf("%v \"%v\" %v", "Sorry,", string(l.RuneByte), "is Danger word. Please not use.")
-	fmt.Print(l.dntkPrint("\r" + alertString))
+	fmt.Print(l.dntkPrint(alertString))
 	l.Alert = false
 	time.Sleep(time.Second)
-	fmt.Print(l.dntkPrint("\r" + strings.Repeat(" ", len(alertString))))
+	fmt.Print(l.dntkPrint(strings.Repeat(" ", len(alertString))))
 	l.printPrompt()
 }
 
@@ -342,15 +349,30 @@ func init() {
 	os.Setenv("BC_LINE_LENGTH", fmt.Sprint(*maxresult))
 }
 
+const (
+	DARWIN_OSNAME = "darwin"
+	LINUX_OSNAME  = "linux"
+)
+
 func main() {
+	var sttyOSFlag string
+	if runtime.GOOS == DARWIN_OSNAME {
+		sttyOSFlag = "-f"
+	} else if runtime.GOOS == LINUX_OSNAME {
+		sttyOSFlag = "-F"
+	} else {
+		// freebsd?
+		sttyOSFlag = "-f"
+	}
+
 	// disable input buffering
-	exec.Command("stty", "-f", "/dev/tty", "cbreak", "min", "1").Run()
+	exec.Command("stty", sttyOSFlag, "/dev/tty", "cbreak", "min", "1").Run()
 	// delete \n
-	exec.Command("stty", "-f", "/dev/tty", "erase", "\n").Run()
+	exec.Command("stty", sttyOSFlag, "/dev/tty", "erase", "\n").Run()
 	// do not display entered characters on the screen
-	exec.Command("stty", "-f", "/dev/tty", "-echo").Run()
+	exec.Command("stty", sttyOSFlag, "/dev/tty", "-echo").Run()
 	// restore the echoing state when exiting
-	defer exec.Command("stty", "-f", "/dev/tty", "echo").Run()
+	defer exec.Command("stty", sttyOSFlag, "/dev/tty", "echo").Run()
 
 	l := newline()
 	if *alias != "" {
@@ -376,12 +398,14 @@ func main() {
 	if *fixed != "" {
 		fixedStr = *fixed + " "
 	}
-	fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): ")) + fixedStr))
+	fmt.Print(l.dntkPrint(string([]byte(PROMPT)) + fixedStr))
+	fmt.Print("\033[" + fmt.Sprint(cursor.GetCursorRow()) + ";" + fmt.Sprint(len([]byte(PROMPT))+1) + "H")
+	fmt.Print("\033[s")
 	for {
 
 		os.Stdin.Read(l.RuneByte)
 
-		fmt.Print(l.dntkPrint("\r" + strings.Repeat(" ", len(l.BufferAndEqual))))
+		fmt.Print(l.dntkPrint(strings.Repeat(" ", len(l.BufferAndEqual))))
 
 		if len(l.Buffer) < 1 {
 			l.Flag = false
@@ -394,7 +418,7 @@ func main() {
 			if *alias != "" {
 				l.parseAliasOpt()
 			}
-			fmt.Print(l.dntkPrint("\r" + string([]byte("(dntk): "))))
+			fmt.Print(l.dntkPrint(string([]byte(PROMPT))))
 			continue
 		} else if fmt.Sprint(l.RuneByte) == DELETE_KEY {
 			// send delete key OR backspace key
@@ -410,7 +434,7 @@ func main() {
 				l.printFuncQuitBuffer()
 				continue
 			}
-			fmt.Println(l.dntkPrint("\r" + string(l.BufferAndEqual)))
+			fmt.Println(l.dntkPrint(string(l.BufferAndEqual)))
 			break
 		} else if sliceContains(string(l.RuneByte), funcSlice) {
 			l.FuncMode = true

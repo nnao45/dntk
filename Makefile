@@ -1,16 +1,16 @@
-GO15VENDOREXPERIMENT=1
+GO15VENDOREXPERIMENT = 1
+VERSION = 
 
 NAME	 := dntk
 TARGET	 := bin/$(NAME)
-VERSION  := v1.0.9
 PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
 DIST_DIRS := find * -type d -exec
-
 SRCS	:= $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -w -X \"main.version=$(VERSION)\" -extldflags \"-static\""
+LDFLAGS := -ldflags="-s -X \"main.version=$(VERSION)\""
+OPTS :=-a -installsuffix cgo
 
 $(TARGET): $(SRCS)
-	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$(NAME)
+	go build $(OPTS) $(LDFLAGS) -o bin/$(NAME) src/dntk.go 
 
 .PHONY: install
 install:
@@ -19,12 +19,10 @@ install:
 .PHONY: clean
 clean:
 	rm -rf bin/*
-	rm -rf dist/*
 
 .PHONY: clean-all
 clean-all:
 	rm -rf bin/*
-	rm -rf vendor/*
 	rm -rf dist/*
 
 .PHONY: run
@@ -41,7 +39,7 @@ dep:
 
 .PHONY: dep-install
 dep-install:
-	go get github.com/golang/dep/cmd/dep
+	go get -u github.com/golang/dep/cmd/dep
 
 .PHONY: readme-upde
 readme-upde:
@@ -54,12 +52,8 @@ release:
 
 .PHONY: cross-build
 cross-build: deps
-	for os in darwin linux; do \
-		for arch in amd64 386; do \
-			GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$(NAME)-$$os-$$arch/$(NAME); \
-		done; \
-	done
-
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) src/dntk.go
+	CC=x86_64-pc-linux-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
 .PHONY: dist
 dist:
 	cd dist && \
@@ -68,3 +62,6 @@ dist:
 		$(DIST_DIRS) tar -zcf {}-$(VERSION).tar.gz {} \; && \
 		$(DIST_DIRS) zip -r {}-$(VERSION).zip {} \; && \
 		cd ..
+
+.PHONY: deploy
+deploy: clean readme-upde cross-build dist release clean-all

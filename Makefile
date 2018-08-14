@@ -66,4 +66,4 @@ dist:
 		cd ..
 
 .PHONY: deploy
-deploy: clean readme-upde cross-build dist release clean-all
+deploy: clean readme-upde release clean-all

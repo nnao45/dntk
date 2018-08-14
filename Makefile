@@ -56,7 +56,7 @@ cross-build: deps
 	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) src/dntk.go
 	GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) src/dntk.go
 	CC=x86_64-pc-linux-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
-	CC=i386-pc-linux-gcc GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
+	CC=i586-pc-linux-gcc GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
 
 .PHONY: dist
 dist:

@@ -12,7 +12,7 @@ before_install:
 - df
 - cd /Volumes/gcc-4.8.1-for-linux64
 - sudo installer -pkg gcc-4.8.1-for-linux64.pkg -target "/"
-- hdiutil detach /Volumes/gcc-4.8.1-for-linux64
+- cd ../../
 - export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux64/bin"
 before_script:
 - make clean

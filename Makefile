@@ -44,8 +44,8 @@ dep-install:
 
 .PHONY: readme-upde
 readme-upde:
-	sed -i -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
-	sed -i -e 's/$(PRE-VERSION)/$(VERSION)/g' Dockerfile
+	sed -i '' -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
+	sed -i '' -e 's/$(PRE-VERSION)/$(VERSION)/g' Dockerfile
 
 .PHONY: release
 release:

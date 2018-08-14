@@ -19,7 +19,7 @@ before_install:
 - cd ${TRAVIS_BUILD_DIR}
 - export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux32/bin"
 before_script:
-- make clean
+- make clean-all
 - make dep-install
 - make deps
 - make cross-build

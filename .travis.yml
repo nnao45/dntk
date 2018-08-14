@@ -10,7 +10,7 @@ before_install:
 - hdiutil attach gcc-4.8.1-for-linux64.dmg
 - cd /Volumes/gcc-4.8.1-for-linux64
 - sudo installer -pkg gcc-4.8.1-for-linux64.pkg -target "/"
-- cd ../../
+- cd ${TRAVIS_BUILD_DIR}
 - export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux64/bin"
 before_script:
 - make clean

@@ -14,7 +14,7 @@ before_install:
 - export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux64/bin"
 - wget http://crossgcc.rts-software.org/download/gcc-4.8.1-for-linux32-linux64/gcc-4.8.1-for-linux32.dmg
 - hdiutil attach gcc-4.8.1-for-linux32.dmg
-- cd /Volumes/gcc-4.8.1-for-linux64
+- cd /Volumes/gcc-4.8.1-for-linux32
 - sudo installer -pkg gcc-4.8.1-for-linux32.pkg -target "/"
 - cd ${TRAVIS_BUILD_DIR}
 - export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux32/bin"

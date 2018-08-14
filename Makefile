@@ -49,7 +49,7 @@ readme-upde:
 
 .PHONY: release
 release:
-	git tag -a $(VERSION) -m 'version $(VERSION)' ; git push --tags origin master
+	git tag -a $(VERSION) -m 'version $(VERSION)' ; git push origin $(VERSION)'
 
 .PHONY: cross-build
 cross-build: deps

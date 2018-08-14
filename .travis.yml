@@ -8,7 +8,8 @@ os:
 before_install:
 - wget http://crossgcc.rts-software.org/download/gcc-4.8.1-for-linux32-linux64/gcc-4.8.1-for-linux64.dmg
 - df
-- hdiutil attach /Volumes/gcc-4.8.1-for-linux64
+- hdiutil attach gcc-4.8.1-for-linux64.dmg
+- df
 - sudo installer -pkg gcc-4.8.1-for-linux64.pkg -target "/"
 - hdiutil detach /Volumes/gcc-4.8.1-for-linux64
 - export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux64/bin"

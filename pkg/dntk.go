@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nnao45/dntk/src/cursor"
+	"github.com/nnao45/dntk/pkg/cursor"
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/alecthomas/kingpin.v2"
 )

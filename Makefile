@@ -11,7 +11,7 @@ LDFLAGS := -ldflags="-s -X \"main.version=$(VERSION)\""
 OPTS :=-a -installsuffix cgo
 
 $(TARGET): $(SRCS)
-	go build $(OPTS) $(LDFLAGS) -o bin/$(NAME) src/dntk.go 
+	go build $(OPTS) $(LDFLAGS) -o bin/$(NAME) pkg/dntk.go 
 
 .PHONY: install
 install:
@@ -49,14 +49,14 @@ readme-upde:
 
 .PHONY: release
 release:
-	git tag -a $(VERSION) -m 'version $(VERSION)' ; git push origin $(VERSION)'
+	git tag -a $(VERSION) -m 'version $(VERSION)' ; git push origin $(VERSION)
 
 .PHONY: cross-build
 cross-build: deps
-	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) src/dntk.go
-	GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-386/$(NAME) src/dntk.go
-	CC=x86_64-pc-linux-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
-	CC=i586-pc-linux-gcc GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-386/$(NAME) src/dntk.go
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) pkg/dntk.go
+	GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-386/$(NAME) pkg/dntk.go
+	CC=x86_64-pc-linux-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) pkg/dntk.go
+	CC=i586-pc-linux-gcc GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-386/$(NAME) pkg/dntk.go
 
 .PHONY: dist
 dist:

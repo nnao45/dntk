@@ -1,4 +1,5 @@
 GO15VENDOREXPERIMENT = 1
+OSXCROSS_NO_INCLUDE_PATH_WARNINGS = 1
 VERSION = 
 
 NAME	 := dntk
@@ -54,6 +55,7 @@ release:
 cross-build: deps
 	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) src/dntk.go
 	CC=x86_64-pc-linux-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
+
 .PHONY: dist
 dist:
 	cd dist && \
@@ -64,4 +66,4 @@ dist:
 		cd ..
 
 .PHONY: deploy
-deploy: clean readme-upde cross-build dist release clean-all
+deploy: clean readme-upde release clean-all

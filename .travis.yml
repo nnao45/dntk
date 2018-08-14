@@ -5,11 +5,20 @@ go:
 - master
 os:
 - osx
+before_install:
+- wget http://crossgcc.rts-software.org/download/gcc-4.8.1-for-linux32-linux64/gcc-4.8.1-for-linux64.dmg
+- hdiutil attach gcc-4.8.1-for-linux64.dmg
+- cd /Volumes/gcc-4.8.1-for-linux64
+- sudo installer -pkg gcc-4.8.1-for-linux64.pkg -target "/"
+- cd ${TRAVIS_BUILD_DIR}
+- export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux64/bin"
 before_script:
 - make clean
 - make dep-install
 - make deps
-- make
+- make cross-build
+- make dist
+- make 
 script:
 - bin/dntk --version
 deploy:

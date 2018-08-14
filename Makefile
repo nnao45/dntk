@@ -50,10 +50,16 @@ readme-upde:
 release:
 	git tag -a $(VERSION) -m 'version $(VERSION)' ; git push --tags origin master
 
-.PHONY: cross-build
+.PHONY: cross-build-osx
 cross-build: deps
 	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) src/dntk.go
 	CC=x86_64-pc-linux-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
+
+.PHONY: cross-build-linux
+cross-build: deps
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) src/dntk.go
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) src/dntk.go
+
 .PHONY: dist
 dist:
 	cd dist && \

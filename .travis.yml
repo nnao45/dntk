@@ -4,12 +4,15 @@ env:
 go:
 - master
 os:
-- osx
+- linux
 before_script:
 - make clean
 - make dep-install
 - make deps
-- make
+- make cross-build-linux
+- make dist
+- make 
+sudo: false
 script:
 - bin/dntk --version
 deploy:

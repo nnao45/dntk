@@ -34,7 +34,6 @@ dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.or
     </tr>
 </table>
 
-
 ## ***Current dntk's version: v1.0.12***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 

@@ -47,18 +47,22 @@ fn main() {
         let r = unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 1) };
         if r > 0 {
             let input_char = ptr[0] as u8 as char;
+            // match dntk_scan(input_char) {
+            //     None => (),
+            //     Some(c) => input_vec.push(c),
+            // }
             input_vec.push(input_char);
             print!("\r(dntk): ");
             print!("{:?}", input_vec);
             print!(" = ");
-            print!(
-                "{}",
-                bc!(format!(
-                    "{} + {} + {}",
-                    input_vec[0], input_vec[0], input_vec[0]
-                ))
-                .unwrap()
-            );
+            // print!(
+            //     "{}",
+            //     bc!(format!(
+            //         "{} + {} + {}",
+            //         input_vec[0], input_vec[0], input_vec[0]
+            //     ))
+            //     .unwrap()
+            // );
         }
         std::io::stdout().flush().unwrap();
     }
@@ -88,5 +92,26 @@ impl Error for ScanError {
             ScanError::UnkownError => "Scan key code is unknown",
             ScanError::UnSupportedError => "Scan key code is unsupported",
         }
+    }
+}
+
+fn dntk_scan(ascii_char: char) -> Option<char> {
+    match ascii_char {
+        's' => Some('s'),
+        'c' => Some('c'),
+        'a' => Some('a'),
+        'l' => Some('l'),
+        'e' => Some('e'),
+        'j' => Some('j'),
+        '(' => Some('('),
+        ')' => Some(')'),
+        '+' => Some('+'),
+        '-' => Some('-'),
+        '/' => Some('/'),
+        '*' => Some('*'),
+        '\n' => Some('\n'), // \n
+        '\u{1b}' => Some('\u{1b}'), // escape key
+        '\u{1b}' => Some('\u{7f}'), // delete key
+        _ => None,
     }
 }

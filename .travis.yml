@@ -1,13 +1,17 @@
-language: go
-env:
-- GIMME_CGO_ENABLED=1
-go:
-- master
+language: rust
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
 os:
-- osx
-- linux
+  - osx
+  - linux
 script:
-- cargo build --release
+  - cargo build --release
 deploy:
   provider: releases
   skip_cleanup: true

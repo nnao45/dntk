@@ -12,6 +12,7 @@ use std::fmt;
 use std::io::Write;
 
 fn main() {
+    #[cfg(target_os = "macos")]
     let mut saved_termattr = libc::termios {
         c_iflag: 0,
         c_oflag: 0,
@@ -20,6 +21,17 @@ fn main() {
         c_cc: [0u8; 20],
         c_ispeed: 0,
         c_ospeed: 0,
+    };
+    #[cfg(target_os = "linux")]
+    let mut saved_termattr = libc::termios {
+        c_iflag: 0,
+        c_oflag: 0,
+        c_cflag: 0,
+        c_lflag: 0,
+        c_cc: [0u8; 32],
+        c_ispeed: 0,
+        c_ospeed: 0,
+        c_line: 0,
     };
     unsafe {
         let saved_termattr_ptr = &mut saved_termattr;

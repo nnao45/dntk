@@ -53,4 +53,3 @@ pub const ASCII_CODE_SPACE       : u8 = 0x20; // white space key
 // http://tldp.org/HOWTO/Bash-Prompt-HOWTO/x361.html
 pub const CURSOR_MOVE_ES_HEAD    : &str = "\x1b[";
 pub const CURSOR_MOVE_ES_BACK    : &str = "D";
-pub const CURSOR_MOVE_ES_FORWARD : &str = "C";

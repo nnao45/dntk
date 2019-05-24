@@ -1,5 +1,6 @@
 pub const DNTK_PROMPT          : &str = "\r(dntk): ";
 
+// https://qiita.com/hidai@github/items/1704bf2926ab8b157a4f
 #[allow(dead_code)]
 pub const COLOR_BLACK_HEADER   : &str = "\x1b[30m";
 #[allow(dead_code)]
@@ -16,6 +17,7 @@ pub const COLOR_CYAN_HEADER    : &str = "\x1b[36m";
 pub const COLOR_WHITE_HEADER   : &str = "\x1b[37m";
 pub const COLOR_PLAIN_HEADER   : &str = "\x1b[0m";
 
+// http://www9.plala.or.jp/sgwr-t/c_sub/ascii.html
 pub const ASCII_CODE_ZERO      : u8 = 0x30; // 0
 pub const ASCII_CODE_ONE       : u8 = 0x31; // 1
 pub const ASCII_CODE_TWO       : u8 = 0x32; // 2
@@ -38,9 +40,14 @@ pub const ASCII_CODE_PLUS      : u8 = 0x2b; // +
 pub const ASCII_CODE_MINUS     : u8 = 0x2d; // -
 pub const ASCII_CODE_ASTERISK  : u8 = 0x2a; // *
 pub const ASCII_CODE_SLUSH     : u8 = 0x2f; // /
+pub const ASCII_CODE_PERIOD    : u8 = 0x2e; // .
 pub const ASCII_CODE_EQUAL     : u8 = 0x3d; // =
 pub const ASCII_CODE_SEMICOLON : u8 = 0x3b; // ;
 pub const ASCII_CODE_NEWLINE   : u8 = 0x0a; // \n
 pub const ASCII_CODE_ESCAPE    : u8 = 0x1b; // escape key
 pub const ASCII_CODE_DELETE    : u8 = 0x7f; // delete key
 pub const ASCII_CODE_SPACE     : u8 = 0x20; // white space key
+
+//
+pub const CURSOR_MOVE_ES_HEAD  : &str = "\x1b[";
+pub const CURSOR_MOVE_ES_BACK  : &str = "D";

@@ -2,7 +2,8 @@
 extern crate bc;
 extern crate libc;
 
-#[macro_use(defer)] extern crate scopeguard;
+#[macro_use(defer)]
+extern crate scopeguard;
 
 mod util;
 
@@ -76,10 +77,12 @@ fn main() {
                     before_printed_result_len = p4.to_string().len();
                     before_printed_len = p1.to_string().len() + p2.to_string().len() + p3.to_string().len() + p4.to_string().len();
                     print!("{}{}{}{}{}{}", util::COLOR_CYAN_HEADER, p1, p2, p3, &p4, util::COLOR_PLAIN_HEADER);
+                    print!("{}{}{}", util::CURSOR_MOVE_ES_HEAD, (p3.to_string().len() + &p4.to_string().len()), util::CURSOR_MOVE_ES_BACK);
                     },
                 _ => {
                     before_printed_len = p1.to_string().len() + p2.to_string().len() + p3.to_string().len() + before_printed_result_len;
                     print!("{}{}{}{}{}", util::COLOR_MAGENDA_HEADER, p1, p2, p3, util::COLOR_PLAIN_HEADER);
+                    print!("{}{}{}", util::CURSOR_MOVE_ES_HEAD, p3.to_string().len(), util::CURSOR_MOVE_ES_BACK);
                 },
             }
         }
@@ -135,6 +138,7 @@ fn char_scan(ascii_char: u8) -> Option<u8> {
         util::ASCII_CODE_MINUS      => Some(util::ASCII_CODE_MINUS     ), // -
         util::ASCII_CODE_ASTERISK   => Some(util::ASCII_CODE_ASTERISK  ), // *
         util::ASCII_CODE_SLUSH      => Some(util::ASCII_CODE_SLUSH     ), // /
+        util::ASCII_CODE_PERIOD     => Some(util::ASCII_CODE_PERIOD    ), // .
         util::ASCII_CODE_EQUAL      => Some(util::ASCII_CODE_EQUAL     ), // =
         util::ASCII_CODE_SEMICOLON  => Some(util::ASCII_CODE_SEMICOLON ), // ;
         util::ASCII_CODE_NEWLINE    => Some(util::ASCII_CODE_NEWLINE   ), // \n

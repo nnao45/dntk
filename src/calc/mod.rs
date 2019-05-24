@@ -15,12 +15,12 @@ pub struct Dntker {
 
 #[derive(Debug)]
 enum ScanResult {
-    EndCode(u8),
     BcCode(u8),
-    DeleteCode(u8),
-    CurLeftCode(u8),
-    CurRightCode(u8),
-    UnknownCode(u8),
+    EndCode,
+    DeleteCode,
+    CurLeftCode,
+    CurRightCode,
+    UnknownCode,
 }
 
 impl Dntker {
@@ -58,8 +58,8 @@ impl Dntker {
             util::ASCII_CODE_J           => ScanResult::BcCode(util::ASCII_CODE_J                   ), // j
             util::ASCII_CODE_ROUNDLEFT   => ScanResult::BcCode(util::ASCII_CODE_ROUNDLEFT           ), // (
             util::ASCII_CODE_ROUNDRIGHT  => ScanResult::BcCode(util::ASCII_CODE_ROUNDRIGHT          ), // )
-            util::ASCII_CODE_SQUARELEFT  => ScanResult::CurLeftCode(util::ASCII_CODE_SQUARELEFT     ), // [
-            util::ASCII_CODE_SQUARERIGHT => ScanResult::CurRightCode(util::ASCII_CODE_SQUARERIGHT   ), // ]
+            util::ASCII_CODE_SQUARELEFT  => ScanResult::CurLeftCode,                                   // [
+            util::ASCII_CODE_SQUARERIGHT => ScanResult::CurRightCode,                                  // ]
             util::ASCII_CODE_PLUS        => ScanResult::BcCode(util::ASCII_CODE_PLUS                ), // +
             util::ASCII_CODE_MINUS       => ScanResult::BcCode(util::ASCII_CODE_MINUS               ), // -
             util::ASCII_CODE_ASTERISK    => ScanResult::BcCode(util::ASCII_CODE_ASTERISK            ), // *
@@ -67,11 +67,11 @@ impl Dntker {
             util::ASCII_CODE_PERIOD      => ScanResult::BcCode(util::ASCII_CODE_PERIOD              ), // .
             util::ASCII_CODE_EQUAL       => ScanResult::BcCode(util::ASCII_CODE_EQUAL               ), // =
             util::ASCII_CODE_SEMICOLON   => ScanResult::BcCode(util::ASCII_CODE_SEMICOLON           ), // ;
-            util::ASCII_CODE_NEWLINE     => ScanResult::EndCode(util::ASCII_CODE_NEWLINE            ), // \n
-            util::ASCII_CODE_ESCAPE      => ScanResult::EndCode(util::ASCII_CODE_ESCAPE             ), // escape key
-            util::ASCII_CODE_DELETE      => ScanResult::DeleteCode(util::ASCII_CODE_DELETE          ), // delete key
+            util::ASCII_CODE_NEWLINE     => ScanResult::EndCode, // \n
+            util::ASCII_CODE_ESCAPE      => ScanResult::EndCode, // escape key
+            util::ASCII_CODE_DELETE      => ScanResult::DeleteCode,                                    // delete key
             util::ASCII_CODE_SPACE       => ScanResult::BcCode(util::ASCII_CODE_SPACE               ), // white space key
-            _                            => ScanResult::UnknownCode(0),
+            _                            => ScanResult::UnknownCode,
         }
     }
 
@@ -129,18 +129,18 @@ impl Dntker {
             if r > 0 {
                 let input_char = ptr[0] as u8;
                 match &self.char_scan(input_char) {
-                    ScanResult::UnknownCode(_) => (),
-                    ScanResult::EndCode(_) => {
+                    ScanResult::UnknownCode => (),
+                    ScanResult::EndCode => {
                         print!("\n");
                         break
                     },
-                    ScanResult::DeleteCode(_) => {
+                    ScanResult::DeleteCode => {
                         &self.delete_column();
                     },
-                    ScanResult::CurLeftCode(_) => {
+                    ScanResult::CurLeftCode => {
                         &self.cursor_move_left();
                     },
-                    ScanResult::CurRightCode(_) => {
+                    ScanResult::CurRightCode => {
                         &self.cursor_move_right();
                     },
                     ScanResult::BcCode(code) => {

@@ -12,7 +12,7 @@ os:
   - linux
 env:
   global:
-    LINUX_TERM_LIB='linux_travis.rs'
+    LINUX_TERM_LIB='linux_unknown.rs'
 script:
   - cargo build --release
 deploy:

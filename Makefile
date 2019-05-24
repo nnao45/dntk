@@ -1,71 +1,39 @@
-GO15VENDOREXPERIMENT = 1
-OSXCROSS_NO_INCLUDE_PATH_WARNINGS = 1
-VERSION = v1.0.12
+# general
+VERSION = $(shell ./version.sh)
+NAME = twiquery-stream
+TARGET = $(NAME)
+DOCKER_REPO = nnao45
+LINUX_TERM_LIB = linux_unknown.rs
 
-NAME	 := dntk
-TARGET	 := bin/$(NAME)
-PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
-DIST_DIRS := find * -type d -exec
-SRCS	:= $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -X \"main.version=$(VERSION)\""
-OPTS :=-a -installsuffix cgo
+$(TARGET):
+	cargo build --release
 
-$(TARGET): $(SRCS)
-	go build $(OPTS) $(LDFLAGS) -o bin/$(NAME) pkg/dntk.go 
-
-.PHONY: install
-install:
-	go install $(LDFLAGS)
-
-.PHONY: clean
-clean:
-	rm -rf bin/*
-
-.PHONY: clean-all
-clean-all:
-	rm -rf bin/*
-	rm -rf dist/*
+.PHONY: version
+version:
+	@echo $(VERSION)
 
 .PHONY: run
 run:
-	go run $(NAME).go
+	cargo run --release
 
-.PHONY: upde
-upde:
-	dep ensure -update
+.PHONY: test
+test:
+	cargo test
 
-.PHONY: deps
-dep:
-	dep ensure
+.PHONY: clean
+clean:
+	cargo clean
 
-.PHONY: dep-install
-dep-install:
-	go get -u github.com/golang/dep/cmd/dep
+.PHONY: docker-build
+docker-build:
+	docker rmi -f $(DOCKER_REPO)/$(TARGET):latest
+	docker build -t $(DOCKER_REPO)/$(TARGET):latest .
+	docker tag $(DOCKER_REPO)/$(TARGET):latest $(DOCKER_REPO)/$(TARGET):$(VERSION)
 
-.PHONY: readme-upde
-readme-upde:
-	sed -i '' -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
-	sed -i '' -e 's/$(PRE-VERSION)/$(VERSION)/g' Dockerfile
+.PHONY: docker-push
+docker-push:
+	docker push $(DOCKER_REPO)/$(NAME):latest
+	docker push $(DOCKER_REPO)/$(NAME):$(VERSION)
 
-.PHONY: release
-release:
-	git tag -a $(VERSION) -m 'version $(VERSION)' ; git push origin $(VERSION)
-
-.PHONY: cross-build
-cross-build: deps
-	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-amd64/$(NAME) pkg/dntk.go
-	GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-darwin-386/$(NAME) pkg/dntk.go
-	CC=x86_64-pc-linux-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-amd64/$(NAME) pkg/dntk.go
-	CC=i586-pc-linux-gcc GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $(OPTS) $(LDFLAGS) -o dist/$(NAME)-linux-386/$(NAME) pkg/dntk.go
-
-.PHONY: dist
-dist:
-	cd dist && \
-		$(DIST_DIRS) cp ../LICENSE {} \; && \
-		$(DIST_DIRS) cp ../README.md {} \; && \
-		$(DIST_DIRS) tar -zcf {}-$(VERSION).tar.gz {} \; && \
-		$(DIST_DIRS) zip -r {}-$(VERSION).zip {} \; && \
-		cd ..
-
-.PHONY: deploy
-deploy: clean readme-upde release clean-all
+.PHONY: docker-release
+docker-release: docker-build docker-push

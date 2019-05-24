@@ -42,7 +42,7 @@ fn main() {
     let mut buf: [libc::c_char; 1] = [0; 1];
     let ptr = &mut buf;
 
-    print!("\r{}", util::DNTK_PROMPT);
+    print!("{}", util::DNTK_PROMPT);
     let mut input_vec = Vec::new();
     let mut before_printed_len = 0;
     let mut before_printed_result_len = 0;
@@ -68,7 +68,7 @@ fn main() {
                     },
             }
             print!("\r{}", (0..before_printed_len).map(|_| " ").collect::<String>());
-            let p1 = "\r(dntk): ";
+            let p1 = format!("{}", util::DNTK_PROMPT);
             let p2 = std::str::from_utf8(&input_vec).unwrap_or(&"error occured");
             let p3 = " = ";
             match bc!(format!("{}", p2)) {

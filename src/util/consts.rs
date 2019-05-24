@@ -1,4 +1,4 @@
-pub const DNTK_PROMPT          : &str = "(dntk): ";
+pub const DNTK_PROMPT          : &str = "\r(dntk): ";
 
 #[allow(dead_code)]
 pub const COLOR_BLACK_HEADER   : &str = "\x1b[30m";

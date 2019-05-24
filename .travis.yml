@@ -10,6 +10,9 @@ matrix:
 os:
   - osx
   - linux
+env:
+  global:
+    LINUX_TERM_LIB='linux_travis.rs'
 script:
   - cargo build --release
 deploy:

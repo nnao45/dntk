@@ -1,5 +1,6 @@
 # Setup Building Container
 FROM ekidd/rust-musl-builder:nightly-2019-04-25 as builder
+ENV LINUX_TERM_LIB linux_docker.rs
 
 ## Build Cache Dependency Library
 RUN mkdir /tmp/dntk

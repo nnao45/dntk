@@ -1,25 +1,11 @@
+#[cfg(target_os = "macos")]
+include!("osx.rs");
+
+#[cfg(target_os = "linux")]
+include!(env!("LINUX_TERM_LIB"));
+
 pub fn setup() -> libc::termios {
-    #[cfg(target_os = "macos")]
-    let mut saved_termattr = libc::termios {
-        c_iflag: 0,
-        c_oflag: 0,
-        c_cflag: 0,
-        c_lflag: 0,
-        c_cc: [0u8; 20],
-        c_ispeed: 0,
-        c_ospeed: 0,
-    };
-    #[cfg(target_os = "linux")]
-    let mut saved_termattr = libc::termios {
-        c_iflag: 0,
-        c_oflag: 0,
-        c_cflag: 0,
-        c_lflag: 0,
-        c_cc: [0u8; 32],
-        __c_ispeed: 0,
-        __c_ospeed: 0,
-        c_line: 0,
-    };
+    let mut saved_termattr = get_termattr();
     unsafe {
         let saved_termattr_ptr = &mut saved_termattr;
         libc::tcgetattr(0, saved_termattr_ptr);

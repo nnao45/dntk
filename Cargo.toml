@@ -7,4 +7,4 @@ edition = "2018"
 [dependencies]
 libc = "0.2"
 bc = "0.1"
-sdl2 = "0.32.2"
+scopeguard = "1.0.0"

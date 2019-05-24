@@ -67,8 +67,8 @@ impl Dntker {
             util::ASCII_CODE_PERIOD      => ScanResult::BcCode(util::ASCII_CODE_PERIOD              ), // .
             util::ASCII_CODE_EQUAL       => ScanResult::BcCode(util::ASCII_CODE_EQUAL               ), // =
             util::ASCII_CODE_SEMICOLON   => ScanResult::BcCode(util::ASCII_CODE_SEMICOLON           ), // ;
-            util::ASCII_CODE_NEWLINE     => ScanResult::EndCode, // \n
-            util::ASCII_CODE_ESCAPE      => ScanResult::EndCode, // escape key
+            util::ASCII_CODE_NEWLINE     => ScanResult::EndCode,                                       // \n
+            util::ASCII_CODE_ESCAPE      => ScanResult::EndCode,                                       // escape key
             util::ASCII_CODE_DELETE      => ScanResult::DeleteCode,                                    // delete key
             util::ASCII_CODE_SPACE       => ScanResult::BcCode(util::ASCII_CODE_SPACE               ), // white space key
             _                            => ScanResult::UnknownCode,

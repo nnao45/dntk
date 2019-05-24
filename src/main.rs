@@ -14,6 +14,6 @@ fn main() {
             libc::tcsetattr(0, libc::TCSANOW, &saved_termattr);
         }
     );
-    let dntker = calc::Dntker::new();
+    let dntker = &mut calc::Dntker::new();
     dntker.run();
 }

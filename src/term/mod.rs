@@ -16,8 +16,8 @@ pub fn setup() -> libc::termios {
         c_cflag: 0,
         c_lflag: 0,
         c_cc: [0u8; 32],
-        c_ispeed: 0,
-        c_ospeed: 0,
+        __c_ispeed: 0,
+        __c_ospeed: 0,
         c_line: 0,
     };
     unsafe {

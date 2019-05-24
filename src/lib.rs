@@ -1,2 +1,2 @@
 pub mod term;
-pub mod calc;
+pub mod dntker;

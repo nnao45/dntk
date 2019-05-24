@@ -5,7 +5,7 @@ extern crate libc;
 extern crate scopeguard;
 
 mod term;
-mod calc;
+mod dntker;
 
 fn main() {
     let saved_termattr = term::setup();
@@ -14,6 +14,6 @@ fn main() {
             libc::tcsetattr(0, libc::TCSANOW, &saved_termattr);
         }
     );
-    let dntker = &mut calc::Dntker::new();
+    let dntker = &mut dntker::Dntker::new();
     dntker.run();
 }

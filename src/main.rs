@@ -4,6 +4,8 @@ extern crate libc;
 
 #[macro_use(defer)] extern crate scopeguard;
 
+mod util;
+
 use std::error::Error;
 use std::fmt;
 use std::io::Write;
@@ -19,8 +21,8 @@ fn main() {
         c_ospeed: 0,
     };
     unsafe {
-        let ptr = &mut saved_termattr;
-        libc::tcgetattr(0, ptr);
+        let saved_termattr_ptr = &mut saved_termattr;
+        libc::tcgetattr(0, saved_termattr_ptr);
     }
     let mut termattr = saved_termattr;
     termattr.c_lflag = termattr.c_lflag & !(libc::ICANON | libc::ECHO);
@@ -40,29 +42,45 @@ fn main() {
     let mut buf: [libc::c_char; 1] = [0; 1];
     let ptr = &mut buf;
 
-    print!("\r(dntk): ");
+    print!("\r{}", util::DNTK_PROMPT);
     let mut input_vec = Vec::new();
+    let mut before_printed_len = 0;
+    let mut before_printed_result_len = 0;
     loop {
         let r = unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 1) };
         if r > 0 {
             let input_char = ptr[0] as u8;
             match char_scan(input_char) {
                 None => (),
+                Some(util::ASCII_CODE_NEWLINE) => {
+                    print!("\n");
+                    break
+                },
+                Some(util::ASCII_CODE_ESCAPE) => {
+                    print!("\n");
+                    break
+                },
+                Some(util::ASCII_CODE_DELETE) => {
+                    &input_vec.pop();
+                },
                 Some(i) => {
                     &input_vec.push(i);
                     },
             }
+            print!("\r{}", (0..before_printed_len).map(|_| " ").collect::<String>());
             let p1 = "\r(dntk): ";
-            print!("{}", p1);
             let p2 = std::str::from_utf8(&input_vec).unwrap_or(&"error occured");
-            print!("{}", p2);
             let p3 = " = ";
-            print!("{}", p3);
             match bc!(format!("{}", p2)) {
                 Ok(p4) => {
-                    print!("{}", &p4);
+                    before_printed_result_len = p4.to_string().len();
+                    before_printed_len = p1.to_string().len() + p2.to_string().len() + p3.to_string().len() + p4.to_string().len();
+                    print!("{}{}{}{}{}{}", util::COLOR_CYAN_HEADER, p1, p2, p3, &p4, util::COLOR_PLAIN_HEADER);
                     },
-                _ => (),
+                _ => {
+                    before_printed_len = p1.to_string().len() + p2.to_string().len() + p3.to_string().len() + before_printed_result_len;
+                    print!("{}{}{}{}{}", util::COLOR_MAGENDA_HEADER, p1, p2, p3, util::COLOR_PLAIN_HEADER);
+                },
             }
         }
         std::io::stdout().flush().unwrap();
@@ -95,31 +113,34 @@ impl Error for ScanError {
 
 fn char_scan(ascii_char: u8) -> Option<u8> {
     match ascii_char {
-        48 => Some(48),
-        49 => Some(49),
-        50 => Some(50),
-        51 => Some(51),
-        52 => Some(52),
-        53 => Some(53),
-        54 => Some(54),
-        55 => Some(55),
-        56 => Some(56),
-        57 => Some(57),
-        115 => Some(115),
-        99 => Some(99),
-        97 => Some(97),
-        108 => Some(108),
-        101 => Some(101),
-        106 => Some(106),
-        123 => Some(123),
-        125 => Some(125),
-        43 => Some(43),
-        45 => Some(45),
-        42 => Some(42),
-        47 => Some(47),
-        10 => Some(10), // \n
-        27 => Some(27), // escape key
-        127 => Some(127), // delete key
+        util::ASCII_CODE_ZERO       => Some(util::ASCII_CODE_ZERO      ), // 0
+        util::ASCII_CODE_ONE        => Some(util::ASCII_CODE_ONE       ), // 1
+        util::ASCII_CODE_TWO        => Some(util::ASCII_CODE_TWO       ), // 2
+        util::ASCII_CODE_THREE      => Some(util::ASCII_CODE_THREE     ), // 3
+        util::ASCII_CODE_FOUR       => Some(util::ASCII_CODE_FOUR      ), // 4
+        util::ASCII_CODE_FIVE       => Some(util::ASCII_CODE_FIVE      ), // 5
+        util::ASCII_CODE_SIX        => Some(util::ASCII_CODE_SIX       ), // 6
+        util::ASCII_CODE_SEVEN      => Some(util::ASCII_CODE_SEVEN     ), // 7
+        util::ASCII_CODE_EIGHT      => Some(util::ASCII_CODE_EIGHT     ), // 8
+        util::ASCII_CODE_NINE       => Some(util::ASCII_CODE_NINE      ), // 9
+        util::ASCII_CODE_S          => Some(util::ASCII_CODE_S         ), // s
+        util::ASCII_CODE_C          => Some(util::ASCII_CODE_C         ), // c
+        util::ASCII_CODE_A          => Some(util::ASCII_CODE_A         ), // a
+        util::ASCII_CODE_L          => Some(util::ASCII_CODE_L         ), // l
+        util::ASCII_CODE_E          => Some(util::ASCII_CODE_E         ), // e
+        util::ASCII_CODE_J          => Some(util::ASCII_CODE_J         ), // j
+        util::ASCII_CODE_ROUNDLEFT  => Some(util::ASCII_CODE_ROUNDLEFT ), // (
+        util::ASCII_CODE_ROUNDRIGHT => Some(util::ASCII_CODE_ROUNDRIGHT), // )
+        util::ASCII_CODE_PLUS       => Some(util::ASCII_CODE_PLUS      ), // +
+        util::ASCII_CODE_MINUS      => Some(util::ASCII_CODE_MINUS     ), // -
+        util::ASCII_CODE_ASTERISK   => Some(util::ASCII_CODE_ASTERISK  ), // *
+        util::ASCII_CODE_SLUSH      => Some(util::ASCII_CODE_SLUSH     ), // /
+        util::ASCII_CODE_EQUAL      => Some(util::ASCII_CODE_EQUAL     ), // =
+        util::ASCII_CODE_SEMICOLON  => Some(util::ASCII_CODE_SEMICOLON ), // ;
+        util::ASCII_CODE_NEWLINE    => Some(util::ASCII_CODE_NEWLINE   ), // \n
+        util::ASCII_CODE_ESCAPE     => Some(util::ASCII_CODE_ESCAPE    ), // escape key
+        util::ASCII_CODE_DELETE     => Some(util::ASCII_CODE_DELETE    ), // delete key
+        util::ASCII_CODE_SPACE      => Some(util::ASCII_CODE_SPACE     ), // white space key
         _ => None,
     }
 }

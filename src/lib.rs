@@ -1,1 +1,2 @@
-pub mod util;
+pub mod term;
+pub mod calc;

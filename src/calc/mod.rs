@@ -8,7 +8,7 @@ use bc::{bc, BCError};
 pub struct Dntker {
     input_vec: Vec<u8>,
     before_printed_len: usize,
-    before_printed_result: String,
+    before_printed_result_len: usize,
     before_printed_statement_len: usize,
     currnet_cur_pos: usize,
 }
@@ -33,7 +33,7 @@ impl Dntker {
         Dntker {
             input_vec: Vec::new(),
             before_printed_len: 0,
-            before_printed_result: "".to_string(),
+            before_printed_result_len: 0,
             before_printed_statement_len: 0,
             currnet_cur_pos: 0,
         }
@@ -109,17 +109,17 @@ impl Dntker {
     }
 
     fn print_ok(&mut self, p1: &str, p2: &str, p3: &str, p4: &str) {
-        self.before_printed_result = p4.to_string();
+        self.before_printed_result_len = p4.to_string().len();
         self.before_printed_statement_len = p2.to_string().len();
-        self.before_printed_len = p1.to_string().len() + self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result.len();
+        self.before_printed_len = p1.to_string().len() + self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
         let pos_differnce = self.before_printed_statement_len - self.currnet_cur_pos;
         print!("{}{}{}{}{}{}", util::COLOR_CYAN_HEADER, p1, p2, p3, &p4, util::COLOR_PLAIN_HEADER);
-        print!("{}{}{}", util::CURSOR_MOVE_ES_HEAD, (p3.to_string().len() + self.before_printed_result.len() + pos_differnce), util::CURSOR_MOVE_ES_BACK);
+        print!("{}{}{}", util::CURSOR_MOVE_ES_HEAD, (p3.to_string().len() + self.before_printed_result_len + pos_differnce), util::CURSOR_MOVE_ES_BACK);
     }
 
     fn print_ng(&mut self, p1: &str, p2: &str, p3: &str) {
         self.before_printed_statement_len = p2.to_string().len();
-        self.before_printed_len = p1.to_string().len() +  self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result.len();
+        self.before_printed_len = p1.to_string().len() +  self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
         let pos_differnce =  self.before_printed_statement_len - &self.currnet_cur_pos;
         print!("{}{}{}{}{}", util::COLOR_MAGENDA_HEADER, p1, p2, p3, util::COLOR_PLAIN_HEADER);
         print!("{}{}{}", util::CURSOR_MOVE_ES_HEAD, (p3.to_string().len() + pos_differnce), util::CURSOR_MOVE_ES_BACK);

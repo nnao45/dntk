@@ -40,37 +40,37 @@ impl Dntker {
 
     fn char_scan(&self, ascii_char: u8) -> ScanResult {
         match ascii_char {
-            util::ASCII_CODE_ZERO        => ScanResult::BcCode(util::ASCII_CODE_ZERO      ), // 0
-            util::ASCII_CODE_ONE         => ScanResult::BcCode(util::ASCII_CODE_ONE       ), // 1
-            util::ASCII_CODE_TWO         => ScanResult::BcCode(util::ASCII_CODE_TWO       ), // 2
-            util::ASCII_CODE_THREE       => ScanResult::BcCode(util::ASCII_CODE_THREE     ), // 3
-            util::ASCII_CODE_FOUR        => ScanResult::BcCode(util::ASCII_CODE_FOUR      ), // 4
-            util::ASCII_CODE_FIVE        => ScanResult::BcCode(util::ASCII_CODE_FIVE      ), // 5
-            util::ASCII_CODE_SIX         => ScanResult::BcCode(util::ASCII_CODE_SIX       ), // 6
-            util::ASCII_CODE_SEVEN       => ScanResult::BcCode(util::ASCII_CODE_SEVEN     ), // 7
-            util::ASCII_CODE_EIGHT       => ScanResult::BcCode(util::ASCII_CODE_EIGHT     ), // 8
-            util::ASCII_CODE_NINE        => ScanResult::BcCode(util::ASCII_CODE_NINE      ), // 9
-            util::ASCII_CODE_S           => ScanResult::BcCode(util::ASCII_CODE_S         ), // s
-            util::ASCII_CODE_C           => ScanResult::BcCode(util::ASCII_CODE_C         ), // c
-            util::ASCII_CODE_A           => ScanResult::BcCode(util::ASCII_CODE_A         ), // a
-            util::ASCII_CODE_L           => ScanResult::BcCode(util::ASCII_CODE_L         ), // l
-            util::ASCII_CODE_E           => ScanResult::BcCode(util::ASCII_CODE_E         ), // e
-            util::ASCII_CODE_J           => ScanResult::BcCode(util::ASCII_CODE_J         ), // j
-            util::ASCII_CODE_ROUNDLEFT   => ScanResult::BcCode(util::ASCII_CODE_ROUNDLEFT ), // (
-            util::ASCII_CODE_ROUNDRIGHT  => ScanResult::BcCode(util::ASCII_CODE_ROUNDRIGHT), // )
-            util::ASCII_CODE_SQUARELEFT  => ScanResult::CurLeftCode,                         // [
-            util::ASCII_CODE_SQUARERIGHT => ScanResult::CurRightCode,                        // ]
-            util::ASCII_CODE_PLUS        => ScanResult::BcCode(util::ASCII_CODE_PLUS      ), // +
-            util::ASCII_CODE_MINUS       => ScanResult::BcCode(util::ASCII_CODE_MINUS     ), // -
-            util::ASCII_CODE_ASTERISK    => ScanResult::BcCode(util::ASCII_CODE_ASTERISK  ), // *
-            util::ASCII_CODE_SLUSH       => ScanResult::BcCode(util::ASCII_CODE_SLUSH     ), // /
-            util::ASCII_CODE_PERIOD      => ScanResult::BcCode(util::ASCII_CODE_PERIOD    ), // .
-            util::ASCII_CODE_EQUAL       => ScanResult::BcCode(util::ASCII_CODE_EQUAL     ), // =
-            util::ASCII_CODE_SEMICOLON   => ScanResult::BcCode(util::ASCII_CODE_SEMICOLON ), // ;
-            util::ASCII_CODE_NEWLINE     => ScanResult::EndCode,                             // \n
-            util::ASCII_CODE_ESCAPE      => ScanResult::EndCode,                             // escape key
-            util::ASCII_CODE_DELETE      => ScanResult::DeleteCode,                          // delete key
-            util::ASCII_CODE_SPACE       => ScanResult::BcCode(util::ASCII_CODE_SPACE     ), // white space key
+            util::ASCII_CODE_ZERO        => ScanResult::BcCode(util::ASCII_CODE_ZERO                ), // 0
+            util::ASCII_CODE_ONE         => ScanResult::BcCode(util::ASCII_CODE_ONE                 ), // 1
+            util::ASCII_CODE_TWO         => ScanResult::BcCode(util::ASCII_CODE_TWO                 ), // 2
+            util::ASCII_CODE_THREE       => ScanResult::BcCode(util::ASCII_CODE_THREE               ), // 3
+            util::ASCII_CODE_FOUR        => ScanResult::BcCode(util::ASCII_CODE_FOUR                ), // 4
+            util::ASCII_CODE_FIVE        => ScanResult::BcCode(util::ASCII_CODE_FIVE                ), // 5
+            util::ASCII_CODE_SIX         => ScanResult::BcCode(util::ASCII_CODE_SIX                 ), // 6
+            util::ASCII_CODE_SEVEN       => ScanResult::BcCode(util::ASCII_CODE_SEVEN               ), // 7
+            util::ASCII_CODE_EIGHT       => ScanResult::BcCode(util::ASCII_CODE_EIGHT               ), // 8
+            util::ASCII_CODE_NINE        => ScanResult::BcCode(util::ASCII_CODE_NINE                ), // 9
+            util::ASCII_CODE_S           => ScanResult::BcCode(util::ASCII_CODE_S                   ), // s
+            util::ASCII_CODE_C           => ScanResult::BcCode(util::ASCII_CODE_C                   ), // c
+            util::ASCII_CODE_A           => ScanResult::BcCode(util::ASCII_CODE_A                   ), // a
+            util::ASCII_CODE_L           => ScanResult::BcCode(util::ASCII_CODE_L                   ), // l
+            util::ASCII_CODE_E           => ScanResult::BcCode(util::ASCII_CODE_E                   ), // e
+            util::ASCII_CODE_J           => ScanResult::BcCode(util::ASCII_CODE_J                   ), // j
+            util::ASCII_CODE_ROUNDLEFT   => ScanResult::BcCode(util::ASCII_CODE_ROUNDLEFT           ), // (
+            util::ASCII_CODE_ROUNDRIGHT  => ScanResult::BcCode(util::ASCII_CODE_ROUNDRIGHT          ), // )
+            util::ASCII_CODE_SQUARELEFT  => ScanResult::CurLeftCode,                                   // [
+            util::ASCII_CODE_SQUARERIGHT => ScanResult::CurRightCode,                                  // ]
+            util::ASCII_CODE_PLUS        => ScanResult::BcCode(util::ASCII_CODE_PLUS                ), // +
+            util::ASCII_CODE_MINUS       => ScanResult::BcCode(util::ASCII_CODE_MINUS               ), // -
+            util::ASCII_CODE_ASTERISK    => ScanResult::BcCode(util::ASCII_CODE_ASTERISK            ), // *
+            util::ASCII_CODE_SLUSH       => ScanResult::BcCode(util::ASCII_CODE_SLUSH               ), // /
+            util::ASCII_CODE_PERIOD      => ScanResult::BcCode(util::ASCII_CODE_PERIOD              ), // .
+            util::ASCII_CODE_EQUAL       => ScanResult::BcCode(util::ASCII_CODE_EQUAL               ), // =
+            util::ASCII_CODE_SEMICOLON   => ScanResult::BcCode(util::ASCII_CODE_SEMICOLON           ), // ;
+            util::ASCII_CODE_NEWLINE     => ScanResult::EndCode,                                       // \n
+            util::ASCII_CODE_ESCAPE      => ScanResult::EndCode,                                       // escape key
+            util::ASCII_CODE_DELETE      => ScanResult::DeleteCode,                                    // delete key
+            util::ASCII_CODE_SPACE       => ScanResult::BcCode(util::ASCII_CODE_SPACE               ), // white space key
             _                            => ScanResult::UnknownCode,
         }
     }
@@ -129,7 +129,9 @@ impl Dntker {
             if r > 0 {
                 let input_char = ptr[0] as u8;
                 match &self.char_scan(input_char) {
-                    ScanResult::UnknownCode => (),
+                    ScanResult::UnknownCode => {
+                        // TODO INFORM WARN
+                    },
                     ScanResult::EndCode => {
                         print!("\n");
                         break

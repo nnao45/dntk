@@ -134,7 +134,7 @@ $ echo "123 * 2" | dntk | xargs echo
 ```
 behave, like bc ☺️
 
-***Have a nice go hacking days***:sparkles::wink:
+***Have a nice rust hacking days***:sparkles::wink:
 ## Writer & License
 dntk was writed by nnao45 (WORK:Infrastructure Engineer, Twitter:@nnao45, MAIL:n4sekai5y@gmail.com).  
 This software is released under the MIT License, see LICENSE.

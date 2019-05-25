@@ -1,8 +1,10 @@
 mod util;
 
+use super::meta;
 use std::io::Write;
 use bc::{bc, BCError};
 use atty::Stream;
+use clap::{App, Arg};
 
 #[derive(Debug, PartialEq)]
 pub struct Dntker {
@@ -33,12 +35,21 @@ enum DntkResult {
 
 impl Dntker {
     pub fn new() -> Self {
+        let mut iv : Vec<u8> = Vec::new();
+        let mut bpsl = 0;
+        let mut ccp = 0;
+        if let Some(v) = meta::build_cli().get_matches().value_of("scale") {
+            let scale_bytes = &mut format!("{}{}{}", "scale=", v, "; ").as_bytes().to_owned();
+            bpsl = scale_bytes.len();
+            ccp = scale_bytes.len();
+            iv.append(scale_bytes);
+        }
         Dntker {
-            input_vec: Vec::new(),
+            input_vec:iv,
             before_printed_len: 0,
             before_printed_result_len: 0,
-            before_printed_statement_len: 0,
-            currnet_cur_pos: 0,
+            before_printed_statement_len: bpsl,
+            currnet_cur_pos: ccp,
         }
     }
 
@@ -104,7 +115,7 @@ impl Dntker {
         &self.input_vec.insert(self.currnet_cur_pos-1, code.to_owned());
     }
 
-    fn statement_from_utf8(&self) -> String {
+    fn statement_from_utf8(&mut self) -> String {
         std::str::from_utf8(&self.input_vec).unwrap().to_string()
     }
 

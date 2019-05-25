@@ -6,11 +6,11 @@ use bc::{bc, BCError};
 
 #[derive(Debug)]
 pub struct Dntker {
-    input_vec: Vec<u8>,
-    before_printed_len: usize,
-    before_printed_result_len: usize,
-    before_printed_statement_len: usize,
-    currnet_cur_pos: usize,
+    pub input_vec: Vec<u8>,
+    pub before_printed_len: usize,
+    pub before_printed_result_len: usize,
+    pub before_printed_statement_len: usize,
+    pub currnet_cur_pos: usize,
 }
 
 #[derive(Debug, PartialEq)]
@@ -202,40 +202,71 @@ mod dntker_tests {
     #[test]
     fn test_filter_char() {
         let d = Dntker::new();
-       assert_eq!(d.filter_char(util::ASCII_CODE_ZERO       ), FilterResult::BcCode(util::ASCII_CODE_ZERO      ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_ONE        ), FilterResult::BcCode(util::ASCII_CODE_ONE       ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_TWO        ), FilterResult::BcCode(util::ASCII_CODE_TWO       ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_THREE      ), FilterResult::BcCode(util::ASCII_CODE_THREE     ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_FOUR       ), FilterResult::BcCode(util::ASCII_CODE_FOUR      ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_FIVE       ), FilterResult::BcCode(util::ASCII_CODE_FIVE      ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_SIX        ), FilterResult::BcCode(util::ASCII_CODE_SIX       ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_SEVEN      ), FilterResult::BcCode(util::ASCII_CODE_SEVEN     ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_EIGHT      ), FilterResult::BcCode(util::ASCII_CODE_EIGHT     ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_NINE       ), FilterResult::BcCode(util::ASCII_CODE_NINE      ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_S          ), FilterResult::BcCode(util::ASCII_CODE_S         ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_C          ), FilterResult::BcCode(util::ASCII_CODE_C         ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_A          ), FilterResult::BcCode(util::ASCII_CODE_A         ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_L          ), FilterResult::BcCode(util::ASCII_CODE_L         ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_E          ), FilterResult::BcCode(util::ASCII_CODE_E         ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_J          ), FilterResult::BcCode(util::ASCII_CODE_J         ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDLEFT  ), FilterResult::BcCode(util::ASCII_CODE_ROUNDLEFT ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDRIGHT ), FilterResult::BcCode(util::ASCII_CODE_ROUNDRIGHT));
-       assert_eq!(d.filter_char(util::ASCII_CODE_SQUARELEFT ), FilterResult::CurLeftCode                        );
-       assert_eq!(d.filter_char(util::ASCII_CODE_SQUARERIGHT), FilterResult::CurRightCode                       );
-       assert_eq!(d.filter_char(util::ASCII_CODE_PLUS       ), FilterResult::BcCode(util::ASCII_CODE_PLUS      ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_MINUS      ), FilterResult::BcCode(util::ASCII_CODE_MINUS     ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_ASTERISK   ), FilterResult::BcCode(util::ASCII_CODE_ASTERISK  ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_SLUSH      ), FilterResult::BcCode(util::ASCII_CODE_SLUSH     ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_PERIOD     ), FilterResult::BcCode(util::ASCII_CODE_PERIOD    ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_EQUAL      ), FilterResult::BcCode(util::ASCII_CODE_EQUAL     ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ));
-       assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::EndCode                            );
-       assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EndCode                            );
-       assert_eq!(d.filter_char(util::ASCII_CODE_DELETE     ), FilterResult::DeleteCode                         );
-       assert_eq!(d.filter_char(util::ASCII_CODE_SPACE      ), FilterResult::BcCode(util::ASCII_CODE_SPACE     ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_ZERO       ), FilterResult::BcCode(util::ASCII_CODE_ZERO      ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_ONE        ), FilterResult::BcCode(util::ASCII_CODE_ONE       ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_TWO        ), FilterResult::BcCode(util::ASCII_CODE_TWO       ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_THREE      ), FilterResult::BcCode(util::ASCII_CODE_THREE     ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_FOUR       ), FilterResult::BcCode(util::ASCII_CODE_FOUR      ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_FIVE       ), FilterResult::BcCode(util::ASCII_CODE_FIVE      ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_SIX        ), FilterResult::BcCode(util::ASCII_CODE_SIX       ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_SEVEN      ), FilterResult::BcCode(util::ASCII_CODE_SEVEN     ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_EIGHT      ), FilterResult::BcCode(util::ASCII_CODE_EIGHT     ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_NINE       ), FilterResult::BcCode(util::ASCII_CODE_NINE      ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_S          ), FilterResult::BcCode(util::ASCII_CODE_S         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_C          ), FilterResult::BcCode(util::ASCII_CODE_C         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_A          ), FilterResult::BcCode(util::ASCII_CODE_A         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_L          ), FilterResult::BcCode(util::ASCII_CODE_L         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_E          ), FilterResult::BcCode(util::ASCII_CODE_E         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_J          ), FilterResult::BcCode(util::ASCII_CODE_J         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDLEFT  ), FilterResult::BcCode(util::ASCII_CODE_ROUNDLEFT ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDRIGHT ), FilterResult::BcCode(util::ASCII_CODE_ROUNDRIGHT));
+        assert_eq!(d.filter_char(util::ASCII_CODE_SQUARELEFT ), FilterResult::CurLeftCode                        );
+        assert_eq!(d.filter_char(util::ASCII_CODE_SQUARERIGHT), FilterResult::CurRightCode                       );
+        assert_eq!(d.filter_char(util::ASCII_CODE_PLUS       ), FilterResult::BcCode(util::ASCII_CODE_PLUS      ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_MINUS      ), FilterResult::BcCode(util::ASCII_CODE_MINUS     ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_ASTERISK   ), FilterResult::BcCode(util::ASCII_CODE_ASTERISK  ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_SLUSH      ), FilterResult::BcCode(util::ASCII_CODE_SLUSH     ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_PERIOD     ), FilterResult::BcCode(util::ASCII_CODE_PERIOD    ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_EQUAL      ), FilterResult::BcCode(util::ASCII_CODE_EQUAL     ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::EndCode                            );
+        assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EndCode                            );
+        assert_eq!(d.filter_char(util::ASCII_CODE_DELETE     ), FilterResult::DeleteCode                         );
+        assert_eq!(d.filter_char(util::ASCII_CODE_SPACE      ), FilterResult::BcCode(util::ASCII_CODE_SPACE     ));
 
-       assert_eq!(d.filter_char(0x00                        ), FilterResult::UnknownCode(0x00                  ));
-       assert_eq!(d.filter_char(0x21                        ), FilterResult::UnknownCode(0x21                  ));
-       assert_eq!(d.filter_char(0x4f                        ), FilterResult::UnknownCode(0x4f                  ));
+        assert_eq!(d.filter_char(0x00                        ), FilterResult::UnknownCode(0x00                  ));
+        assert_eq!(d.filter_char(0x21                        ), FilterResult::UnknownCode(0x21                  ));
+        assert_eq!(d.filter_char(0x4f                        ), FilterResult::UnknownCode(0x4f                  ));
+    }
+
+    #[test]
+    fn test_delete_column() {
+        let d1 = &mut Dntker::new();
+        d1.delete_column();
+
+        assert_eq!(d1.input_vec, vec![]);
+        assert_eq!(d1.currnet_cur_pos, 0);
+
+        assert_eq!(d1.before_printed_len, 0);
+        assert_eq!(d1.before_printed_statement_len, 0);
+
+        let test_before_printed_len = 3;
+        let test_before_printed_result_len = 1;
+        let test_before_printed_statement_len = 3;
+        let test_currnet_cur_pos = 3;
+        let d2 = &mut Dntker {
+            input_vec: vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS, util::ASCII_CODE_TWO],
+            before_printed_len: test_before_printed_len,
+            before_printed_result_len: test_before_printed_result_len,
+            before_printed_statement_len: test_before_printed_statement_len,
+            currnet_cur_pos: test_currnet_cur_pos,
+        };
+        d2.delete_column();
+
+        assert_eq!(d2.input_vec, vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS]);
+        assert_eq!(d2.currnet_cur_pos, test_currnet_cur_pos-1);
+
+        assert_eq!(d2.before_printed_len, test_before_printed_len);
+        assert_eq!(d2.before_printed_statement_len, test_before_printed_statement_len);
     }
 }

@@ -59,7 +59,7 @@ All OK!! 😎
 ## clean buffer
 if you want to clean buffer, very easy, type `r`
 
-![result](https://github.com/nnao45/naoGifRepo/blob/master/dntk-demo05.gif)
+[![asciicast](https://asciinema.org/a/248301.svg)](https://asciinema.org/a/248301)
 
 ## Pipe use...
 ```bash

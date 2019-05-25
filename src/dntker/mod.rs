@@ -102,7 +102,7 @@ impl Dntker {
     }
 
     fn statement_from_utf8(&self) -> String {
-        std::str::from_utf8(&self.input_vec).unwrap_or(&"error occured").to_string()
+        std::str::from_utf8(&self.input_vec).unwrap().to_string()
     }
 
     fn output_fill_whitespace(&self, len: usize) -> String {

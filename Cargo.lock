@@ -52,7 +52,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "dntk"
-version = "2.0.1"
+version = "2.0.2"
 dependencies = [
  "atty 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "bc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",

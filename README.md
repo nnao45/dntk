@@ -1,8 +1,8 @@
 # dntk
 [![Travis CI](https://travis-ci.org/nnao45/dntk.svg?branch=master)](https://travis-ci.org/nnao45/dntk)
-[![v2.0.1](https://img.shields.io/badge/package-v2.0.1-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v2.0.1)
-[![crates](https://img.shields.io/badge/crates.io-v2.0.1-319e8c.svg)](https://crates.io/crates/dntk)
-[![docker](https://img.shields.io/badge/docker-v2.0.1-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags)
+[![v2.0.2](https://img.shields.io/badge/package-v2.0.2-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v2.0.2)
+[![crates](https://img.shields.io/badge/crates.io-v2.0.2-319e8c.svg)](https://crates.io/crates/dntk)
+[![docker](https://img.shields.io/badge/docker-v2.0.2-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
 [![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux-orange.svg)]()
 
@@ -32,7 +32,7 @@ dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.or
     </tr>
 </table>
 
-## ***Current dntk's version: v2.0.1***
+## ***Current dntk's version: v2.0.2***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## Install
@@ -43,14 +43,14 @@ $ brew install nnao45/dntk/dntk
 
 ### Linux
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.0.1/dntk-v2.0.1-x86_64-unknown-linux-gnu.zip
-$ unzip dntk-v2.0.1-x86_64-unknown-linux-gnu.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v2.0.2/dntk-v2.0.2-x86_64-unknown-linux-gnu.zip
+$ unzip dntk-v2.0.2-x86_64-unknown-linux-gnu.zip
 ```
 
 if can't move, try...
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.0.1/dntk-v2.0.1-x86_64-unknown-linux-musl.zip
-$ unzip dntk-v2.0.1-x86_64-unknown-linux-musl.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v2.0.2/dntk-v2.0.2-x86_64-unknown-linux-musl.zip
+$ unzip dntk-v2.0.2-x86_64-unknown-linux-musl.zip
 ```
 
 ### From Rust source
@@ -85,6 +85,25 @@ $ echo 'alias bc=dntk' >> ~/.bashrc
 $ echo 'alias bc=dntk' >> ~/.zshrc
 ```
 All OK!! 😎
+
+## Options
+```
+./target/release/dntk --help
+dntk 2.0.2
+nnao45 <n4sekai5y@gmail.com>
+Command line's Interactive calculator, GNU bc wrapper.
+
+USAGE:
+    dntk [FLAGS] [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+    -w, --white      Set White color in a output
+
+OPTIONS:
+    -s, --scale <NUMBER>    Number of truncated after the decimal point
+```
 
 ## Movable Cursor
 

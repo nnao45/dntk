@@ -20,7 +20,7 @@ pub fn build_cli() -> App<'static, 'static> {
             .takes_value(true)                  // 値を持つことを定義
         )
         .arg(Arg::with_name("white")              // オプションを定義
-            .help("Set non color in a output")              // ヘルプメッセージ
+            .help("Set White color in a output")              // ヘルプメッセージ
             .short("w")                         // ショートコマンド
             .long("white")                        // ロングコマンド
     )

@@ -4,7 +4,6 @@ use super::meta;
 use std::io::Write;
 use bc::{bc, BCError};
 use atty::Stream;
-use clap::{App, Arg};
 
 #[derive(Debug, PartialEq)]
 pub struct Dntker {
@@ -139,7 +138,7 @@ impl Dntker {
         let pos_differnce = self.before_printed_statement_len - self.currnet_cur_pos;
         let pos_move_point = (p3.to_string().len() + self.before_printed_result_len + &pos_differnce).to_string();
         let result = &mut vec![util::COLOR_CYAN_HEADER, p1, p2, p3, p4, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, &pos_move_point, util::CURSOR_MOVE_ES_BACK];
-        self.output(result, 0, 4,)
+        self.output(result, 0, 4)
     }
 
     fn output_ng(&mut self, p1: &str, p2: &str, p3: &str) -> String {

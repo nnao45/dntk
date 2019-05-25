@@ -10,7 +10,7 @@ matrix:
       rust: stable
       env:
         - TARGET=x86_64-unknown-linux-gnu
-          LINUX_TERM_LIB=linux_unknown.rs
+          LINUX_TERM_LIB=linux_gnu.rs
     - os: linux
       rust: stable
       env:

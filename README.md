@@ -1,8 +1,10 @@
+# dntk
 [![Travis CI](https://travis-ci.org/nnao45/dntk.svg?branch=master)](https://travis-ci.org/nnao45/dntk)
 [![v2.0.1](https://img.shields.io/badge/package-v2.0.1-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v2.0.1)
+[![docker](https://img.shields.io/badge/docker-v2.0.1-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
+[![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux-orange.svg)]()
 
-# dntk
 dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
 [![asciicast](https://asciinema.org/a/248298.svg)](https://asciinema.org/a/248298)
 <a href="https://asciinema.org/a/248301" target="_blank"><img src="https://asciinema.org/a/248301.svg" height="320px"></a>
@@ -135,7 +137,7 @@ $ echo "123 * 2" | dntk | xargs echo
 ```
 behave, like bc ☺️
 
-***Have a nice go hacking days***:sparkles::wink:
+***Have a nice rust hacking days***:sparkles::wink:
 ## Writer & License
 dntk was writed by nnao45 (WORK:Infrastructure Engineer, Twitter:@nnao45, MAIL:n4sekai5y@gmail.com).  
 This software is released under the MIT License, see LICENSE.

@@ -8,23 +8,23 @@ matrix:
       env: TARGET=x86_64-apple-darwin
     - os: linux
       rust: stable
-      env: TARGET=x86_64-unknown-linux-gnu
+      env:
+        - TARGET=x86_64-unknown-linux-gnu
+          LINUX_TERM_LIB=linux_unknown.rs
     - os: linux
       rust: stable
-      env: TARGET=x86_64-unknown-linux-musl
+      env:
+        - TARGET=x86_64-unknown-linux-musl
+          LINUX_TERM_LIB=linux_musl.rs
     - os: linux
       rust: stable
-      env: TARGET=aarch64-unknown-linux-gnu
-os:
-  - osx
-  - linux
-env:
-  global:
-    LINUX_TERM_LIB='linux_unknown.rs'
+      env:
+        - TARGET=aarch64-unknown-linux-gnu
+          LINUX_TERM_LIB=linux_unknown.rs
 before_script:
   - rustc -V
   - cargo -V
-  - if [[ "${TARGET}" == "x86_64-unknown-linux-musl" ]]; then rustup target add $TARGET; export LINUX_TERM_LIB=linux_musl.rs; fi
+  - if [[ "${TARGET}" == "x86_64-unknown-linux-musl" ]]; then rustup target add $TARGET; fi
   - git --version
   - echo $TRAVIS_BRANCH
   - git rev-parse HEAD

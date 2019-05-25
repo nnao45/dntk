@@ -304,4 +304,37 @@ mod dntker_tests {
         assert_eq!(d2.before_printed_result_len, 1);
         assert_eq!(d2.before_printed_statement_len, 3);
     }
+    #[test]
+    fn test_cursor_move_right() {
+        let d1 = &mut Dntker::new();
+        d1.cursor_move_right();
+
+        assert_eq!(d1.input_vec, vec![]);
+        assert_eq!(d1.currnet_cur_pos, 0);
+
+        assert_eq!(d1.before_printed_len, 0);
+        assert_eq!(d1.before_printed_result_len, 0);
+        assert_eq!(d1.before_printed_statement_len, 0);
+
+        let test_input_vec = vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS, util::ASCII_CODE_TWO];
+        let test_before_printed_len = 3;
+        let test_before_printed_result_len = 1;
+        let test_before_printed_statement_len = 3;
+        let test_currnet_cur_pos = 2;
+        let d2 = &mut  Dntker {
+            input_vec: test_input_vec,
+            before_printed_len: test_before_printed_len,
+            before_printed_result_len: test_before_printed_result_len,
+            before_printed_statement_len: test_before_printed_statement_len,
+            currnet_cur_pos: test_currnet_cur_pos,
+        };
+        d2.cursor_move_right();
+
+        assert_eq!(d2.input_vec, vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS, util::ASCII_CODE_TWO]);
+        assert_eq!(d2.currnet_cur_pos, 3);
+
+        assert_eq!(d2.before_printed_len, 3);
+        assert_eq!(d2.before_printed_result_len, 1);
+        assert_eq!(d2.before_printed_statement_len, 3);
+    }
 }

@@ -373,4 +373,30 @@ mod dntker_tests {
         assert_eq!(d2.before_printed_result_len, 1);
         assert_eq!(d2.before_printed_statement_len, 3);
     }
+
+    #[test]
+    fn test_statement_from_utf8() {
+        let test_input_vec1 = vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS, util::ASCII_CODE_TWO];
+        let test_input_vec2 = vec![util::ASCII_CODE_S, util::ASCII_CODE_ROUNDLEFT, util::ASCII_CODE_EIGHT, util::ASCII_CODE_ROUNDRIGHT];
+        let test_before_printed_len = 3;
+        let test_before_printed_result_len = 1;
+        let test_before_printed_statement_len = 3;
+        let test_currnet_cur_pos = 2;
+        let d1 = &mut  Dntker {
+            input_vec: test_input_vec1,
+            before_printed_len: test_before_printed_len,
+            before_printed_result_len: test_before_printed_result_len,
+            before_printed_statement_len: test_before_printed_statement_len,
+            currnet_cur_pos: test_currnet_cur_pos,
+        };
+        let d2 = &mut  Dntker {
+            input_vec: test_input_vec2,
+            before_printed_len: test_before_printed_len,
+            before_printed_result_len: test_before_printed_result_len,
+            before_printed_statement_len: test_before_printed_statement_len,
+            currnet_cur_pos: test_currnet_cur_pos,
+        };
+        assert_eq!("1+2".to_string(), d1.statement_from_utf8());
+        assert_eq!("s(8)".to_string(), d2.statement_from_utf8());
+    }
 }

@@ -1,8 +1,9 @@
+# dntk
 [![Travis CI](https://travis-ci.org/nnao45/dntk.svg?branch=master)](https://travis-ci.org/nnao45/dntk)
 [![v2.0.1](https://img.shields.io/badge/package-v2.0.1-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v2.0.1)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
+[![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux-blue.svg)]()
 
-# dntk
 dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
 [![asciicast](https://asciinema.org/a/248298.svg)](https://asciinema.org/a/248298)
   

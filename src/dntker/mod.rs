@@ -399,4 +399,11 @@ mod dntker_tests {
         assert_eq!("1+2".to_string(), d1.statement_from_utf8());
         assert_eq!("s(8)".to_string(), d2.statement_from_utf8());
     }
+
+    #[test]
+    fn test_output_fill_whitespace() {
+        let d = Dntker::new();
+        assert_eq!("\r".to_string(), d.output_fill_whitespace(0));
+        assert_eq!("\r    ".to_string(), d.output_fill_whitespace(4));
+    }
 }

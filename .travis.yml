@@ -14,6 +14,7 @@ env:
   global:
     LINUX_TERM_LIB='linux_unknown.rs'
 script:
+  - cargo test
   - cargo build --release
 deploy:
   provider: releases

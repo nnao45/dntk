@@ -1,32 +1,38 @@
-language: go
-env:
-- GIMME_CGO_ENABLED=1
-go:
-- master
-os:
-- osx
-before_install:
-- wget http://crossgcc.rts-software.org/download/gcc-4.8.1-for-linux32-linux64/gcc-4.8.1-for-linux64.dmg
-- hdiutil attach gcc-4.8.1-for-linux64.dmg
-- cd /Volumes/gcc-4.8.1-for-linux64
-- sudo installer -pkg gcc-4.8.1-for-linux64.pkg -target "/"
-- cd ${TRAVIS_BUILD_DIR}
-- export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux64/bin"
-- wget http://crossgcc.rts-software.org/download/gcc-4.8.1-for-linux32-linux64/gcc-4.8.1-for-linux32.dmg
-- hdiutil attach gcc-4.8.1-for-linux32.dmg
-- cd /Volumes/gcc-4.8.1-for-linux32
-- sudo installer -pkg gcc-4.8.1-for-linux32.pkg -target "/"
-- cd ${TRAVIS_BUILD_DIR}
-- export PATH="${PATH}:/usr/local/gcc-4.8.1-for-linux32/bin"
+language: rust
+rust:
+  - stable
+matrix:
+  include:
+    - os: osx
+      rust: stable
+      env: TARGET=x86_64-apple-darwin
+    - os: linux
+      rust: stable
+      env:
+        - TARGET=x86_64-unknown-linux-gnu
+          LINUX_TERM_LIB=linux_gnu.rs
+    - os: linux
+      rust: stable
+      env:
+        - TARGET=x86_64-unknown-linux-musl
+          LINUX_TERM_LIB=linux_musl.rs
 before_script:
-- make clean-all
-- make dep-install
-- make deps
-- make cross-build
-- make dist
-- make 
+  - rustc -V
+  - cargo -V
+  - if [[ "${TARGET}" == "x86_64-unknown-linux-musl" ]]; then rustup target add $TARGET; fi
+  - git --version
+  - echo $TRAVIS_BRANCH
+  - git rev-parse HEAD
 script:
-- bin/dntk --version
+  - export PKG_CONFIG_ALLOW_CROSS=1
+  - cargo test  --target $TARGET
+  - cargo build --target $TARGET
+before_deploy:
+  - export PKG_CONFIG_ALLOW_CROSS=1
+  - cargo build --target $TARGET --release
+  - mkdir "dntk-${TRAVIS_TAG}-${TARGET}"
+  - cp target/$TARGET/release/dntk LICENSE README.md "dntk-${TRAVIS_TAG}-${TARGET}"
+  - zip "dntk-${TRAVIS_TAG}-${TARGET}.zip" -r "dntk-${TRAVIS_TAG}-${TARGET}"
 deploy:
   provider: releases
   skip_cleanup: true
@@ -36,3 +42,7 @@ deploy:
   file: "./dist/*.{tar.gz,zip}"
   on:
     tags: true
+notifications:
+  email:
+    on_success: never
+    on_failure: change

@@ -404,6 +404,7 @@ mod dntker_tests {
     fn test_output_fill_whitespace() {
         let d = Dntker::new();
         assert_eq!("\r".to_string(), d.output_fill_whitespace(0));
+        assert_eq!("\r ".to_string(), d.output_fill_whitespace(1));
         assert_eq!("\r    ".to_string(), d.output_fill_whitespace(4));
     }
 }

@@ -63,6 +63,22 @@ $ cargo install dntk
 $ zplug 'nnao45/dntk', as:command, from:gh-r
 ```
 
+### Docker
+Can use dntk docker image,  
+Look!! Very light weight!!🚀
+
+```bash
+$ docker images nnao45/dntk
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+nnao45/dntk         latest              3a37b5d989b5        2 hours ago         10.5MB
+```
+
+And run, 
+
+```bash
+$ docker run -it --rm nnao45/dntk:latest
+```
+
 ### And...
 ```bash
 $ echo 'alias bc=dntk' >> ~/.bashrc

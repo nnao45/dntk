@@ -39,7 +39,7 @@ deploy:
   file_glob: true
   api_key:
     secure: PiyrDGGfzpLQDwNfZWnoSuu9uCjiK1Ump5Oy+IMc1CzWPGy18FuZcnI6RttxBGd3amZlUPGG2mh0/sc2+Bs8AXScHuY3OQRxSF4xSKchB4eoEzJMLqAXAOe9aF8QFOICfSLz1kDMtHWydrRHwMJuTzEwKcO43ktICT1GNwCWOWdNheYuwE1unFlBc1PXxNex+ywYzluV3uVuuX8Vw3D0ZZML0hpxUw6NOuhxyHraR64bGR+Jo/O20XELwKZB8i/A4y62SbYiGmFf04rWQeK3is2NFTEdxlQE+hCqJGzFxgnN7KP0zJfkVNrsUM6ALHcA0K1dH2xJKco8ozpdqeEU9SdPO9m1aNRwoZbZjg3z6YNtjL1/WswfTpvECTZhOX/LDs4s2VdBk3uNPKqbnjs/fv8QiXkZaqEmMgFGc7sDjXN8C0KY5OdVShzoo8eFZvI3nSDkDpG2lR4keAnD8eTnaQd9VZLO0b7SOoIxPJ5KzEqbstHUosCt5e0zs1FgA5b6dDpnKoDK6Oyp75tcyASh1IPt0hdL01pdxBIdOiHfRpHCRswCu8FCYhsBzwz2BHy6P2OxfAjw+x01/tzjsBBueBN2hF1GH7M3oHM9gzZY8WIIxZJ1JxyJj+450xHaYmSrJDR/wC9AGfSTxzGhp4RMlWsF3oRI+xo9I1V3PxK1Vno=
-  file: "./dist/*.{tar.gz,zip}"
+  file: "dntk-${TRAVIS_TAG}-${TARGET}.zip"
   on:
     tags: true
 notifications:

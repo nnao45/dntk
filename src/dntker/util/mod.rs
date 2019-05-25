@@ -34,6 +34,7 @@ pub const ASCII_CODE_A           : u8 = 0x61; // a
 pub const ASCII_CODE_L           : u8 = 0x6c; // l
 pub const ASCII_CODE_E           : u8 = 0x65; // e
 pub const ASCII_CODE_J           : u8 = 0x6a; // j
+pub const ASCII_CODE_R           : u8 = 0x72; // r
 pub const ASCII_CODE_ROUNDLEFT   : u8 = 0x28; // (
 pub const ASCII_CODE_ROUNDRIGHT  : u8 = 0x29; // )
 pub const ASCII_CODE_SQUARELEFT  : u8 = 0x5b; // [

@@ -4,7 +4,7 @@ use std::io::Write;
 use bc::{bc, BCError};
 use atty::Stream;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Dntker {
     pub input_vec: Vec<u8>,
     pub before_printed_len: usize,
@@ -17,6 +17,7 @@ pub struct Dntker {
 enum FilterResult {
     BcCode(u8),
     EndCode,
+    RefreshCode,
     DeleteCode,
     CurLeftCode,
     CurRightCode,
@@ -27,6 +28,7 @@ enum FilterResult {
 enum DntkResult {
     Output(String),
     Fin,
+    Continue,
 }
 
 impl Dntker {
@@ -58,6 +60,7 @@ impl Dntker {
             util::ASCII_CODE_L           => FilterResult::BcCode(util::ASCII_CODE_L         ), // l
             util::ASCII_CODE_E           => FilterResult::BcCode(util::ASCII_CODE_E         ), // e
             util::ASCII_CODE_J           => FilterResult::BcCode(util::ASCII_CODE_J         ), // j
+            util::ASCII_CODE_R           => FilterResult::RefreshCode,                         // r
             util::ASCII_CODE_ROUNDLEFT   => FilterResult::BcCode(util::ASCII_CODE_ROUNDLEFT ), // (
             util::ASCII_CODE_ROUNDRIGHT  => FilterResult::BcCode(util::ASCII_CODE_ROUNDRIGHT), // )
             util::ASCII_CODE_SQUARELEFT  => FilterResult::CurLeftCode,                         // [
@@ -133,6 +136,12 @@ impl Dntker {
         print!("{}", &self.output_fill_whitespace(warn_str.len()));
     }
 
+    fn refresh(&mut self) {
+        print!("{}", self.output_fill_whitespace(self.before_printed_len));
+        *self = Dntker::new();
+        print!("{}", util::DNTK_PROMPT);
+    }
+
     fn dntk_exec(&mut self, ptr: [libc::c_char; 1]) -> DntkResult {
         let input_char = ptr[0] as u8;
         match &self.filter_char(input_char) {
@@ -141,6 +150,10 @@ impl Dntker {
             },
             FilterResult::EndCode => {
                 return DntkResult::Fin
+            },
+            FilterResult::RefreshCode => {
+                &self.refresh();
+                return DntkResult::Continue
             },
             FilterResult::DeleteCode => {
                 &self.delete_column();
@@ -192,6 +205,9 @@ impl Dntker {
                     DntkResult::Fin => {
                         print!("\n");
                         break
+                    },
+                    DntkResult::Continue => {
+                        continue
                     },
                     DntkResult::Output(o) => {
                         print!("{}", o);
@@ -427,6 +443,24 @@ mod dntker_tests {
         let d = &mut Dntker::new();
         assert_eq!("\u{1b}[35m\r(dntk): 1+2* = \u{1b}[0m\u{1b}[7D".to_string(), d.output_ng(util::DNTK_PROMPT, "1+2*", " = "));
         assert_eq!("\u{1b}[35m\r(dntk): a(123)*s( = \u{1b}[0m\u{1b}[12D".to_string(), d.output_ng(util::DNTK_PROMPT, "a(123)*s(", " = "));
+    }
+
+    #[test]
+    fn test_refresh() {
+        let test_input_vec = vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS, util::ASCII_CODE_TWO];
+        let test_before_printed_len = 3;
+        let test_before_printed_result_len = 1;
+        let test_before_printed_statement_len = 3;
+        let test_currnet_cur_pos = 2;
+        let d = &mut Dntker {
+            input_vec: test_input_vec,
+            before_printed_len: test_before_printed_len,
+            before_printed_result_len: test_before_printed_result_len,
+            before_printed_statement_len: test_before_printed_statement_len,
+            currnet_cur_pos: test_currnet_cur_pos,
+        };
+        d.refresh();
+        assert_eq!(d, &mut Dntker::new());
     }
 
     #[test]

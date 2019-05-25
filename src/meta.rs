@@ -16,7 +16,7 @@ pub fn build_cli() -> App<'static, 'static> {
             .help("Number of truncated after the decimal point")                // ヘルプメッセージ
             .short("s")                         // ショートコマンド
             .long("scale")                       // ロングコマンド
-            .value_name("VALUE")
+            .value_name("NUMBER")
             .takes_value(true)                  // 値を持つことを定義
         )
         .arg(Arg::with_name("white")              // オプションを定義

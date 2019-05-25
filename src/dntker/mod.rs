@@ -124,25 +124,38 @@ impl Dntker {
         format!("\r{}", (0..len).map(|_| " ").collect::<String>())
     }
 
+    fn output(&self, v: &mut Vec<&str>, p1: usize, p2: usize) -> String {
+        if meta::build_cli().get_matches().is_present("white") {
+            v.remove(p1);
+            v.remove(p2);
+        }
+        v.iter().map(|s| s.to_string()).collect()
+    }
+
     fn output_ok(&mut self, p1: &str, p2: &str, p3: &str, p4: &str) -> String {
         self.before_printed_result_len = p4.to_string().len();
         self.before_printed_statement_len = p2.to_string().len();
         self.before_printed_len = p1.to_string().len() + self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
         let pos_differnce = self.before_printed_statement_len - self.currnet_cur_pos;
-        format!("{}{}{}{}{}{}{}{}{}", util::COLOR_CYAN_HEADER, p1, p2, p3, p4, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, (p3.to_string().len() + self.before_printed_result_len + pos_differnce), util::CURSOR_MOVE_ES_BACK)
+        let pos_move_point = (p3.to_string().len() + self.before_printed_result_len + &pos_differnce).to_string();
+        let result = &mut vec![util::COLOR_CYAN_HEADER, p1, p2, p3, p4, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, &pos_move_point, util::CURSOR_MOVE_ES_BACK];
+        self.output(result, 0, 4,)
     }
 
     fn output_ng(&mut self, p1: &str, p2: &str, p3: &str) -> String {
         self.before_printed_statement_len = p2.to_string().len();
         self.before_printed_len = p1.to_string().len() +  self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
         let pos_differnce =  self.before_printed_statement_len - &self.currnet_cur_pos;
-        format!("{}{}{}{}{}{}{}{}", util::COLOR_MAGENDA_HEADER, p1, p2, p3, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, (p3.to_string().len() + pos_differnce), util::CURSOR_MOVE_ES_BACK)
+        let pos_move_point = (p3.to_string().len() + pos_differnce).to_string();
+        let result = &mut vec![util::COLOR_MAGENDA_HEADER, p1, p2, p3, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, &pos_move_point, util::CURSOR_MOVE_ES_BACK];
+        self.output(result, 0, 3)
     }
 
     fn info_wn(&mut self, unknown_code: &u8) {
         print!("{}", self.output_fill_whitespace(self.before_printed_len));
         let warn_str =format!("this char is no supported: {}", unknown_code.to_owned() as char);
-        print!("{}{}{}{}", "\r", util::COLOR_YELLOW_HEADER, warn_str, util::COLOR_PLAIN_HEADER);
+        let result = &mut vec!["\r", util::COLOR_YELLOW_HEADER, &warn_str, util::COLOR_PLAIN_HEADER];
+        print!("{}", self.output(result, 1, 2));
         std::io::stdout().flush().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(1000));
         print!("{}", &self.output_fill_whitespace(warn_str.len()));

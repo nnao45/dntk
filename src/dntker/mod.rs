@@ -239,6 +239,16 @@ mod dntker_tests {
         assert_eq!(d.filter_char(0x4f                        ), FilterResult::UnknownCode(0x4f                  ));
     }
 
+    pub fn new_dummy_dntker(p1: usize, p2: usize, p3: usize, p4: usize) -> Dntker {
+        Dntker {
+            input_vec: vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS, util::ASCII_CODE_TWO],
+            before_printed_len: p1,
+            before_printed_result_len: p2,
+            before_printed_statement_len: p3,
+            currnet_cur_pos: p4,
+        }
+    }
+
     #[test]
     fn test_delete_column() {
         let d1 = &mut Dntker::new();
@@ -254,13 +264,12 @@ mod dntker_tests {
         let test_before_printed_result_len = 1;
         let test_before_printed_statement_len = 3;
         let test_currnet_cur_pos = 3;
-        let d2 = &mut Dntker {
-            input_vec: vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS, util::ASCII_CODE_TWO],
-            before_printed_len: test_before_printed_len,
-            before_printed_result_len: test_before_printed_result_len,
-            before_printed_statement_len: test_before_printed_statement_len,
-            currnet_cur_pos: test_currnet_cur_pos,
-        };
+        let d2 = &mut new_dummy_dntker(
+            test_before_printed_len,
+            test_before_printed_result_len,
+            test_before_printed_statement_len,
+            test_currnet_cur_pos,
+        );
         d2.delete_column();
 
         assert_eq!(d2.input_vec, vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS]);
@@ -268,5 +277,17 @@ mod dntker_tests {
 
         assert_eq!(d2.before_printed_len, test_before_printed_len);
         assert_eq!(d2.before_printed_statement_len, test_before_printed_statement_len);
+    }
+
+    #[test]
+    fn test_cursor_move_left() {
+        let d1 = &mut Dntker::new();
+        d1.delete_column();
+
+        assert_eq!(d1.input_vec, vec![]);
+        assert_eq!(d1.currnet_cur_pos, 0);
+
+        assert_eq!(d1.before_printed_len, 0);
+        assert_eq!(d1.before_printed_statement_len, 0);
     }
 }

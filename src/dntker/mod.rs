@@ -1,8 +1,8 @@
 mod util;
 
 use std::io::Write;
-
 use bc::{bc, BCError};
+use atty::Stream;
 
 #[derive(Debug)]
 pub struct Dntker {
@@ -175,6 +175,13 @@ impl Dntker {
     }
 
     pub fn run(&mut self) {
+        if !atty::is(Stream::Stdin) {
+            let mut s = String::new();
+            std::io::stdin().read_line(&mut s).ok();
+            println!("{}", bc!(s).unwrap());
+            return
+        };
+
         let ptr: [libc::c_char; 1] = [0; 1];
 
         print!("{}", util::DNTK_PROMPT);

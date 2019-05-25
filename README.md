@@ -43,8 +43,14 @@ $ brew install nnao45/dntk/dntk
 
 ### Linux
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.0.1/dntk-linux-amd64-v2.0.1.tar.gz
-$ tar xvfz dntk-linux-amd64-v2.0.1.tar.gz
+$ wget https://github.com/nnao45/dntk/releases/download/v2.0.1/dntk-v2.0.1-x86_64-unknown-linux-gnu.zip
+$ unzip dntk-v2.0.1-x86_64-unknown-linux-gnu.zip
+```
+
+if can't move, try...
+```bash
+$ wget https://github.com/nnao45/dntk/releases/download/v2.0.1/dntk-v2.0.1-x86_64-unknown-linux-musl.zip
+$ unzip dntk-v2.0.1-x86_64-unknown-linux-musl.zip
 ```
 
 ### From Rust source

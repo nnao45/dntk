@@ -39,7 +39,8 @@ impl Dntker {
         let mut bpsl = 0;
         let mut ccp = 0;
         if let Some(v) = meta::build_cli().get_matches().value_of("scale") {
-            let scale_bytes = &mut format!("{}{}{}", "scale=", v, "; ").as_bytes().to_owned();
+            let i: usize = v.parse().unwrap();
+            let scale_bytes = &mut format!("{}{}{}", "scale=", i, "; ").as_bytes().to_owned();
             bpsl = scale_bytes.len();
             ccp = scale_bytes.len();
             iv.append(scale_bytes);

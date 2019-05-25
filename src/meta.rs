@@ -8,20 +8,20 @@ use clap::{
 };
 
 pub fn build_cli() -> App<'static, 'static> {
-    App::new(crate_name!())   // Cargo.tomlのnameを参照する
-        .version(crate_version!())      // Cargo.tomlのversionを参照する
-        .author(crate_authors!())       // Cargo.tomlのauthorsを参照する
-        .about(crate_description!())    // Cargo.tomlのdescriptionを参照する
-        .arg(Arg::with_name("scale")              // フラグを定義
-            .help("Number of truncated after the decimal point")                // ヘルプメッセージ
-            .short("s")                         // ショートコマンド
-            .long("scale")                       // ロングコマンド
+    App::new(crate_name!())
+        .version(crate_version!())
+        .author(crate_authors!())
+        .about(crate_description!())
+        .arg(Arg::with_name("scale")
+            .help("Number of truncated after the decimal point")
+            .short("s")
+            .long("scale")
             .value_name("NUMBER")
-            .takes_value(true)                  // 値を持つことを定義
+            .takes_value(true)
         )
-        .arg(Arg::with_name("white")              // オプションを定義
-            .help("Set White color in a output")              // ヘルプメッセージ
-            .short("w")                         // ショートコマンド
-            .long("white")                        // ロングコマンド
+        .arg(Arg::with_name("white")
+            .help("Set White color in a output")
+            .short("w")
+            .long("white")
     )
 }

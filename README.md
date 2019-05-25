@@ -137,7 +137,7 @@ if you want to clean buffer, very easy, type `r`
 
 ## Pipe Use...
 ```bash
-$ echo "123 * 2" | dntk | xargs echo
+$ echo "123 * 2" | dntk
 246
 ```
 behave, like bc ☺️

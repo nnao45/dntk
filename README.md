@@ -56,12 +56,78 @@ $ echo 'alias bc=dntk' >> ~/.zshrc
 ```
 All OK!! 😎
 
+## Movable Cursor
+
+<table>
+    <tr>
+        <td>key</td>
+        <td>feature</td>
+    </tr>
+    <tr>
+        <td>[</td>
+        <td>cursor move to left</td>
+    </tr>
+    <tr>
+        <td>]</td>
+        <td>cursor move to right</td>
+    </tr>
+</table>
+
+## Using Function
+
+you can use under function.
+
+<table>
+    <tr>
+        <td>function</td>
+        <td>command</td>
+        <td>detail</td>
+    </tr>
+    <tr>
+        <td>(x)</td>
+        <td>()</td>
+        <td>Simple round bracket</td>
+    </tr>
+    <tr>
+        <td>sin(x)</td>
+        <td>s()</td>
+        <td>Sin of trigonometric function</td>
+    </tr>
+    <tr>
+        <td>cos(x)</td>
+        <td>c()</td>
+        <td>Cosin of trigonometric function</td>
+    </tr>
+    <tr>
+        <td>atan(x)</td>
+        <td>a()</td>
+        <td>Tangent of inverse trigonometric function</td>
+    </tr>
+    <tr>
+        <td>log(x)</td>
+        <td>l()</td>
+        <td>Logarithm function</td>
+    </tr>
+    <tr>
+        <td>exp(x)</td>
+        <td>e()</td>
+        <td>Exponential function</td>
+    </tr>
+    <tr>
+        <td>j(n,x)</td>
+        <td>j()</td>
+        <td>The n-order Bessel function</td>
+    </tr>
+</table>
+
+more detail 👉 https://www.gnu.org/software/bc/manual/html_mono/bc.html
+
 ## clean buffer
 if you want to clean buffer, very easy, type `r`
 
 [![asciicast](https://asciinema.org/a/248301.svg)](https://asciinema.org/a/248301)
 
-## Pipe use...
+## Pipe Use...
 ```bash
 $ echo "123 * 2" | dntk | xargs echo
 246

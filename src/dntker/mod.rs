@@ -522,39 +522,4 @@ mod dntker_tests {
         let ptr_enter: [libc::c_char; 1] = [util::ASCII_CODE_NEWLINE as i8; 1];
         assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_enter));
     }
-
-}
-
-#[cfg(test)]
-mod dntker_tests_flag_s {
-    use super::{Dntker, util, DntkResult};
-    #[test]
-    #[ignore]
-    fn test_dntk_exec_flag_s() {
-        std::env::set_var("DNTK_SCALE", "3");
-        let d1 = &mut Dntker::new();
-        let ptr1: [libc::c_char; 1] = [util::ASCII_CODE_ONE as i8; 1];
-        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): scale=3; 1 = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr1));
-        let ptr2: [libc::c_char; 1] = [util::ASCII_CODE_SLUSH as i8; 1];
-        assert_eq!(DntkResult::Output("\u{1b}[35m\r(dntk): scale=3; 1/ = \u{1b}[0m\u{1b}[3D".to_string()), d1.dntk_exec(ptr2));
-        let ptr3: [libc::c_char; 1] = [util::ASCII_CODE_THREE as i8; 1];
-        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): scale=3; 1/3 = .333\u{1b}[0m\u{1b}[7D".to_string()), d1.dntk_exec(ptr3));
-    }
-}
-
-#[cfg(test)]
-mod dntker_tests_flag_w {
-    use super::{Dntker, util, DntkResult};
-    #[test]
-    #[ignore]
-    fn test_dntk_exec_flag_w() {
-        std::env::set_var("DNTK_WHITE", "TRUE");
-        let d1 = &mut Dntker::new();
-        let ptr1: [libc::c_char; 1] = [util::ASCII_CODE_ONE as i8; 1];
-        assert_eq!(DntkResult::Output("\r(dntk): scale=3; 1 = 1\u{1b}[4D".to_string()), d1.dntk_exec(ptr1));
-        let ptr2: [libc::c_char; 1] = [util::ASCII_CODE_SLUSH as i8; 1];
-        assert_eq!(DntkResult::Output("\r(dntk): scale=3; 1/ = \u{1b}[3D".to_string()), d1.dntk_exec(ptr2));
-        let ptr3: [libc::c_char; 1] = [util::ASCII_CODE_THREE as i8; 1];
-        assert_eq!(DntkResult::Output("\r(dntk): scale=3; 1/3 = .333\u{1b}[7D".to_string()), d1.dntk_exec(ptr3));
-    }
 }

@@ -129,6 +129,11 @@ OPTIONS:
         <td>Esc, Ctrl+C, Enter</td>
         <td>Finish dntk app</td>
     </tr>
+    <tr>
+        <td>Delete</td>
+        <td>Delete current char</td>
+    </tr>
+
 </table>
 
 ### Basic Operation

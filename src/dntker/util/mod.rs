@@ -43,6 +43,7 @@ pub const ASCII_CODE_PLUS        : u8 = 0x2b; // +
 pub const ASCII_CODE_MINUS       : u8 = 0x2d; // -
 pub const ASCII_CODE_ASTERISK    : u8 = 0x2a; // *
 pub const ASCII_CODE_SLUSH       : u8 = 0x2f; // /
+pub const ASCII_CODE_HAT         : u8 = 0x5e; // ^
 pub const ASCII_CODE_DOT         : u8 = 0x2e; // .
 pub const ASCII_CODE_EQUAL       : u8 = 0x3d; // =
 pub const ASCII_CODE_SEMICOLON   : u8 = 0x3b; // ;

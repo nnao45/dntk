@@ -89,7 +89,7 @@ All OK!! 😎
 ## Options
 ```
 ❯❯❯ dntk -h
-dntk 2.0.5
+dntk 2.0.6
 nnao45 <n4sekai5y@gmail.com>
 Command line's Interactive calculator, GNU bc wrapper.
 
@@ -103,6 +103,7 @@ FLAGS:
     -w, --white      Set White color in a output
 
 OPTIONS:
+        --bc-path <PATH>    Use a specific bc command path [default: bc]
     -s, --scale <NUMBER>    Number of truncated after the decimal point
 ```
 

@@ -30,4 +30,11 @@ pub fn build_cli() -> App<'static, 'static> {
             .short("q")
             .long("quiet")
         )
+        .arg(Arg::with_name("bc-path")
+            .help("Use a specific bc command path")
+            .long("bc-path")
+            .value_name("PATH")
+            .takes_value(true)
+            .default_value("bc")
+        )
 }

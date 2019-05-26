@@ -1,12 +1,13 @@
 mod util;
+mod bc;
 
 use super::meta;
 use std::io::Write;
-use bc::{bc, BCError};
 use atty::Stream;
 
 #[derive(Debug, PartialEq)]
 pub struct Dntker {
+    pub executer: bc::BcExecuter,
     pub input_vec: Vec<u8>,
     pub before_printed_len: usize,
     pub before_printed_result_len: usize,
@@ -34,22 +35,13 @@ enum DntkResult {
 
 impl Dntker {
     pub fn new() -> Self {
-        let mut iv : Vec<u8> = Vec::new();
-        let mut bpsl = 0;
-        let mut ccp = 0;
-        if let Some(v) = meta::build_cli().get_matches().value_of("scale") {
-            let i: usize = v.parse().unwrap();
-            let scale_bytes = &mut format!("{}{}{}", "scale=", i, "; ").as_bytes().to_owned();
-            bpsl = scale_bytes.len();
-            ccp = scale_bytes.len();
-            iv.append(scale_bytes);
-        }
         Dntker {
-            input_vec:iv,
+            executer: bc::BcExecuter::new(),
+            input_vec: Vec::new(),
             before_printed_len: 0,
             before_printed_result_len: 0,
-            before_printed_statement_len: bpsl,
-            currnet_cur_pos: ccp,
+            before_printed_statement_len: 0,
+            currnet_cur_pos: 0,
         }
     }
 
@@ -158,7 +150,7 @@ impl Dntker {
 
     fn info_wn(&mut self, unknown_code: &u8) {
         print!("{}", self.output_fill_whitespace(self.before_printed_len));
-        let warn_str =format!("this char is no supported: {}", unknown_code.to_owned() as char);
+        let warn_str = format!("this char is no supported: {}", unknown_code.to_owned() as char);
         let result = &mut vec!["\r", util::COLOR_YELLOW_HEADER, &warn_str, util::COLOR_PLAIN_HEADER];
         print!("{}", self.output(result, 1, 2));
         std::io::stdout().flush().unwrap();
@@ -205,13 +197,13 @@ impl Dntker {
         let p1 = format!("{}", util::DNTK_PROMPT);
         let p2 = &self.statement_from_utf8();
         let p3 = " = ";
-        match bc!(format!("{}", p2)) {
+        match &self.executer.exec(p2) {
             Ok(p4) => {
                 DntkResult::Output(self.output_ok(&p1, p2, p3, &p4))
             },
             Err(e) => {
                 match e {
-                    BCError::PopenError(e) => panic!("{:?}", e),
+                    bc::BcError::PopenError(e) => panic!("{:?}", e),
                     _ => {
                         DntkResult::Output(self.output_ng(&p1, p2, p3))
                     },
@@ -224,7 +216,7 @@ impl Dntker {
         if !atty::is(Stream::Stdin) {
             let mut s = String::new();
             std::io::stdin().read_line(&mut s).ok();
-            println!("{}", bc!(s).unwrap());
+            println!("{}", &self.executer.exec(&s).unwrap());
             return
         };
 
@@ -254,7 +246,7 @@ impl Dntker {
 
 #[cfg(test)]
 mod dntker_tests {
-    use super::{Dntker, util, FilterResult, DntkResult};
+    use super::{Dntker, util, FilterResult, DntkResult, bc};
     #[test]
     fn test_filter_char() {
         let d = Dntker::new();
@@ -317,7 +309,8 @@ mod dntker_tests {
         let test_before_printed_result_len = 1;
         let test_before_printed_statement_len = 3;
         let test_currnet_cur_pos = 2;
-        let d2 = &mut  Dntker {
+        let d2 = &mut Dntker {
+            executer: bc::BcExecuter::new(),
             input_vec: test_input_vec,
             before_printed_len: test_before_printed_len,
             before_printed_result_len: test_before_printed_result_len,
@@ -350,7 +343,8 @@ mod dntker_tests {
         let test_before_printed_result_len = 1;
         let test_before_printed_statement_len = 3;
         let test_currnet_cur_pos = 2;
-        let d2 = &mut  Dntker {
+        let d2 = &mut Dntker {
+            executer: bc::BcExecuter::new(),
             input_vec: test_input_vec,
             before_printed_len: test_before_printed_len,
             before_printed_result_len: test_before_printed_result_len,
@@ -384,7 +378,8 @@ mod dntker_tests {
         let test_before_printed_result_len = 1;
         let test_before_printed_statement_len = 3;
         let test_currnet_cur_pos = 2;
-        let d2 = &mut  Dntker {
+        let d2 = &mut Dntker {
+            executer: bc::BcExecuter::new(),
             input_vec: test_input_vec,
             before_printed_len: test_before_printed_len,
             before_printed_result_len: test_before_printed_result_len,
@@ -419,7 +414,8 @@ mod dntker_tests {
         let test_before_printed_result_len = 1;
         let test_before_printed_statement_len = 3;
         let test_currnet_cur_pos = 2;
-        let d2 = &mut  Dntker {
+        let d2 = &mut Dntker {
+            executer: bc::BcExecuter::new(),
             input_vec: test_input_vec,
             before_printed_len: test_before_printed_len,
             before_printed_result_len: test_before_printed_result_len,
@@ -445,6 +441,7 @@ mod dntker_tests {
         let test_before_printed_statement_len = 3;
         let test_currnet_cur_pos = 2;
         let d1 = &mut Dntker {
+            executer: bc::BcExecuter::new(),
             input_vec: test_input_vec1,
             before_printed_len: test_before_printed_len,
             before_printed_result_len: test_before_printed_result_len,
@@ -452,6 +449,7 @@ mod dntker_tests {
             currnet_cur_pos: test_currnet_cur_pos,
         };
         let d2 = &mut Dntker {
+            executer: bc::BcExecuter::new(),
             input_vec: test_input_vec2,
             before_printed_len: test_before_printed_len,
             before_printed_result_len: test_before_printed_result_len,
@@ -492,6 +490,7 @@ mod dntker_tests {
         let test_before_printed_statement_len = 3;
         let test_currnet_cur_pos = 2;
         let d = &mut Dntker {
+            executer: bc::BcExecuter::new(),
             input_vec: test_input_vec,
             before_printed_len: test_before_printed_len,
             before_printed_result_len: test_before_printed_result_len,

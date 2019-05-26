@@ -1,4 +1,3 @@
-extern crate bc;
 extern crate libc;
 extern crate clap;
 

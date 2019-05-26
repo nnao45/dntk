@@ -105,7 +105,7 @@ OPTIONS:
     -s, --scale <NUMBER>    Number of truncated after the decimal point
 ```
 
-## Movable Cursor
+## Keybind
 
 <table>
     <tr>
@@ -120,17 +120,54 @@ OPTIONS:
         <td>]</td>
         <td>cursor move to right</td>
     </tr>
+    <tr>
+        <td>0~9</td>
+        <td>Sendkey this number</td>
+    </tr>
+    <tr>
+        <td>Esc, Ctrl+C, Enter</td>
+        <td>Finish dntk app</td>
+    </tr>
 </table>
 
-## Using Function
+### Operation
+
+<table>
+    <tr>
+        <td>key</td>
+        <td>feature</td>
+    </tr>
+    <tr>
+        <td>+</td>
+        <td>plus</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>minus</td>
+    </tr>
+    <tr>
+        <td>*</td>
+        <td>multiplication</td>
+    </tr>
+    <tr>
+        <td>/</td>
+        <td>division</td>
+    </tr>
+    <tr>
+        <td>^</td>
+        <td>exponentiation</td>
+    </tr>
+</table>
+
+### Using Function
 
 you can use under function.
 
 <table>
     <tr>
         <td>function</td>
-        <td>command</td>
-        <td>detail</td>
+        <td>key</td>
+        <td>feature</td>
     </tr>
     <tr>
         <td>(x)</td>

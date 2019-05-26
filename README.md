@@ -94,16 +94,16 @@ nnao45 <n4sekai5y@gmail.com>
 Command line's Interactive calculator, GNU bc wrapper.
 
 USAGE:
-    dntk [OPTIONS]
+    dntk [FLAGS] [OPTIONS]
 
 FLAGS:
     -h, --help       Prints help information
+    -q, --quiet      No print warn message
     -v, --version    Prints version information
+    -w, --white      Set White color in a output
 
 OPTIONS:
-    -q, --quiet <quiet>     No print warn message [env: DNTK_QUIET=]
-    -s, --scale <NUMBER>    Number of truncated after the decimal point [env: DNTK_SCALE=]
-    -w, --white <white>     Set White color in a output [env: DNTK_WHITE=]
+    -s, --scale <NUMBER>    Number of truncated after the decimal point
 ```
 
 ## Keybind

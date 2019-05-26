@@ -57,4 +57,4 @@ toml-upde:
 	@./release.sh
 
 .PHONY: release
-crelease: toml-upde readme-upde cargo-release git-release docker-release
+release: toml-upde readme-upde cargo-release git-release docker-release

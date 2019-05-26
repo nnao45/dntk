@@ -294,7 +294,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_SPACE      ), FilterResult::BcCode(util::ASCII_CODE_SPACE     ));
 
         assert_eq!(d.filter_char(0x00                        ), FilterResult::UnknownCode(0x00                  ));
-        assert_eq!(d.filter_char(0x21                        ), FilterResult::UnknownCode(0x21                  ));
+        assert_eq!(d.filter_char(0x40                        ), FilterResult::UnknownCode(0x40                  ));
         assert_eq!(d.filter_char(0x4f                        ), FilterResult::UnknownCode(0x4f                  ));
     }
 

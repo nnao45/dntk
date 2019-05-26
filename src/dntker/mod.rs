@@ -76,13 +76,18 @@ impl Dntker {
             util::ASCII_CODE_ROUNDRIGHT  => FilterResult::BcCode(util::ASCII_CODE_ROUNDRIGHT), // )
             util::ASCII_CODE_SQUARELEFT  => FilterResult::CurLeftCode,                         // [
             util::ASCII_CODE_SQUARERIGHT => FilterResult::CurRightCode,                        // ]
+            util::ASCII_CODE_LARGER      => FilterResult::BcCode(util::ASCII_CODE_LARGER),     // <
+            util::ASCII_CODE_SMALLER     => FilterResult::BcCode(util::ASCII_CODE_SMALLER),    // >
             util::ASCII_CODE_PLUS        => FilterResult::BcCode(util::ASCII_CODE_PLUS      ), // +
             util::ASCII_CODE_MINUS       => FilterResult::BcCode(util::ASCII_CODE_MINUS     ), // -
             util::ASCII_CODE_ASTERISK    => FilterResult::BcCode(util::ASCII_CODE_ASTERISK  ), // *
             util::ASCII_CODE_SLUSH       => FilterResult::BcCode(util::ASCII_CODE_SLUSH     ), // /
             util::ASCII_CODE_HAT         => FilterResult::BcCode(util::ASCII_CODE_HAT       ), // ^
             util::ASCII_CODE_DOT         => FilterResult::BcCode(util::ASCII_CODE_DOT       ), // .
+            util::ASCII_CODE_BIKKURI     => FilterResult::BcCode(util::ASCII_CODE_BIKKURI   ), // !
             util::ASCII_CODE_EQUAL       => FilterResult::BcCode(util::ASCII_CODE_EQUAL     ), // =
+            util::ASCII_CODE_PIPE        => FilterResult::BcCode(util::ASCII_CODE_PIPE      ), // |
+            util::ASCII_CODE_AND         => FilterResult::BcCode(util::ASCII_CODE_AND       ), // &
             util::ASCII_CODE_SEMICOLON   => FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ), // ;
             util::ASCII_CODE_NEWLINE     => FilterResult::EndCode,                             // \n
             util::ASCII_CODE_ESCAPE      => FilterResult::EndCode,                             // escape key
@@ -268,6 +273,8 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_J          ), FilterResult::BcCode(util::ASCII_CODE_J         ));
         assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDLEFT  ), FilterResult::BcCode(util::ASCII_CODE_ROUNDLEFT ));
         assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDRIGHT ), FilterResult::BcCode(util::ASCII_CODE_ROUNDRIGHT));
+        assert_eq!(d.filter_char(util::ASCII_CODE_LARGER     ), FilterResult::BcCode(util::ASCII_CODE_LARGER    ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_SMALLER    ), FilterResult::BcCode(util::ASCII_CODE_SMALLER   ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SQUARELEFT ), FilterResult::CurLeftCode                        );
         assert_eq!(d.filter_char(util::ASCII_CODE_SQUARERIGHT), FilterResult::CurRightCode                       );
         assert_eq!(d.filter_char(util::ASCII_CODE_PLUS       ), FilterResult::BcCode(util::ASCII_CODE_PLUS      ));
@@ -276,7 +283,10 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_SLUSH      ), FilterResult::BcCode(util::ASCII_CODE_SLUSH     ));
         assert_eq!(d.filter_char(util::ASCII_CODE_HAT        ), FilterResult::BcCode(util::ASCII_CODE_HAT       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_DOT        ), FilterResult::BcCode(util::ASCII_CODE_DOT       ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_BIKKURI    ), FilterResult::BcCode(util::ASCII_CODE_BIKKURI   ));
         assert_eq!(d.filter_char(util::ASCII_CODE_EQUAL      ), FilterResult::BcCode(util::ASCII_CODE_EQUAL     ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_PIPE       ), FilterResult::BcCode(util::ASCII_CODE_PIPE      ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_AND        ), FilterResult::BcCode(util::ASCII_CODE_AND       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ));
         assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::EndCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EndCode                            );

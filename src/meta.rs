@@ -23,5 +23,10 @@ pub fn build_cli() -> App<'static, 'static> {
             .help("Set White color in a output")
             .short("w")
             .long("white")
-    )
+        )
+        .arg(Arg::with_name("quiet")
+            .help("No print warn message")
+            .short("q")
+            .long("quiet")
+        )
 }

@@ -11,7 +11,7 @@ RUN mkdir -p src/ && \
     touch src/lib.rs
 RUN cargo build --release
 ## Build Base Library
-COPY . .
+COPY ./src/ ./src/
 RUN sudo chown -R rust:rust .
 RUN cargo build --release
 

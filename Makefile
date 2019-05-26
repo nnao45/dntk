@@ -1,5 +1,6 @@
 # general
 VERSION = $(shell ./version.sh)
+PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
 NAME = twiquery-stream
 TARGET = $(NAME)
 DOCKER_REPO = nnao45
@@ -37,3 +38,23 @@ docker-push:
 
 .PHONY: docker-release
 docker-release: docker-build docker-push
+
+.PHONY: git-release
+git-release:
+	git tag -a $(VERSION) -m "release $(VERSION)"
+	git push origin $(VERSION)
+
+.PHONY: cargo-release
+cargo-release:
+	cargo publish
+
+.PHONY: readme-upde
+readme-upde:
+	sed -i '' -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
+
+.PHONY: toml-upde
+toml-upde:
+	@./release.sh
+
+.PHONY: release
+crelease: toml-upde readme-upde cargo-release git-release docker-release

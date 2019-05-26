@@ -176,6 +176,9 @@ impl Dntker {
         let input_char = ptr[0] as u8;
         match &self.filter_char(input_char) {
             FilterResult::UnknownCode(unknown_code) => {
+                if meta::build_cli().get_matches().is_present("quiet") {
+                    return DntkResult::Continue
+                }
                 &self.info_wn(unknown_code);
             },
             FilterResult::EndCode => {

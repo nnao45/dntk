@@ -41,6 +41,8 @@ docker-release: docker-build docker-push
 
 .PHONY: git-release
 git-release:
+	git add .
+	git commit -m "release $(VERSION)"
 	git tag -a $(VERSION) -m "release $(VERSION)"
 	git push origin $(VERSION)
 
@@ -57,4 +59,4 @@ toml-upde:
 	@./release.sh
 
 .PHONY: release
-release: toml-upde readme-upde cargo-release git-release docker-release
+release: toml-upde readme-upde git-release cargo-release docker-release

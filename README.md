@@ -109,7 +109,7 @@ OPTIONS:
 
 ## Keybind
 
-### Basic key
+### Basic Key
 
 <table>
     <tr>
@@ -250,7 +250,7 @@ you can use under function.
 
 more detail 👉 https://www.gnu.org/software/bc/manual/html_mono/bc.html
 
-## clean buffer
+## Clean Buffer
 if you want to clean buffer, very easy, type `r`
 
 [![asciicast](https://asciinema.org/a/248301.svg)](https://asciinema.org/a/248301)

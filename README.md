@@ -109,6 +109,8 @@ OPTIONS:
 
 ## Keybind
 
+### Basic key
+
 <table>
     <tr>
         <td>key</td>

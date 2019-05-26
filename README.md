@@ -88,21 +88,22 @@ All OK!! 😎
 
 ## Options
 ```
-./target/release/dntk --help
-dntk 2.0.3
+❯❯❯ dntk -h
+dntk 2.0.4
 nnao45 <n4sekai5y@gmail.com>
 Command line's Interactive calculator, GNU bc wrapper.
 
 USAGE:
-    dntk [FLAGS] [OPTIONS]
+    dntk [OPTIONS]
 
 FLAGS:
     -h, --help       Prints help information
-    -V, --version    Prints version information
-    -w, --white      Set White color in a output
+    -v, --version    Prints version information
 
 OPTIONS:
-    -s, --scale <NUMBER>    Number of truncated after the decimal point
+    -q, --quiet <quiet>     No print warn message [env: DNTK_QUIET=]
+    -s, --scale <NUMBER>    Number of truncated after the decimal point [env: DNTK_SCALE=]
+    -w, --white <white>     Set White color in a output [env: DNTK_WHITE=]
 ```
 
 ## Keybind

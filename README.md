@@ -53,7 +53,7 @@ $ wget https://github.com/nnao45/dntk/releases/download/v2.0.6/dntk-v2.0.6-x86_6
 $ unzip dntk-v2.0.6-x86_64-unknown-linux-musl.zip
 ```
 
-### From Rust source
+### Cargo
 ```bash
 $ cargo install dntk
 ```

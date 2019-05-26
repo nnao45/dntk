@@ -89,7 +89,7 @@ All OK!! 😎
 ## Options
 ```
 ❯❯❯ dntk -h
-dntk 2.0.4
+dntk 2.0.5
 nnao45 <n4sekai5y@gmail.com>
 Command line's Interactive calculator, GNU bc wrapper.
 

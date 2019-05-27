@@ -117,11 +117,11 @@ OPTIONS:
         <td>feature</td>
     </tr>
     <tr>
-        <td>[, →</td>
+        <td>[, ←</td>
         <td>cursor move to left</td>
     </tr>
     <tr>
-        <td>], ←</td>
+        <td>], →</td>
         <td>cursor move to right</td>
     </tr>
     <tr>

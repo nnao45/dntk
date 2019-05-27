@@ -527,6 +527,8 @@ mod dntker_tests {
         assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_escape));
         let ptr1: [libc::c_char; 3] = [util::ASCII_CODE_ONE as i8; 3];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1 = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr1));
+        let ptr_right: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8, 0x91 as u8 as i8, util::ASCII_CODE_RIGHT as i8];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1 = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr_right));
         let ptr2: [libc::c_char; 3] = [util::ASCII_CODE_PLUS as i8; 3];
         assert_eq!(DntkResult::Output("\u{1b}[35m\r(dntk): 1+ = \u{1b}[0m\u{1b}[3D".to_string()), d1.dntk_exec(ptr2));
         let ptr3: [libc::c_char; 3] = [util::ASCII_CODE_ZERO as i8; 3];

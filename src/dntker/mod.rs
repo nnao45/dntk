@@ -19,6 +19,7 @@ pub struct Dntker {
 enum FilterResult {
     BcCode(u8),
     EndCode,
+    EscCode,
     RefreshCode,
     DeleteCode,
     CurLeftCode,
@@ -82,7 +83,7 @@ impl Dntker {
             util::ASCII_CODE_AND         => FilterResult::BcCode(util::ASCII_CODE_AND       ), // &
             util::ASCII_CODE_SEMICOLON   => FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ), // ;
             util::ASCII_CODE_NEWLINE     => FilterResult::EndCode,                             // \n
-            util::ASCII_CODE_ESCAPE      => FilterResult::EndCode,                             // escape key
+            util::ASCII_CODE_ESCAPE      => FilterResult::EscCode,                             // escape key
             util::ASCII_CODE_DELETE      => FilterResult::DeleteCode,                          // delete key
             util::ASCII_CODE_SPACE       => FilterResult::BcCode(util::ASCII_CODE_SPACE     ), // white space key
             unknown_code                 => FilterResult::UnknownCode(unknown_code),
@@ -164,7 +165,7 @@ impl Dntker {
         print!("{}", util::DNTK_PROMPT);
     }
 
-    fn dntk_exec(&mut self, ptr: [libc::c_char; 1]) -> DntkResult {
+    fn dntk_exec(&mut self, ptr: [libc::c_char; 3]) -> DntkResult {
         let input_char = ptr[0] as u8;
         match &self.filter_char(input_char) {
             FilterResult::UnknownCode(unknown_code) => {
@@ -172,6 +173,23 @@ impl Dntker {
                     return DntkResult::Continue
                 }
                 &self.info_wn(unknown_code);
+            },
+            FilterResult::EscCode => {
+                if ptr.len() >= 3 {
+                    match ptr[2] as u8 {
+                        util::ASCII_CODE_RIGHT => {
+                            &self.cursor_move_right();
+                        },
+                        util::ASCII_CODE_LEFT => {
+                            &self.cursor_move_left();
+                        },
+                        _ => {
+                            return DntkResult::Fin
+                        }
+                    }
+                } else {
+                    return DntkResult::Fin
+                }
             },
             FilterResult::EndCode => {
                 return DntkResult::Fin
@@ -221,11 +239,11 @@ impl Dntker {
             return
         };
 
-        let ptr: [libc::c_char; 1] = [0; 1];
+        let ptr: [libc::c_char; 3] = [0; 3];
 
         print!("{}", util::DNTK_PROMPT);
         loop {
-            let r = unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 1) };
+            let r = unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) };
             if r > 0 {
                 match self.dntk_exec(ptr) {
                     DntkResult::Fin => {
@@ -285,7 +303,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_AND        ), FilterResult::BcCode(util::ASCII_CODE_AND       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ));
         assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::EndCode                            );
-        assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EndCode                            );
+        assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EscCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_DELETE     ), FilterResult::DeleteCode                         );
         assert_eq!(d.filter_char(util::ASCII_CODE_SPACE      ), FilterResult::BcCode(util::ASCII_CODE_SPACE     ));
 
@@ -505,21 +523,21 @@ mod dntker_tests {
     #[test]
     fn test_dntk_exec() {
         let d1 = &mut Dntker::new();
-        let ptr_escape: [libc::c_char; 1] = [util::ASCII_CODE_ESCAPE as i8; 1];
+        let ptr_escape: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8; 3];
         assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_escape));
-        let ptr1: [libc::c_char; 1] = [util::ASCII_CODE_ONE as i8; 1];
+        let ptr1: [libc::c_char; 3] = [util::ASCII_CODE_ONE as i8; 3];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1 = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr1));
-        let ptr2: [libc::c_char; 1] = [util::ASCII_CODE_PLUS as i8; 1];
+        let ptr2: [libc::c_char; 3] = [util::ASCII_CODE_PLUS as i8; 3];
         assert_eq!(DntkResult::Output("\u{1b}[35m\r(dntk): 1+ = \u{1b}[0m\u{1b}[3D".to_string()), d1.dntk_exec(ptr2));
-        let ptr3: [libc::c_char; 1] = [util::ASCII_CODE_ZERO as i8; 1];
+        let ptr3: [libc::c_char; 3] = [util::ASCII_CODE_ZERO as i8; 3];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0 = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr3));
-        let ptr4: [libc::c_char; 1] = [util::ASCII_CODE_DOT as i8; 1];
+        let ptr4: [libc::c_char; 3] = [util::ASCII_CODE_DOT as i8; 3];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr4));
-        let ptr_unknown_ascii: [libc::c_char; 1] = [0x4f as i8; 1];
+        let ptr_unknown_ascii: [libc::c_char; 3] = [0x4f as i8; 3];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr_unknown_ascii));
-        let ptr5: [libc::c_char; 1] = [util::ASCII_CODE_SEVEN as i8; 1];
+        let ptr5: [libc::c_char; 3] = [util::ASCII_CODE_SEVEN as i8; 3];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0.7 = 1.7\u{1b}[0m\u{1b}[6D".to_string()), d1.dntk_exec(ptr5));
-        let ptr_enter: [libc::c_char; 1] = [util::ASCII_CODE_NEWLINE as i8; 1];
+        let ptr_enter: [libc::c_char; 3] = [util::ASCII_CODE_NEWLINE as i8; 3];
         assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_enter));
     }
 }

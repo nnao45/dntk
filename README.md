@@ -117,11 +117,11 @@ OPTIONS:
         <td>feature</td>
     </tr>
     <tr>
-        <td>[</td>
+        <td>[, →</td>
         <td>cursor move to left</td>
     </tr>
     <tr>
-        <td>]</td>
+        <td>], ←</td>
         <td>cursor move to right</td>
     </tr>
     <tr>
@@ -129,7 +129,7 @@ OPTIONS:
         <td>Sendkey this number</td>
     </tr>
     <tr>
-        <td>Esc, Ctrl+C, Enter</td>
+        <td>Ctrl+C, Enter</td>
         <td>Finish dntk app</td>
     </tr>
     <tr>

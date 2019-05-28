@@ -234,10 +234,19 @@ impl Dntker {
         }
     }
 
-    pub fn wait(&self, ptr: [libc::c_char; 3]) -> isize {
-        #[cfg(target_os = "windows")]
-        return wconsole::getch(false).unwrap();
-        return unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) }
+    #[cfg(target_os = "windows")]
+    pub fn watch(&self,  ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
+        ptr[0] = wconsole::getch(false).unwrap();
+        return ptr
+    }
+
+    #[cfg(target_os = "macos")]
+    pub fn watch(&self,  ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
+        loop{
+            if unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) } > 0 {
+                return ptr
+            };
+        }
     }
 
     pub fn run(&mut self) {
@@ -251,9 +260,11 @@ impl Dntker {
         let ptr: [libc::c_char; 3] = [0; 3];
 
         print!("{}", util::DNTK_PROMPT);
+        std::io::stdout().flush().unwrap();
         loop {
-            if self.wait(ptr) > 0 {
-                match self.dntk_exec(ptr) {
+            //let r = unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) };
+            //if r > 0 {
+                match self.dntk_exec(self.watch(ptr)) {
                     DntkResult::Fin => {
                         print!("\n");
                         break
@@ -265,7 +276,7 @@ impl Dntker {
                         print!("{}", o);
                     },
                 }
-            }
+            //}
             std::io::stdout().flush().unwrap();
         }
     }

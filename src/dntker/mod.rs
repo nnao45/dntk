@@ -5,6 +5,9 @@ use super::meta;
 use std::io::Write;
 use atty::Stream;
 
+#[cfg(target_os = "windows")]
+use winconsole;
+
 #[derive(Debug, PartialEq)]
 pub struct Dntker {
     pub executer: bc::BcExecuter,
@@ -243,7 +246,12 @@ impl Dntker {
 
         print!("{}", util::DNTK_PROMPT);
         loop {
-            let r = unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) };
+            let mut r = 0;
+            if cfg!(target_os = "windows") {
+                r = winconsole::console::getch.unwrap();
+            } else {
+                r = unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) };
+            }
             if r > 0 {
                 match self.dntk_exec(ptr) {
                     DntkResult::Fin => {

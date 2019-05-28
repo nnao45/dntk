@@ -15,15 +15,11 @@ mod meta;
 fn main() {
     let _matches = meta::build_cli().get_matches();
 
-    #[cfg(target_os = "macos")]
-    let saved_termattr = term::get_termattr();
-    #[cfg(target_os = "linux")]
+    #[cfg(not(target_os = "windows"))]
     let saved_termattr = term::get_termattr();
     defer!(
         unsafe {
-            #[cfg(target_os = "macos")]
-            libc::tcsetattr(0, libc::TCSANOW, &saved_termattr);
-            #[cfg(target_os = "linux")]
+            #[cfg(not(target_os = "windows"))]
             libc::tcsetattr(0, libc::TCSANOW, &saved_termattr);
         }
     );

@@ -52,6 +52,7 @@ enum DntkStringType {
 
 impl DntkString {
     pub fn colorize(mut self) -> Self {
+        #[cfg(not(target_os = "windows"))]
         match &self.dtype {
             DntkStringType::Ok => {
                 self.data = format!("{}{}{}", util::COLOR_CYAN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
@@ -66,10 +67,32 @@ impl DntkString {
                 self
             },
         }
+        #[cfg(target_os = "windows")]
+        match &self.dtype {
+            DntkStringType::Ok => {
+                wincolor::Console::stdout().unwrap().fg(wincolor::Intense::Yes, wincolor::Color::Cyan).unwrap();
+                self
+            },
+            DntkStringType::Ng => {
+                wincolor::Console::stdout().unwrap().fg(wincolor::Intense::Yes, wincolor::Color::Magenta).unwrap();
+                self
+            },
+            DntkStringType::Warn => {
+                wincolor::Console::stdout().unwrap().fg(wincolor::Intense::Yes, wincolor::Color::Yellow).unwrap();
+                self
+            },
+        }
     }
 
+    #[cfg(not(target_os = "windows"))]
     pub fn cursorize(mut self) -> Self {
         self.data = format!("{}{}{}{}", &self.data, util::CURSOR_MOVE_ES_HEAD, &self.cur_pos_from_right, util::CURSOR_MOVE_ES_BACK);
+        self
+    }
+    #[cfg(target_os = "windows")]
+    pub fn cursorize(mut self) -> Self {
+        let vec_cur = wconsole::console::get_cursor_position().unwrap();
+        wconsole::console::set_cursor_position(vec_cur.x - &self.cur_pos_from_right, vec_cur.y).unwrap();
         self
     }
 

@@ -6,7 +6,7 @@ use std::io::Write;
 use atty::Stream;
 
 #[cfg(target_os = "windows")]
-use winconsole;
+use winconsole::console as wconsole;
 
 #[derive(Debug, PartialEq)]
 pub struct Dntker {
@@ -234,6 +234,12 @@ impl Dntker {
         }
     }
 
+    pub fn wait(&self, ptr: [libc::c_char; 3]) -> isize {
+        #[cfg(target_os = "windows")]
+        return wconsole::getch(false).unwrap();
+        return unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) }
+    }
+
     pub fn run(&mut self) {
         if !atty::is(Stream::Stdin) {
             let mut s = String::new();
@@ -246,13 +252,7 @@ impl Dntker {
 
         print!("{}", util::DNTK_PROMPT);
         loop {
-            let mut r = 0;
-            if cfg!(target_os = "windows") {
-                r = winconsole::console::getch.unwrap();
-            } else {
-                r = unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) };
-            }
-            if r > 0 {
+            if self.wait(ptr) > 0 {
                 match self.dntk_exec(ptr) {
                     DntkResult::Fin => {
                         print!("\n");

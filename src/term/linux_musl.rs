@@ -1,5 +1,5 @@
 fn get_termattr() -> libc::termios {
-    let mut saved_termattr =libc::termios {
+    let mut saved_termattr = libc::termios {
         c_iflag: 0,
         c_oflag: 0,
         c_cflag: 0,

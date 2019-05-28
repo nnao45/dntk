@@ -4,6 +4,7 @@ mod bc;
 use super::meta;
 use std::io::Write;
 use atty::Stream;
+use wincolor;
 
 #[cfg(target_os = "windows")]
 use winconsole::console as wconsole;
@@ -35,6 +36,31 @@ enum DntkResult {
     Output(String),
     Fin,
     Continue,
+}
+
+struct DntkString {
+    data: String,
+    dtype: DntkStringType,
+}
+
+enum DntkStringType {
+    Ok,
+    Ng,
+    Warn,
+}
+
+impl DntkString {
+    pub fn colorize(&mut self) -> Self {
+        unimplemented!()
+    }
+
+    pub fn cursorize(&mut self) -> Self {
+        unimplemented!()
+    }
+
+    pub fn to_string(&mut self) -> String {
+        unimplemented!()
+    }
 }
 
 impl Dntker {
@@ -125,38 +151,65 @@ impl Dntker {
         format!("\r{}", (0..len).map(|_| " ").collect::<String>())
     }
 
-    fn output(&self, v: &mut Vec<&str>, color_u8_1: usize, color_u8_2: usize) -> String {
-        if meta::build_cli().get_matches().is_present("white") {
-            v.remove(color_u8_1);
-            v.remove(color_u8_2);
-        }
-        v.iter().map(|s| s.to_string()).collect()
-    }
+    //fn output(&self, v: &mut Vec<&str>, color_u8_1: usize, color_u8_2: usize) -> String {
+    //    if meta::build_cli().get_matches().is_present("white") || cfg!(target_os = "windows") {
+    //        v.remove(color_u8_1);
+    //        v.remove(color_u8_2);
+    //    }
+    //    v.iter().map(|s| s.to_string()).collect()
+    //}
+//
+    //fn foutput(&mut self, mut output: &mut str, color1: &str, color2: &str, is_ok: bool) -> String {
+    //    //if ! meta::build_cli().get_matches().is_present("white") && ! cfg!(target_os = "windows") {
+    //    //    if is_ok {
+    //    //        output = &mut self.colorize_ok(color1, &mut output, color2);
+    //    //    } else{
+    //    //        output = &mut self.colorize_ng(color1, &mut output, color2);
+    //    //    }
+    //    //}
+    //    self.cursorize(&mut output).to_string()
+    //}
 
-    fn output_ok(&mut self, p1: &str, p2: &str, p3: &str, p4: &str) -> String {
+    fn output_ok(&mut self, p1: &str, p2: &str, p3: &str, p4: &str) -> DntkString {
         self.before_printed_result_len = p4.to_string().len();
         self.before_printed_statement_len = p2.to_string().len();
         self.before_printed_len = p1.to_string().len() + self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
         let pos_differnce = self.before_printed_statement_len - self.currnet_cur_pos;
         let pos_move_point = (p3.to_string().len() + self.before_printed_result_len + &pos_differnce).to_string();
-        let result = &mut vec![util::COLOR_CYAN_HEADER, p1, p2, p3, p4, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, &pos_move_point, util::CURSOR_MOVE_ES_BACK];
-        self.output(result, 0, 5-1)
+        //let result = &mut vec![util::COLOR_CYAN_HEADER, p1, p2, p3, p4, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, &pos_move_point, util::CURSOR_MOVE_ES_BACK];
+        //self.output(result, 0, 5-1)
+        DntkString {
+            data: format!("{}{}{}{}", p1, p2, p3, p4),
+            dtype: DntkStringType::Ok,
+        }
     }
 
-    fn output_ng(&mut self, p1: &str, p2: &str, p3: &str) -> String {
+    fn output_ng(&mut self, p1: &str, p2: &str, p3: &str) -> DntkString {
         self.before_printed_statement_len = p2.to_string().len();
         self.before_printed_len = p1.to_string().len() +  self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
         let pos_differnce =  self.before_printed_statement_len - &self.currnet_cur_pos;
         let pos_move_point = (p3.to_string().len() + pos_differnce).to_string();
-        let result = &mut vec![util::COLOR_MAGENDA_HEADER, p1, p2, p3, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, &pos_move_point, util::CURSOR_MOVE_ES_BACK];
-        self.output(result, 0, 4-1)
+        //let result = &mut vec![util::COLOR_MAGENDA_HEADER, p1, p2, p3, util::COLOR_PLAIN_HEADER, util::CURSOR_MOVE_ES_HEAD, &pos_move_point, util::CURSOR_MOVE_ES_BACK];
+        //self.output(result, 0, 4-1)
+        DntkString {
+            data: format!("{}{}{}", p1, p2, p3),
+            dtype: DntkStringType::Ng,
+        }
     }
 
     fn info_wn(&mut self, unknown_code: &u8) {
         print!("{}", self.output_fill_whitespace(self.before_printed_len));
         let warn_str = format!("this char is no supported: {}", unknown_code.to_owned() as char);
-        let result = &mut vec!["\r", util::COLOR_YELLOW_HEADER, &warn_str, util::COLOR_PLAIN_HEADER];
-        print!("{}", self.output(result, 1, 3-1));
+        print!("{}", DntkString {
+            data: format!("{}{}", "\r", &warn_str),
+            dtype: DntkStringType::Warn,
+        }
+            .colorize()
+            .cursorize()
+            .to_string()
+        );
+        //let result = &mut vec!["\r", util::COLOR_YELLOW_HEADER, &warn_str, util::COLOR_PLAIN_HEADER];
+        //print!("{}", self.output(result, 1, 3-1));
         std::io::stdout().flush().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(1000));
         print!("{}", &self.output_fill_whitespace(warn_str.len()));
@@ -220,14 +273,20 @@ impl Dntker {
         let p3 = " = ";
         match &self.executer.exec(p2) {
             Ok(p4) => {
-                DntkResult::Output(self.output_ok(&p1, p2, p3, &p4))
+                DntkResult::Output(self.output_ok(&p1, p2, p3, &p4)
+                                     .colorize()
+                                     .cursorize()
+                                     .to_string())
             },
             Err(e) => {
                 match e {
                     bc::BcError::PopenError(e) => panic!("call bc process open error: {:?}", e),
                     bc::BcError::Timeout => panic!("call bc process is timeout"),
                     _ => {
-                        DntkResult::Output(self.output_ng(&p1, p2, p3))
+                        DntkResult::Output(self.output_ng(&p1, p2, p3)
+                                     .colorize()
+                                     .cursorize()
+                                     .to_string())
                     },
                 }
             },

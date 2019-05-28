@@ -17,6 +17,7 @@ scopeguard = "1.0.0"
 atty = "0.2"
 clap = "2.20.3"
 subprocess = "0.1.18"
+wincolor = "1.0.1"
 
 [dependencies.winconsole]
 version = "0.10"

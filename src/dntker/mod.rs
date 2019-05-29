@@ -124,6 +124,7 @@ impl Dntker {
             util::ASCII_CODE_SEMICOLON   => FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ), // ;
             util::ASCII_CODE_NEWLINE     => FilterResult::EndCode,                             // \n
             util::ASCII_CODE_ESCAPE      => FilterResult::EscCode,                             // escape key
+            util::ASCII_CODE_BACKSPACE   => FilterResult::DeleteCode,                          // backspace key
             util::ASCII_CODE_DELETE      => FilterResult::DeleteCode,                          // delete key
             util::ASCII_CODE_SPACE       => FilterResult::BcCode(util::ASCII_CODE_SPACE     ), // white space key
             unknown_code                 => FilterResult::UnknownCode(unknown_code),
@@ -359,6 +360,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ));
         assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::EndCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EscCode                            );
+        assert_eq!(d.filter_char(util::ASCII_CODE_BACKSPACE  ), FilterResult::DeleteCode                         );
         assert_eq!(d.filter_char(util::ASCII_CODE_DELETE     ), FilterResult::DeleteCode                         );
         assert_eq!(d.filter_char(util::ASCII_CODE_SPACE      ), FilterResult::BcCode(util::ASCII_CODE_SPACE     ));
 

@@ -56,6 +56,7 @@ pub const ASCII_CODE_AND         : u8 = 0x26; // &
 pub const ASCII_CODE_SEMICOLON   : u8 = 0x3b; // ;
 pub const ASCII_CODE_NEWLINE     : u8 = 0x0a; // \n
 pub const ASCII_CODE_ESCAPE      : u8 = 0x1b; // escape key
+pub const ASCII_CODE_BACKSPACE   : u8 = 0x08; // backspace key
 pub const ASCII_CODE_DELETE      : u8 = 0x7f; // delete key
 pub const ASCII_CODE_SPACE       : u8 = 0x20; // white space key
 

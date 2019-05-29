@@ -4,13 +4,14 @@
 [![crates](https://img.shields.io/badge/crates.io-v2.1.2-319e8c.svg)](https://crates.io/crates/dntk)
 [![docker](https://img.shields.io/badge/docker-v2.1.2-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
-[![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux-orange.svg)]()
+[![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux|%20windows-orange.svg)]()
 
 dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
 [![asciicast](https://asciinema.org/a/248298.svg)](https://asciinema.org/a/248298)
   
 ✔︎ dntk means calculator in a japanese.  
 ✔︎ dntk is gnu bc wrapper. so, syntax is equal to gnu bc. [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)  
+✔︎ dntk support cross-platform😄 mac, alpine, linux, and **windows**!!!  
 ✔︎ dntk is a NATIVE [The Rust Programming Language](https://rust-lang.org) application.  
 ✔︎ dntk can move cursor, can delete char, can refresh buffer.  
 ✔︎ dntk write color means,  
@@ -56,6 +57,12 @@ if can't move, try...
 ```bash
 $ wget https://github.com/nnao45/dntk/releases/download/v2.1.2/dntk-v2.1.2-x86_64-unknown-linux-musl.zip
 $ unzip dntk-v2.1.2-x86_64-unknown-linux-musl.zip
+```
+
+### Windows
+```bash
+$ wget https://github.com/nnao45/dntk/releases/download/v2.1.2/dntk-v2.1.2-x86_64-pc-windows-msvc.zip
+$ unzip dntk-v2.1.2-x86_64-pc-windows-msvc.zip
 ```
 
 ### Cargo

@@ -12,6 +12,7 @@ dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.or
 ✔︎ dntk means calculator in a japanese.  
 ✔︎ dntk is gnu bc wrapper. so, syntax is equal to gnu bc. [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)  
 ✔︎ dntk is a NATIVE [The Rust Programming Language](https://rust-lang.org) application.  
+✔︎ dntk can move cursor, can delete char, can refresh buffer.  
 ✔︎ dntk write color means,  
 <table>
     <tr>
@@ -140,6 +141,10 @@ OPTIONS:
         <td>Delete, Backspace</td>
         <td>Delete current char</td>
     </tr>
+    <tr>
+        <td>r</td>
+        <td>Clean buffer</td>
+    </tr>
 
 </table>
 
@@ -253,11 +258,6 @@ you can use under function.
 </table>
 
 more detail 👉 https://www.gnu.org/software/bc/manual/html_mono/bc.html
-
-## Clean Buffer
-if you want to clean buffer, very easy, type `r`
-
-[![asciicast](https://asciinema.org/a/248301.svg)](https://asciinema.org/a/248301)
 
 ## Pipe Use...
 ```bash

@@ -24,9 +24,6 @@ impl BcExecuter {
         match meta::build_cli().get_matches().value_of("bc-path") {
             Some(p) => {
                 path.push(p);
-                if ! &path.exists() {
-                    panic!("{}", "please, install and set PATH, bc or bc.exe")
-                }
             },
             None => panic!("{}", "flag parse error occured"),
         }
@@ -100,7 +97,6 @@ mod bc_tests {
     use super::{BcExecuter};
 
     #[test]
-    #[ignore]
     fn test_handle_output(){
         let b = BcExecuter::new();
         let input1 = "1";
@@ -115,7 +111,6 @@ mod bc_tests {
     }
 
     #[test]
-    #[ignore]
     fn test_exec(){
         let b = BcExecuter::new();
         let input1 = "1+2";

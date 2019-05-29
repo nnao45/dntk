@@ -5,6 +5,11 @@ use super::meta;
 use std::io::Write;
 use atty::Stream;
 
+#[cfg(target_os = "windows")]
+use winconsole::console as wconsole;
+
+use ansi_term;
+
 #[derive(Debug, PartialEq)]
 pub struct Dntker {
     pub executer: bc::BcExecuter,
@@ -48,22 +53,29 @@ enum DntkStringType {
 }
 
 impl DntkString {
+    pub fn ancize(mut self) -> Self {
+        self = self.colorize();
+        #[cfg(not(target_os = "windows"))]
+        {
+            self = self.cursorize();
+        }
+        self
+    }
+
     pub fn colorize(mut self) -> Self {
-        if ! meta::build_cli().get_matches().is_present("white") {
-            match &self.dtype {
-                DntkStringType::Ok => {
-                    self.data = format!("{}{}{}", util::COLOR_CYAN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                },
-                DntkStringType::Ng => {
-                    self.data = format!("{}{}{}", util::COLOR_MAGENDA_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                },
-                DntkStringType::Warn => {
-                    self.data = format!("{}{}{}", util::COLOR_YELLOW_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                },
-                DntkStringType::Refresh => {
-                    self.data = format!("{}{}{}", util::COLOR_GREEN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                },
-            }
+        match &self.dtype {
+            DntkStringType::Ok => {
+                self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();
+            },
+            DntkStringType::Ng => {
+                self.data = ansi_term::Colour::Purple.paint(&self.data).to_string();
+            },
+            DntkStringType::Warn => {
+                self.data = ansi_term::Colour::Yellow.paint(&self.data).to_string();
+            },
+            DntkStringType::Refresh => {
+                self.data = ansi_term::Colour::Green.paint(&self.data).to_string();
+            },
         }
         self
     }
@@ -130,6 +142,7 @@ impl Dntker {
             util::ASCII_CODE_AND         => FilterResult::BcCode(util::ASCII_CODE_AND       ), // &
             util::ASCII_CODE_SEMICOLON   => FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ), // ;
             util::ASCII_CODE_AT          => FilterResult::RefreshCode,                         // @
+            util::ASCII_CODE_WINENTER    => FilterResult::EndCode,                             // windows \n
             util::ASCII_CODE_NEWLINE     => FilterResult::EndCode,                             // \n
             util::ASCII_CODE_ESCAPE      => FilterResult::EscCode,                             // escape key
             util::ASCII_CODE_BACKSPACE   => FilterResult::DeleteCode,                          // backspace key
@@ -273,8 +286,7 @@ impl Dntker {
         match &self.executer.exec(p2) {
             Ok(p4) => {
                 DntkResult::Output(self.output_ok(&p1, p2, p3, &p4)
-                                     .colorize()
-                                     .cursorize()
+                                     .ancize()
                                      .to_string())
             },
             Err(e) => {
@@ -283,8 +295,7 @@ impl Dntker {
                     bc::BcError::Timeout => panic!("call bc process is timeout"),
                     _ => {
                         DntkResult::Output(self.output_ng(&p1, p2, p3)
-                                     .colorize()
-                                     .cursorize()
+                                     .ancize()
                                      .to_string())
                     },
                 }
@@ -292,6 +303,13 @@ impl Dntker {
         }
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn watch(&self,  mut ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
+        ptr[0] = wconsole::getch(true).unwrap() as u8 as i8;
+        return ptr
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn watch(&self,  ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
         loop{
             if unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) } > 0 {
@@ -326,6 +344,11 @@ impl Dntker {
                 },
             }
             std::io::stdout().flush().unwrap();
+            #[cfg(target_os = "windows")]
+            {
+                let vec_cur = wconsole::get_cursor_position().unwrap();
+                wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+            }
         }
     }
 }
@@ -374,6 +397,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_AND        ), FilterResult::BcCode(util::ASCII_CODE_AND       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ));
         assert_eq!(d.filter_char(util::ASCII_CODE_AT         ), FilterResult::RefreshCode                        );
+        assert_eq!(d.filter_char(util::ASCII_CODE_WINENTER   ), FilterResult::EndCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::EndCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EscCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_BACKSPACE  ), FilterResult::DeleteCode                         );
@@ -563,15 +587,31 @@ mod dntker_tests {
     #[test]
     fn test_output_ok() {
         let d = &mut Dntker::new();
-        assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m\u{1b}[7D".to_string(), d.output_ok(util::DNTK_PROMPT, "1+2", " = ", "3").colorize().cursorize().to_string());
-        assert_eq!("\u{1b}[36m\r(dntk): a(123) = 1.56266642461495270762\u{1b}[0m\u{1b}[31D".to_string(), d.output_ok(util::DNTK_PROMPT, "a(123)", " = ", "1.56266642461495270762").colorize().cursorize().to_string());
+        #[cfg(not(target_os = "windows"))]
+        {
+            assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m\u{1b}[7D".to_string(), d.output_ok(util::DNTK_PROMPT, "1+2", " = ", "3").ancize().to_string());
+            assert_eq!("\u{1b}[36m\r(dntk): a(123) = 1.56266642461495270762\u{1b}[0m\u{1b}[31D".to_string(), d.output_ok(util::DNTK_PROMPT, "a(123)", " = ", "1.56266642461495270762").ancize().to_string());
+        }
+        #[cfg(target_os = "windows")]
+        {
+            assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m".to_string(), d.output_ok(util::DNTK_PROMPT, "1+2", " = ", "3").ancize().to_string());
+            assert_eq!("\u{1b}[36m\r(dntk): a(123) = 1.56266642461495270762\u{1b}[0m".to_string(), d.output_ok(util::DNTK_PROMPT, "a(123)", " = ", "1.56266642461495270762").ancize().to_string());
+        }
     }
 
     #[test]
     fn test_output_ng() {
         let d = &mut Dntker::new();
-        assert_eq!("\u{1b}[35m\r(dntk): 1+2* = \u{1b}[0m\u{1b}[7D".to_string(), d.output_ng(util::DNTK_PROMPT, "1+2*", " = ").colorize().cursorize().to_string());
-        assert_eq!("\u{1b}[35m\r(dntk): a(123)*s( = \u{1b}[0m\u{1b}[12D".to_string(), d.output_ng(util::DNTK_PROMPT, "a(123)*s(", " = ").colorize().cursorize().to_string());
+        #[cfg(not(target_os = "windows"))]
+        {
+            assert_eq!("\u{1b}[35m\r(dntk): 1+2* = \u{1b}[0m\u{1b}[7D".to_string(), d.output_ng(util::DNTK_PROMPT, "1+2*", " = ").ancize().to_string());
+            assert_eq!("\u{1b}[35m\r(dntk): a(123)*s( = \u{1b}[0m\u{1b}[12D".to_string(), d.output_ng(util::DNTK_PROMPT, "a(123)*s(", " = ").ancize().to_string());
+        }
+        #[cfg(target_os = "windows")]
+        {
+            assert_eq!("\u{1b}[35m\r(dntk): 1+2* = \u{1b}[0m".to_string(), d.output_ng(util::DNTK_PROMPT, "1+2*", " = ").ancize().to_string());
+            assert_eq!("\u{1b}[35m\r(dntk): a(123)*s( = \u{1b}[0m".to_string(), d.output_ng(util::DNTK_PROMPT, "a(123)*s(", " = ").ancize().to_string());
+        }
     }
 
     #[test]
@@ -594,6 +634,31 @@ mod dntker_tests {
     }
 
     #[test]
+    #[cfg(target_os = "windows")]
+    fn test_dntk_exec() {
+        let d1 = &mut Dntker::new();
+        let ptr_escape: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8; 3];
+        assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_escape));
+        let ptr1: [libc::c_char; 3] = [util::ASCII_CODE_ONE as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1 = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr1));
+        let ptr_right: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8, 0x91 as u8 as i8, util::ASCII_CODE_RIGHT as i8];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1 = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr_right));
+        let ptr2: [libc::c_char; 3] = [util::ASCII_CODE_PLUS as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[35m\r(dntk): 1+ = \u{1b}[0m".to_string()), d1.dntk_exec(ptr2));
+        let ptr3: [libc::c_char; 3] = [util::ASCII_CODE_ZERO as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0 = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr3));
+        let ptr4: [libc::c_char; 3] = [util::ASCII_CODE_DOT as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr4));
+        let ptr_unknown_ascii: [libc::c_char; 3] = [0x4f as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr_unknown_ascii));
+        let ptr5: [libc::c_char; 3] = [util::ASCII_CODE_SEVEN as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0.7 = 1.7\u{1b}[0m".to_string()), d1.dntk_exec(ptr5));
+        let ptr_enter: [libc::c_char; 3] = [util::ASCII_CODE_NEWLINE as i8; 3];
+        assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_enter));
+    }
+
+    #[test]
+    #[cfg(not(target_os = "windows"))]
     fn test_dntk_exec() {
         let d1 = &mut Dntker::new();
         let ptr_escape: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8; 3];

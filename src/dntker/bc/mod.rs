@@ -21,7 +21,12 @@ pub struct BcExecuter {
 impl BcExecuter {
     pub fn new() -> Self {
         let mut path = PathBuf::new();
-        path.push(meta::build_cli().get_matches().value_of("bc-path").unwrap());
+        match meta::build_cli().get_matches().value_of("bc-path") {
+            Some(p) => {
+                path.push(p);
+            },
+            None => panic!("{}", "flag parse error occured"),
+        }
         BcExecuter {
             bc_path: path,
         }
@@ -71,10 +76,10 @@ impl BcExecuter {
             }
         }
 
-        let stderr = capture.stderr_str();
+        let stderr = capture.stderr_str().replace("\r", "");
 
         if stderr.is_empty() {
-            let stdout = capture.stdout_str();
+            let stdout = capture.stdout_str().replace("\r", "");
 
             if stdout.is_empty() {
                 Err(BcError::NoResult)
@@ -118,10 +123,10 @@ mod bc_tests {
         let output3 = "65536";
         assert_eq!(b.exec(input3).unwrap(), output3);
         let input4 = "3x4x";
+        #[cfg(not(target_os = "macos"))]
+        let output4 = "Error(\"(standard_in) 1: syntax error\")";
         #[cfg(target_os = "macos")]
         let output4 = "Error(\"(standard_in) 1: parse error\")";
-        #[cfg(target_os = "linux")]
-        let output4 = "Error(\"(standard_in) 1: syntax error\")";
         assert_eq!(format!("{:?}", b.exec(input4).err().unwrap()), output4);
     }
 }

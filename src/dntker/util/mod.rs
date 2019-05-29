@@ -1,22 +1,5 @@
 pub const DNTK_PROMPT            : &str = "\r(dntk): ";
 
-// https://qiita.com/hidai@github/items/1704bf2926ab8b157a4f
-#[allow(dead_code)]
-pub const COLOR_BLACK_HEADER     : &str = "\x1b[30m";
-#[allow(dead_code)]
-pub const COLOR_RED_HEADER       : &str = "\x1b[31m";
-#[allow(dead_code)]
-pub const COLOR_GREEN_HEADER     : &str = "\x1b[32m";
-#[allow(dead_code)]
-pub const COLOR_YELLOW_HEADER    : &str = "\x1b[33m";
-#[allow(dead_code)]
-pub const COLOR_BLUE_HEADER      : &str = "\x1b[34m";
-pub const COLOR_MAGENDA_HEADER   : &str = "\x1b[35m";
-pub const COLOR_CYAN_HEADER      : &str = "\x1b[36m";
-#[allow(dead_code)]
-pub const COLOR_WHITE_HEADER     : &str = "\x1b[37m";
-pub const COLOR_PLAIN_HEADER     : &str = "\x1b[0m";
-
 // http://www9.plala.or.jp/sgwr-t/c_sub/ascii.html
 pub const ASCII_CODE_ZERO        : u8 = 0x30; // 0
 pub const ASCII_CODE_ONE         : u8 = 0x31; // 1
@@ -58,6 +41,7 @@ pub const ASCII_CODE_PIPE        : u8 = 0x7c; // |
 pub const ASCII_CODE_AND         : u8 = 0x26; // &
 pub const ASCII_CODE_SEMICOLON   : u8 = 0x3b; // ;
 pub const ASCII_CODE_AT          : u8 = 0x40; // @
+pub const ASCII_CODE_WINENTER    : u8 = 0x0d; // windows \n
 pub const ASCII_CODE_NEWLINE     : u8 = 0x0a; // \n
 pub const ASCII_CODE_ESCAPE      : u8 = 0x1b; // escape key
 pub const ASCII_CODE_BACKSPACE   : u8 = 0x08; // backspace key

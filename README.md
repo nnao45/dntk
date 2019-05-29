@@ -94,7 +94,7 @@ All OK!! 😎
 ## Options
 ```
 ❯❯❯ dntk -h
-dntk 2.0.6
+dntk 2.1.2
 nnao45 <n4sekai5y@gmail.com>
 Command line's Interactive calculator, GNU bc wrapper.
 
@@ -103,7 +103,7 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
-    -q, --quiet      No print warn message
+    -q, --quiet      No print information message
     -v, --version    Prints version information
     -w, --white      Set White color in a output
 
@@ -142,7 +142,7 @@ OPTIONS:
         <td>Delete current char</td>
     </tr>
     <tr>
-        <td>r</td>
+        <td>@</td>
         <td>Clean buffer</td>
     </tr>
 
@@ -253,6 +253,11 @@ you can use under function.
         <td>exp(x)</td>
         <td>e()</td>
         <td>Exponential function</td>
+    </tr>
+    <tr>
+        <td>sqrt(x)</td>
+        <td>sqrt()</td>
+        <td>Return square root of the expression function</td>
     </tr>
     <tr>
         <td>j(n,x)</td>

@@ -108,13 +108,15 @@ impl Dntker {
             util::ASCII_CODE_L           => FilterResult::BcCode(util::ASCII_CODE_L         ), // l
             util::ASCII_CODE_E           => FilterResult::BcCode(util::ASCII_CODE_E         ), // e
             util::ASCII_CODE_J           => FilterResult::BcCode(util::ASCII_CODE_J         ), // j
-            util::ASCII_CODE_R           => FilterResult::RefreshCode,                         // r
+            util::ASCII_CODE_R           => FilterResult::BcCode(util::ASCII_CODE_R         ), // r
+            util::ASCII_CODE_Q           => FilterResult::BcCode(util::ASCII_CODE_Q         ), // q
+            util::ASCII_CODE_T           => FilterResult::BcCode(util::ASCII_CODE_T         ), // t
             util::ASCII_CODE_ROUNDLEFT   => FilterResult::BcCode(util::ASCII_CODE_ROUNDLEFT ), // (
             util::ASCII_CODE_ROUNDRIGHT  => FilterResult::BcCode(util::ASCII_CODE_ROUNDRIGHT), // )
             util::ASCII_CODE_SQUARELEFT  => FilterResult::CurLeftCode,                         // [
             util::ASCII_CODE_SQUARERIGHT => FilterResult::CurRightCode,                        // ]
-            util::ASCII_CODE_LARGER      => FilterResult::BcCode(util::ASCII_CODE_LARGER),     // <
-            util::ASCII_CODE_SMALLER     => FilterResult::BcCode(util::ASCII_CODE_SMALLER),    // >
+            util::ASCII_CODE_LARGER      => FilterResult::BcCode(util::ASCII_CODE_LARGER    ), // <
+            util::ASCII_CODE_SMALLER     => FilterResult::BcCode(util::ASCII_CODE_SMALLER   ), // >
             util::ASCII_CODE_PLUS        => FilterResult::BcCode(util::ASCII_CODE_PLUS      ), // +
             util::ASCII_CODE_MINUS       => FilterResult::BcCode(util::ASCII_CODE_MINUS     ), // -
             util::ASCII_CODE_ASTERISK    => FilterResult::BcCode(util::ASCII_CODE_ASTERISK  ), // *
@@ -127,6 +129,7 @@ impl Dntker {
             util::ASCII_CODE_PIPE        => FilterResult::BcCode(util::ASCII_CODE_PIPE      ), // |
             util::ASCII_CODE_AND         => FilterResult::BcCode(util::ASCII_CODE_AND       ), // &
             util::ASCII_CODE_SEMICOLON   => FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ), // ;
+            util::ASCII_CODE_AT          => FilterResult::RefreshCode,                         // @
             util::ASCII_CODE_NEWLINE     => FilterResult::EndCode,                             // \n
             util::ASCII_CODE_ESCAPE      => FilterResult::EscCode,                             // escape key
             util::ASCII_CODE_BACKSPACE   => FilterResult::DeleteCode,                          // backspace key
@@ -349,6 +352,9 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_L          ), FilterResult::BcCode(util::ASCII_CODE_L         ));
         assert_eq!(d.filter_char(util::ASCII_CODE_E          ), FilterResult::BcCode(util::ASCII_CODE_E         ));
         assert_eq!(d.filter_char(util::ASCII_CODE_J          ), FilterResult::BcCode(util::ASCII_CODE_J         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_R          ), FilterResult::BcCode(util::ASCII_CODE_R         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_Q          ), FilterResult::BcCode(util::ASCII_CODE_Q         ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_T          ), FilterResult::BcCode(util::ASCII_CODE_T         ));
         assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDLEFT  ), FilterResult::BcCode(util::ASCII_CODE_ROUNDLEFT ));
         assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDRIGHT ), FilterResult::BcCode(util::ASCII_CODE_ROUNDRIGHT));
         assert_eq!(d.filter_char(util::ASCII_CODE_LARGER     ), FilterResult::BcCode(util::ASCII_CODE_LARGER    ));
@@ -367,6 +373,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_PIPE       ), FilterResult::BcCode(util::ASCII_CODE_PIPE      ));
         assert_eq!(d.filter_char(util::ASCII_CODE_AND        ), FilterResult::BcCode(util::ASCII_CODE_AND       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_AT         ), FilterResult::RefreshCode                        );
         assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::EndCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EscCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_BACKSPACE  ), FilterResult::DeleteCode                         );
@@ -374,7 +381,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_SPACE      ), FilterResult::BcCode(util::ASCII_CODE_SPACE     ));
 
         assert_eq!(d.filter_char(0x00                        ), FilterResult::UnknownCode(0x00                  ));
-        assert_eq!(d.filter_char(0x40                        ), FilterResult::UnknownCode(0x40                  ));
+        assert_eq!(d.filter_char(0x0e                        ), FilterResult::UnknownCode(0x0e                  ));
         assert_eq!(d.filter_char(0x4f                        ), FilterResult::UnknownCode(0x4f                  ));
     }
 

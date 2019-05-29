@@ -35,6 +35,8 @@ pub const ASCII_CODE_L           : u8 = 0x6c; // l
 pub const ASCII_CODE_E           : u8 = 0x65; // e
 pub const ASCII_CODE_J           : u8 = 0x6a; // j
 pub const ASCII_CODE_R           : u8 = 0x72; // r
+pub const ASCII_CODE_Q           : u8 = 0x71; // q
+pub const ASCII_CODE_T           : u8 = 0x74; // t
 pub const ASCII_CODE_ROUNDLEFT   : u8 = 0x28; // (
 pub const ASCII_CODE_ROUNDRIGHT  : u8 = 0x29; // )
 pub const ASCII_CODE_SQUARELEFT  : u8 = 0x5b; // [
@@ -55,6 +57,7 @@ pub const ASCII_CODE_EQUAL       : u8 = 0x3d; // =
 pub const ASCII_CODE_PIPE        : u8 = 0x7c; // |
 pub const ASCII_CODE_AND         : u8 = 0x26; // &
 pub const ASCII_CODE_SEMICOLON   : u8 = 0x3b; // ;
+pub const ASCII_CODE_AT          : u8 = 0x40; // @
 pub const ASCII_CODE_NEWLINE     : u8 = 0x0a; // \n
 pub const ASCII_CODE_ESCAPE      : u8 = 0x1b; // escape key
 pub const ASCII_CODE_BACKSPACE   : u8 = 0x08; // backspace key

@@ -48,20 +48,20 @@ enum DntkStringType {
 
 impl DntkString {
     pub fn colorize(mut self) -> Self {
-        match &self.dtype {
-            DntkStringType::Ok => {
-                self.data = format!("{}{}{}", util::COLOR_CYAN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                self
-            },
-            DntkStringType::Ng => {
-                self.data = format!("{}{}{}", util::COLOR_MAGENDA_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                self
-            },
-            DntkStringType::Warn => {
-                self.data = format!("{}{}{}", util::COLOR_YELLOW_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                self
-            },
+        if ! meta::build_cli().get_matches().is_present("white") {
+            match &self.dtype {
+                DntkStringType::Ok => {
+                    self.data = format!("{}{}{}", util::COLOR_CYAN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
+                },
+                DntkStringType::Ng => {
+                    self.data = format!("{}{}{}", util::COLOR_MAGENDA_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
+                },
+                DntkStringType::Warn => {
+                    self.data = format!("{}{}{}", util::COLOR_YELLOW_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
+                },
+            }
         }
+        self
     }
 
     pub fn cursorize(mut self) -> Self {

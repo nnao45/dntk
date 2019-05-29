@@ -72,15 +72,15 @@ impl DntkString {
         #[cfg(target_os = "windows")]
         match &self.dtype {
             DntkStringType::Ok => {
-                ansi_term::Colour::Cyan.paint(&self.data);
+                self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();
                 self
             },
             DntkStringType::Ng => {
-                ansi_term::Colour::Magenda.paint(&self.data);
+                self.data = ansi_term::Colour::Purple.paint(&self.data).to_string();
                 self
             },
             DntkStringType::Warn => {
-                ansi_term::Colour::Yellow.paint(&self.data);
+                self.data = ansi_term::Colour::Yellow.paint(&self.data).to_string();
                 self
             },
         }
@@ -330,8 +330,8 @@ impl Dntker {
     }
 
     #[cfg(target_os = "windows")]
-    pub fn watch(&self,  ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
-        ptr[0] = wconsole::getch(false).unwrap();
+    pub fn watch(&self,  mut ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
+        ptr[0] = wconsole::getch(false).unwrap() as u8 as i8;
         return ptr
     }
 

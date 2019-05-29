@@ -7,7 +7,7 @@
 [![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20windows-orange.svg)]()
 
 dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
-[![asciicast](https://asciinema.org/a/248298.svg)](https://asciinema.org/a/248298)
+![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_demo.gif)
   
 ✔︎ dntk means calculator in a japanese.  
 ✔︎ dntk is gnu bc wrapper. so, syntax is equal to gnu bc. [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)  
@@ -118,6 +118,17 @@ OPTIONS:
         --bc-path <PATH>    Use a specific bc command path [default: bc]
     -s, --scale <NUMBER>    Number of truncated after the decimal point
 ```
+
+## Windows Support
+You may install bc.exe and set PATH.
+```bash
+$ choco install gnuwin
+$ # or
+$ wget wget https://embedeo.org/ws/command_line/bc_dc_calculator_windows/bc-1.07.1-win32-embedeo-02.zip
+$ unzip bc-1.07.1-win32-embedeo-02.zip
+```
+
+![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_win_demo.gif)
 
 ## Keybind
 

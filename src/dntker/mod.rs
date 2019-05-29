@@ -53,37 +53,41 @@ enum DntkStringType {
 }
 
 impl DntkString {
+    pub fn ancize(mut self) -> Self {
+        self = self.colorize();
+        #[cfg(not(target_os = "windows"))]
+        {
+            self = self.cursorize();
+        }
+        self
+    }
+
     pub fn colorize(mut self) -> Self {
         #[cfg(not(target_os = "windows"))]
         match &self.dtype {
             DntkStringType::Ok => {
                 self.data = format!("{}{}{}", util::COLOR_CYAN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                self
             },
             DntkStringType::Ng => {
                 self.data = format!("{}{}{}", util::COLOR_MAGENDA_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                self
             },
             DntkStringType::Warn => {
                 self.data = format!("{}{}{}", util::COLOR_YELLOW_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                self
             },
         }
         #[cfg(target_os = "windows")]
         match &self.dtype {
             DntkStringType::Ok => {
                 self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();
-                self
             },
             DntkStringType::Ng => {
                 self.data = ansi_term::Colour::Purple.paint(&self.data).to_string();
-                self
             },
             DntkStringType::Warn => {
                 self.data = ansi_term::Colour::Yellow.paint(&self.data).to_string();
-                self
             },
         }
+        self
     }
 
     pub fn cursorize(mut self) -> Self {
@@ -240,8 +244,7 @@ impl Dntker {
             dtype: DntkStringType::Warn,
             cur_pos_from_right: 0,
         }
-            .colorize()
-            .cursorize()
+            .ancize()
             .to_string()
         );
         //let result = &mut vec!["\r", util::COLOR_YELLOW_HEADER, &warn_str, util::COLOR_PLAIN_HEADER];
@@ -310,8 +313,7 @@ impl Dntker {
         match &self.executer.exec(p2) {
             Ok(p4) => {
                 DntkResult::Output(self.output_ok(&p1, p2, p3, &p4)
-                                     .colorize()
-                                     .cursorize()
+                                     .ancize()
                                      .to_string())
             },
             Err(e) => {
@@ -320,8 +322,7 @@ impl Dntker {
                     bc::BcError::Timeout => panic!("call bc process is timeout"),
                     _ => {
                         DntkResult::Output(self.output_ng(&p1, p2, p3)
-                                     .colorize()
-                                     .cursorize()
+                                     .ancize()
                                      .to_string())
                     },
                 }
@@ -331,7 +332,7 @@ impl Dntker {
 
     #[cfg(target_os = "windows")]
     pub fn watch(&self,  mut ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
-        ptr[0] = wconsole::getch(false).unwrap() as u8 as i8;
+        ptr[0] = wconsole::getch(true).unwrap() as u8 as i8;
         return ptr
     }
 
@@ -373,6 +374,11 @@ impl Dntker {
                 }
             //}
             std::io::stdout().flush().unwrap();
+            #[cfg(target_os = "windows")]
+            {
+                let vec_cur = wconsole::get_cursor_position().unwrap();
+                wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+            }
         }
     }
 }

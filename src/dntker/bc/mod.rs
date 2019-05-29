@@ -95,6 +95,7 @@ mod bc_tests {
     use super::{BcExecuter};
 
     #[test]
+    #[ignore]
     fn test_handle_output(){
         let b = BcExecuter::new();
         let input1 = "1";
@@ -109,6 +110,7 @@ mod bc_tests {
     }
 
     #[test]
+    #[ignore]
     fn test_exec(){
         let b = BcExecuter::new();
         let input1 = "1+2";

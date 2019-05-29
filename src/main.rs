@@ -1,14 +1,12 @@
 extern crate libc;
 extern crate clap;
+extern crate ansi_term;
 
 #[macro_use(defer)]
 extern crate scopeguard;
 
 #[cfg(target_os = "windows")]
 extern crate winconsole;
-
-#[cfg(target_os = "windows")]
-extern crate ansi_term;
 
 mod term;
 mod dntker;

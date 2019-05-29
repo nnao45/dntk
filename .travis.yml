@@ -18,8 +18,7 @@ matrix:
           LINUX_TERM_LIB=linux_musl.rs
     - os: windows
       rust: stable
-      env:
-        - TARGET=x86_64-pc-windows-msvc
+      env: TARGET=x86_64-pc-windows-msvc
 before_script:
   - rustc -V
   - cargo -V

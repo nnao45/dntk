@@ -8,7 +8,6 @@ use atty::Stream;
 #[cfg(target_os = "windows")]
 use winconsole::console as wconsole;
 
-#[cfg(target_os = "windows")]
 use ansi_term;
 
 #[derive(Debug, PartialEq)]
@@ -64,22 +63,6 @@ impl DntkString {
     }
 
     pub fn colorize(mut self) -> Self {
-        #[cfg(not(target_os = "windows"))]
-        match &self.dtype {
-            DntkStringType::Ok => {
-                self.data = format!("{}{}{}", util::COLOR_CYAN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-            },
-            DntkStringType::Ng => {
-                self.data = format!("{}{}{}", util::COLOR_MAGENDA_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-            },
-            DntkStringType::Warn => {
-                self.data = format!("{}{}{}", util::COLOR_YELLOW_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-            },
-            DntkStringType::Refresh => {
-                self.data = format!("{}{}{}", util::COLOR_GREEN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-            },
-        }
-        #[cfg(target_os = "windows")]
         match &self.dtype {
             DntkStringType::Ok => {
                 self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();

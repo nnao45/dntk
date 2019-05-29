@@ -120,6 +120,7 @@ impl Dntker {
             util::ASCII_CODE_ASTERISK    => FilterResult::BcCode(util::ASCII_CODE_ASTERISK  ), // *
             util::ASCII_CODE_SLUSH       => FilterResult::BcCode(util::ASCII_CODE_SLUSH     ), // /
             util::ASCII_CODE_HAT         => FilterResult::BcCode(util::ASCII_CODE_HAT       ), // ^
+            util::ASCII_CODE_PERCENT     => FilterResult::BcCode(util::ASCII_CODE_PERCENT   ), // %
             util::ASCII_CODE_DOT         => FilterResult::BcCode(util::ASCII_CODE_DOT       ), // .
             util::ASCII_CODE_BIKKURI     => FilterResult::BcCode(util::ASCII_CODE_BIKKURI   ), // !
             util::ASCII_CODE_EQUAL       => FilterResult::BcCode(util::ASCII_CODE_EQUAL     ), // =
@@ -359,6 +360,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_ASTERISK   ), FilterResult::BcCode(util::ASCII_CODE_ASTERISK  ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SLUSH      ), FilterResult::BcCode(util::ASCII_CODE_SLUSH     ));
         assert_eq!(d.filter_char(util::ASCII_CODE_HAT        ), FilterResult::BcCode(util::ASCII_CODE_HAT       ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_PERCENT    ), FilterResult::BcCode(util::ASCII_CODE_PERCENT   ));
         assert_eq!(d.filter_char(util::ASCII_CODE_DOT        ), FilterResult::BcCode(util::ASCII_CODE_DOT       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_BIKKURI    ), FilterResult::BcCode(util::ASCII_CODE_BIKKURI   ));
         assert_eq!(d.filter_char(util::ASCII_CODE_EQUAL      ), FilterResult::BcCode(util::ASCII_CODE_EQUAL     ));

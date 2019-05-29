@@ -192,18 +192,20 @@ impl Dntker {
     }
 
     fn inform(&mut self, msg: &str, dtype: DntkStringType) {
-        print!("{}", self.output_fill_whitespace(self.before_printed_len));
-        print!("{}", DntkString {
-            data: format!("{}{}", "\r", msg),
-            dtype: dtype,
-            cur_pos_from_right: 0,
+        if ! meta::build_cli().get_matches().is_present("quiet") {
+            print!("{}", self.output_fill_whitespace(self.before_printed_len));
+            print!("{}", DntkString {
+                data: format!("{}{}", "\r", msg),
+                dtype: dtype,
+                cur_pos_from_right: 0,
+            }
+                .colorize()
+                .to_string()
+            );
+            std::io::stdout().flush().unwrap();
+            std::thread::sleep(std::time::Duration::from_millis(1000));
+            print!("{}", &self.output_fill_whitespace(msg.len()));
         }
-            .colorize()
-            .to_string()
-        );
-        std::io::stdout().flush().unwrap();
-        std::thread::sleep(std::time::Duration::from_millis(1000));
-        print!("{}", &self.output_fill_whitespace(msg.len()));
     }
 
     fn warning(&mut self, unknown_code: &u8) {
@@ -212,6 +214,7 @@ impl Dntker {
 
     fn refresh(&mut self) {
         self.inform("refresh!!", DntkStringType::Refresh);
+        print!("{}", self.output_fill_whitespace(self.before_printed_len));
         *self = Dntker::new();
         print!("{}", util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
@@ -221,9 +224,6 @@ impl Dntker {
         let input_char = ptr[0] as u8;
         match &self.filter_char(input_char) {
             FilterResult::UnknownCode(unknown_code) => {
-                if meta::build_cli().get_matches().is_present("quiet") {
-                    return DntkResult::Continue
-                }
                 &self.warning(unknown_code);
             },
             FilterResult::EscCode => {

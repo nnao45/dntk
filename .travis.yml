@@ -23,7 +23,7 @@ before_script:
   - rustc -V
   - cargo -V
   - if [[ "${TARGET}" == "x86_64-unknown-linux-musl" ]] || [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then rustup target add $TARGET; fi
-  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then export PATH=$PATH:";C:\Users\travis\build\nnao45\dntk\test\bc-1.07.1-win32-embedeo-02\bin"; fi
+  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then export PATH=$PATH:"/c/Users/travis/build/nnao45/dntk/test/bc-1.07.1-win32-embedeo-02/bin"; fi
   - git --version
   - echo $TRAVIS_BRANCH
   - pwd

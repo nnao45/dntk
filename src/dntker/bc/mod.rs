@@ -76,10 +76,10 @@ impl BcExecuter {
             }
         }
 
-        let stderr = capture.stderr_str();
+        let stderr = capture.stderr_str().replace("\r", "");
 
         if stderr.is_empty() {
-            let stdout = capture.stdout_str();
+            let stdout = capture.stdout_str().replace("\r", "");
 
             if stdout.is_empty() {
                 Err(BcError::NoResult)
@@ -123,10 +123,10 @@ mod bc_tests {
         let output3 = "65536";
         assert_eq!(b.exec(input3).unwrap(), output3);
         let input4 = "3x4x";
-        #[cfg(target_os = "macos")]
-        let output4 = "Error(\"(standard_in) 1: parse error\")";
-        #[cfg(not(target_os = "macos"))]
+        #[cfg(target_os = "linux")]
         let output4 = "Error(\"(standard_in) 1: syntax error\")";
+        #[cfg(not(target_os = "linux"))]
+        let output4 = "Error(\"(standard_in) 1: parse error\")";
         assert_eq!(format!("{:?}", b.exec(input4).err().unwrap()), output4);
     }
 }

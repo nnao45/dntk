@@ -632,6 +632,31 @@ mod dntker_tests {
     }
 
     #[test]
+    #[cfg(target_os = "windows")]
+    fn test_dntk_exec() {
+        let d1 = &mut Dntker::new();
+        let ptr_escape: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8; 3];
+        assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_escape));
+        let ptr1: [libc::c_char; 3] = [util::ASCII_CODE_ONE as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1 = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr1));
+        let ptr_right: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8, 0x91 as u8 as i8, util::ASCII_CODE_RIGHT as i8];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1 = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr_right));
+        let ptr2: [libc::c_char; 3] = [util::ASCII_CODE_PLUS as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[35m\r(dntk): 1+ = \u{1b}[0m".to_string()), d1.dntk_exec(ptr2));
+        let ptr3: [libc::c_char; 3] = [util::ASCII_CODE_ZERO as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0 = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr3));
+        let ptr4: [libc::c_char; 3] = [util::ASCII_CODE_DOT as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr4));
+        let ptr_unknown_ascii: [libc::c_char; 3] = [0x4f as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr_unknown_ascii));
+        let ptr5: [libc::c_char; 3] = [util::ASCII_CODE_SEVEN as i8; 3];
+        assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0.7 = 1.7\u{1b}[0m".to_string()), d1.dntk_exec(ptr5));
+        let ptr_enter: [libc::c_char; 3] = [util::ASCII_CODE_NEWLINE as i8; 3];
+        assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_enter));
+    }
+
+    #[test]
+    #[cfg(not(target_os = "windows"))]
     fn test_dntk_exec() {
         let d1 = &mut Dntker::new();
         let ptr_escape: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8; 3];

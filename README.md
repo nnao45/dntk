@@ -30,6 +30,10 @@ dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.or
         <td>yellow</td>
         <td>danger input char, output warning</td>
     </tr>
+    <tr>
+        <td>green</td>
+        <td>clean buffer message</td>
+    </tr>
 </table>
 
 ## ***Current dntk's version: v2.0.8***

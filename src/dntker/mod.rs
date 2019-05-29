@@ -44,6 +44,7 @@ enum DntkStringType {
     Ok,
     Ng,
     Warn,
+    Refresh,
 }
 
 impl DntkString {
@@ -58,6 +59,9 @@ impl DntkString {
                 },
                 DntkStringType::Warn => {
                     self.data = format!("{}{}{}", util::COLOR_YELLOW_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
+                },
+                DntkStringType::Refresh => {
+                    self.data = format!("{}{}{}", util::COLOR_GREEN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
                 },
             }
         }
@@ -186,27 +190,30 @@ impl Dntker {
         }
     }
 
-    fn info_wn(&mut self, unknown_code: &u8) {
+    fn inform(&mut self, msg: &str, dtype: DntkStringType) {
         print!("{}", self.output_fill_whitespace(self.before_printed_len));
-        let warn_str = format!("this char is no supported: {}", unknown_code.to_owned() as char);
         print!("{}", DntkString {
-            data: format!("{}{}", "\r", &warn_str),
-            dtype: DntkStringType::Warn,
+            data: format!("{}{}", "\r", msg),
+            dtype: dtype,
             cur_pos_from_right: 0,
         }
             .colorize()
-            .cursorize()
             .to_string()
         );
         std::io::stdout().flush().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(1000));
-        print!("{}", &self.output_fill_whitespace(warn_str.len()));
+        print!("{}", &self.output_fill_whitespace(msg.len()));
+    }
+
+    fn warning(&mut self, unknown_code: &u8) {
+        self.inform(&format!("this char is no supported: {}", unknown_code.to_owned() as char), DntkStringType::Warn)
     }
 
     fn refresh(&mut self) {
-        print!("{}", self.output_fill_whitespace(self.before_printed_len));
+        self.inform("refresh!!", DntkStringType::Refresh);
         *self = Dntker::new();
         print!("{}", util::DNTK_PROMPT);
+        std::io::stdout().flush().unwrap();
     }
 
     fn dntk_exec(&mut self, ptr: [libc::c_char; 3]) -> DntkResult {
@@ -216,7 +223,7 @@ impl Dntker {
                 if meta::build_cli().get_matches().is_present("quiet") {
                     return DntkResult::Continue
                 }
-                &self.info_wn(unknown_code);
+                &self.warning(unknown_code);
             },
             FilterResult::EscCode => {
                 if ptr.len() >= 3 {

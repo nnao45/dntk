@@ -22,8 +22,13 @@ impl BcExecuter {
     pub fn new() -> Self {
         let mut path = PathBuf::new();
         match meta::build_cli().get_matches().value_of("bc-path") {
-            Some(p) => path.push(p),
-            None => panic!("Please, install and set PATH, bc or bc.exe"),
+            Some(p) => {
+                path.push(p);
+                if ! &path.exists() {
+                    panic!("{}", "please, install and set PATH, bc or bc.exe")
+                }
+            },
+            None => panic!("{}", "flag parse error occured"),
         }
         BcExecuter {
             bc_path: path,

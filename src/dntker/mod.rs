@@ -5,6 +5,12 @@ use super::meta;
 use std::io::Write;
 use atty::Stream;
 
+#[cfg(target_os = "windows")]
+use winconsole::console as wconsole;
+
+#[cfg(target_os = "windows")]
+use ansi_term;
+
 #[derive(Debug, PartialEq)]
 pub struct Dntker {
     pub executer: bc::BcExecuter,
@@ -48,22 +54,42 @@ enum DntkStringType {
 }
 
 impl DntkString {
+    pub fn ancize(mut self) -> Self {
+        self = self.colorize();
+        #[cfg(not(target_os = "windows"))]
+        {
+            self = self.cursorize();
+        }
+        self
+    }
+
     pub fn colorize(mut self) -> Self {
-        if ! meta::build_cli().get_matches().is_present("white") {
-            match &self.dtype {
-                DntkStringType::Ok => {
-                    self.data = format!("{}{}{}", util::COLOR_CYAN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                },
-                DntkStringType::Ng => {
-                    self.data = format!("{}{}{}", util::COLOR_MAGENDA_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                },
-                DntkStringType::Warn => {
-                    self.data = format!("{}{}{}", util::COLOR_YELLOW_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                },
-                DntkStringType::Refresh => {
-                    self.data = format!("{}{}{}", util::COLOR_GREEN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
-                },
-            }
+        #[cfg(not(target_os = "windows"))]
+        match &self.dtype {
+            DntkStringType::Ok => {
+                self.data = format!("{}{}{}", util::COLOR_CYAN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
+            },
+            DntkStringType::Ng => {
+                self.data = format!("{}{}{}", util::COLOR_MAGENDA_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
+            },
+            DntkStringType::Warn => {
+                self.data = format!("{}{}{}", util::COLOR_YELLOW_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
+            },
+            DntkStringType::Refresh => {
+                self.data = format!("{}{}{}", util::COLOR_GREEN_HEADER, &self.data, util::COLOR_PLAIN_HEADER);
+            },
+        }
+        #[cfg(target_os = "windows")]
+        match &self.dtype {
+            DntkStringType::Ok => {
+                self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();
+            },
+            DntkStringType::Ng => {
+                self.data = ansi_term::Colour::Purple.paint(&self.data).to_string();
+            },
+            DntkStringType::Warn => {
+                self.data = ansi_term::Colour::Yellow.paint(&self.data).to_string();
+            },
         }
         self
     }
@@ -273,8 +299,7 @@ impl Dntker {
         match &self.executer.exec(p2) {
             Ok(p4) => {
                 DntkResult::Output(self.output_ok(&p1, p2, p3, &p4)
-                                     .colorize()
-                                     .cursorize()
+                                     .ancize()
                                      .to_string())
             },
             Err(e) => {
@@ -283,8 +308,7 @@ impl Dntker {
                     bc::BcError::Timeout => panic!("call bc process is timeout"),
                     _ => {
                         DntkResult::Output(self.output_ng(&p1, p2, p3)
-                                     .colorize()
-                                     .cursorize()
+                                     .ancize()
                                      .to_string())
                     },
                 }
@@ -292,6 +316,13 @@ impl Dntker {
         }
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn watch(&self,  mut ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
+        ptr[0] = wconsole::getch(true).unwrap() as u8 as i8;
+        return ptr
+    }
+
+    #[cfg(target_os = "macos")]
     pub fn watch(&self,  ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
         loop{
             if unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) } > 0 {
@@ -326,6 +357,11 @@ impl Dntker {
                 },
             }
             std::io::stdout().flush().unwrap();
+            #[cfg(target_os = "windows")]
+            {
+                let vec_cur = wconsole::get_cursor_position().unwrap();
+                wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+            }
         }
     }
 }
@@ -563,15 +599,15 @@ mod dntker_tests {
     #[test]
     fn test_output_ok() {
         let d = &mut Dntker::new();
-        assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m\u{1b}[7D".to_string(), d.output_ok(util::DNTK_PROMPT, "1+2", " = ", "3").colorize().cursorize().to_string());
-        assert_eq!("\u{1b}[36m\r(dntk): a(123) = 1.56266642461495270762\u{1b}[0m\u{1b}[31D".to_string(), d.output_ok(util::DNTK_PROMPT, "a(123)", " = ", "1.56266642461495270762").colorize().cursorize().to_string());
+        assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m\u{1b}[7D".to_string(), d.output_ok(util::DNTK_PROMPT, "1+2", " = ", "3").ancize().to_string());
+        assert_eq!("\u{1b}[36m\r(dntk): a(123) = 1.56266642461495270762\u{1b}[0m\u{1b}[31D".to_string(), d.output_ok(util::DNTK_PROMPT, "a(123)", " = ", "1.56266642461495270762").ancize().to_string());
     }
 
     #[test]
     fn test_output_ng() {
         let d = &mut Dntker::new();
-        assert_eq!("\u{1b}[35m\r(dntk): 1+2* = \u{1b}[0m\u{1b}[7D".to_string(), d.output_ng(util::DNTK_PROMPT, "1+2*", " = ").colorize().cursorize().to_string());
-        assert_eq!("\u{1b}[35m\r(dntk): a(123)*s( = \u{1b}[0m\u{1b}[12D".to_string(), d.output_ng(util::DNTK_PROMPT, "a(123)*s(", " = ").colorize().cursorize().to_string());
+        assert_eq!("\u{1b}[35m\r(dntk): 1+2* = \u{1b}[0m\u{1b}[7D".to_string(), d.output_ng(util::DNTK_PROMPT, "1+2*", " = ").ancize().to_string());
+        assert_eq!("\u{1b}[35m\r(dntk): a(123)*s( = \u{1b}[0m\u{1b}[12D".to_string(), d.output_ng(util::DNTK_PROMPT, "a(123)*s(", " = ").ancize().to_string());
     }
 
     #[test]

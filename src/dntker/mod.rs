@@ -622,7 +622,7 @@ mod dntker_tests {
     }
 
     #[test]
-    fn test_cursorrize() {
+    fn test_cursorize() {
         let s = "\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m";
         let ds = DntkString {
             data: s.to_string(),

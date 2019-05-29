@@ -140,6 +140,10 @@ OPTIONS:
         <td>Delete, Backspace</td>
         <td>Delete current char</td>
     </tr>
+    <tr>
+        <td>r</td>
+        <td>Clean buffer</td>
+    </tr>
 
 </table>
 
@@ -253,11 +257,6 @@ you can use under function.
 </table>
 
 more detail 👉 https://www.gnu.org/software/bc/manual/html_mono/bc.html
-
-## Clean Buffer
-if you want to clean buffer, very easy, type `r`
-
-[![asciicast](https://asciinema.org/a/248301.svg)](https://asciinema.org/a/248301)
 
 ## Pipe Use...
 ```bash

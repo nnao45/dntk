@@ -142,6 +142,7 @@ impl Dntker {
             util::ASCII_CODE_AND         => FilterResult::BcCode(util::ASCII_CODE_AND       ), // &
             util::ASCII_CODE_SEMICOLON   => FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ), // ;
             util::ASCII_CODE_AT          => FilterResult::RefreshCode,                         // @
+            util::ASCII_CODE_WINENTER    => FilterResult::EndCode,                             // windows \n
             util::ASCII_CODE_NEWLINE     => FilterResult::EndCode,                             // \n
             util::ASCII_CODE_ESCAPE      => FilterResult::EscCode,                             // escape key
             util::ASCII_CODE_BACKSPACE   => FilterResult::DeleteCode,                          // backspace key
@@ -396,6 +397,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_AND        ), FilterResult::BcCode(util::ASCII_CODE_AND       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ));
         assert_eq!(d.filter_char(util::ASCII_CODE_AT         ), FilterResult::RefreshCode                        );
+        assert_eq!(d.filter_char(util::ASCII_CODE_WINENTER   ), FilterResult::EndCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::EndCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE     ), FilterResult::EscCode                            );
         assert_eq!(d.filter_char(util::ASCII_CODE_BACKSPACE  ), FilterResult::DeleteCode                         );

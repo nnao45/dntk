@@ -41,6 +41,7 @@ pub const ASCII_CODE_PIPE        : u8 = 0x7c; // |
 pub const ASCII_CODE_AND         : u8 = 0x26; // &
 pub const ASCII_CODE_SEMICOLON   : u8 = 0x3b; // ;
 pub const ASCII_CODE_AT          : u8 = 0x40; // @
+pub const ASCII_CODE_WINENTER    : u8 = 0x0d; // windows \n
 pub const ASCII_CODE_NEWLINE     : u8 = 0x0a; // \n
 pub const ASCII_CODE_ESCAPE      : u8 = 0x1b; // escape key
 pub const ASCII_CODE_BACKSPACE   : u8 = 0x08; // backspace key

@@ -175,6 +175,10 @@ OPTIONS:
         <td>^</td>
         <td>exponentiation</td>
     </tr>
+    <tr>
+        <td>%</td>
+        <td>remainder</td>
+    </tr>
 </table>
 
 ### Operation for Logical

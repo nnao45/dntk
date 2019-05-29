@@ -1,7 +1,7 @@
 # general
 VERSION = $(shell ./version.sh)
 PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
-NAME = twiquery-stream
+NAME = dntk
 TARGET = $(NAME)
 DOCKER_REPO = nnao45
 LINUX_TERM_LIB = linux_unknown.rs

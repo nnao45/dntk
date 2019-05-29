@@ -133,7 +133,7 @@ OPTIONS:
         <td>Finish dntk app</td>
     </tr>
     <tr>
-        <td>Delete</td>
+        <td>Delete, Backspace</td>
         <td>Delete current char</td>
     </tr>
 

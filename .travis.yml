@@ -24,6 +24,7 @@ before_script:
   - rustc -V
   - cargo -V
   - if [[ "${TARGET}" == "x86_64-unknown-linux-musl" ]] || [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then rustup target add $TARGET; fi
+  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then choco install gnuwin; fi
   - git --version
   - echo $TRAVIS_BRANCH
   - git rev-parse HEAD

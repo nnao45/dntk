@@ -26,7 +26,7 @@ pub fn build_cli() -> App<'static, 'static> {
             .long("white")
         )
         .arg(Arg::with_name("quiet")
-            .help("No print warn message")
+            .help("No print information message")
             .short("q")
             .long("quiet")
         )

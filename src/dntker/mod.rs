@@ -320,7 +320,7 @@ impl Dntker {
 
 #[cfg(test)]
 mod dntker_tests {
-    use super::{Dntker, util, FilterResult, DntkResult, bc};
+    use super::{Dntker, util, FilterResult, DntkResult, bc, DntkString, DntkStringType};
     #[test]
     fn test_filter_char() {
         let d = Dntker::new();
@@ -545,15 +545,15 @@ mod dntker_tests {
     #[test]
     fn test_output_ok() {
         let d = &mut Dntker::new();
-        assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m\u{1b}[7D".to_string(), d.output_ok(util::DNTK_PROMPT, "1+2", " = ", "3").data);
-        assert_eq!("\u{1b}[36m\r(dntk): a(123) = 1.56266642461495270762\u{1b}[0m\u{1b}[31D".to_string(), d.output_ok(util::DNTK_PROMPT, "a(123)", " = ", "1.56266642461495270762").data);
+        assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m\u{1b}[7D".to_string(), d.output_ok(util::DNTK_PROMPT, "1+2", " = ", "3").colorize().cursorize().to_string());
+        assert_eq!("\u{1b}[36m\r(dntk): a(123) = 1.56266642461495270762\u{1b}[0m\u{1b}[31D".to_string(), d.output_ok(util::DNTK_PROMPT, "a(123)", " = ", "1.56266642461495270762").colorize().cursorize().to_string());
     }
 
     #[test]
     fn test_output_ng() {
         let d = &mut Dntker::new();
-        assert_eq!("\u{1b}[35m\r(dntk): 1+2* = \u{1b}[0m\u{1b}[7D".to_string(), d.output_ng(util::DNTK_PROMPT, "1+2*", " = ").data);
-        assert_eq!("\u{1b}[35m\r(dntk): a(123)*s( = \u{1b}[0m\u{1b}[12D".to_string(), d.output_ng(util::DNTK_PROMPT, "a(123)*s(", " = ").data);
+        assert_eq!("\u{1b}[35m\r(dntk): 1+2* = \u{1b}[0m\u{1b}[7D".to_string(), d.output_ng(util::DNTK_PROMPT, "1+2*", " = ").colorize().cursorize().to_string());
+        assert_eq!("\u{1b}[35m\r(dntk): a(123)*s( = \u{1b}[0m\u{1b}[12D".to_string(), d.output_ng(util::DNTK_PROMPT, "a(123)*s(", " = ").colorize().cursorize().to_string());
     }
 
     #[test]
@@ -596,5 +596,39 @@ mod dntker_tests {
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0.7 = 1.7\u{1b}[0m\u{1b}[6D".to_string()), d1.dntk_exec(ptr5));
         let ptr_enter: [libc::c_char; 3] = [util::ASCII_CODE_NEWLINE as i8; 3];
         assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_enter));
+    }
+
+    #[test]
+    fn test_colorize() {
+        let s = "\r(dntk): 1+2 = 3";
+        let ds1 = DntkString {
+            data: s.to_string(),
+            dtype: DntkStringType::Ok,
+            cur_pos_from_right: 4,
+        };
+        let ds2 = DntkString {
+            data: s.to_string(),
+            dtype: DntkStringType::Ng,
+            cur_pos_from_right: 4,
+        };
+        let ds3 = DntkString {
+            data: s.to_string(),
+            dtype: DntkStringType::Warn,
+            cur_pos_from_right: 4,
+        };
+        assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m".to_string(), ds1.colorize().data);
+        assert_eq!("\u{1b}[35m\r(dntk): 1+2 = 3\u{1b}[0m".to_string(), ds2.colorize().data);
+        assert_eq!("\u{1b}[33m\r(dntk): 1+2 = 3\u{1b}[0m".to_string(), ds3.colorize().data);
+    }
+
+    #[test]
+    fn test_cursorrize() {
+        let s = "\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m";
+        let ds = DntkString {
+            data: s.to_string(),
+            dtype: DntkStringType::Ok,
+            cur_pos_from_right: 4,
+        };
+        assert_eq!("\u{1b}[36m\r(dntk): 1+2 = 3\u{1b}[0m\u{1b}[4D".to_string(), ds.cursorize().data);
     }
 }

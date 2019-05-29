@@ -8,6 +8,11 @@ use clap::{
 };
 
 pub fn build_cli() -> App<'static, 'static> {
+    #[cfg(not(target_os = "windows"))]
+    let bc_path = "bc";
+    #[cfg(target_os = "windows")]
+    let bc_path = "bc.exe";
+
     App::new(crate_name!())
         .version(crate_version!())
         .version_short("v")
@@ -35,6 +40,6 @@ pub fn build_cli() -> App<'static, 'static> {
             .long("bc-path")
             .value_name("PATH")
             .takes_value(true)
-            .default_value("bc")
+            .default_value(bc_path)
         )
 }

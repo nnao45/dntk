@@ -90,6 +90,9 @@ impl DntkString {
             DntkStringType::Warn => {
                 self.data = ansi_term::Colour::Yellow.paint(&self.data).to_string();
             },
+            DntkStringType::Refresh => {
+                self.data = ansi_term::Colour::Green.paint(&self.data).to_string();
+            },
         }
         self
     }

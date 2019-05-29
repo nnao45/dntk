@@ -21,7 +21,10 @@ pub struct BcExecuter {
 impl BcExecuter {
     pub fn new() -> Self {
         let mut path = PathBuf::new();
-        path.push(meta::build_cli().get_matches().value_of("bc-path").unwrap());
+        match meta::build_cli().get_matches().value_of("bc-path") {
+            Some(p) => path.push(p),
+            None => panic!("Please, install and set PATH, bc or bc.exe"),
+        }
         BcExecuter {
             bc_path: path,
         }
@@ -120,7 +123,7 @@ mod bc_tests {
         let input4 = "3x4x";
         #[cfg(target_os = "macos")]
         let output4 = "Error(\"(standard_in) 1: parse error\")";
-        #[cfg(target_os = "linux")]
+        #[cfg(not(target_os = "macos"))]
         let output4 = "Error(\"(standard_in) 1: syntax error\")";
         assert_eq!(format!("{:?}", b.exec(input4).err().unwrap()), output4);
     }

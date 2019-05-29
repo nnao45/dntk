@@ -23,9 +23,11 @@ before_script:
   - rustc -V
   - cargo -V
   - if [[ "${TARGET}" == "x86_64-unknown-linux-musl" ]] || [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then rustup target add $TARGET; fi
-  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then export PATH=$PATH:";C:\Users\travis\build\test\bc-1.07.1-win32-embedeo-02\bin"; fi
+  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then export PATH=$PATH:";C:\Users\travis\build\dntk\test\bc-1.07.1-win32-embedeo-02\bin"; fi
   - git --version
   - echo $TRAVIS_BRANCH
+  - pwd
+  - echo $PATH
   - git rev-parse HEAD
 script:
   - export PKG_CONFIG_ALLOW_CROSS=1

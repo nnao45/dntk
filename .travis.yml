@@ -24,7 +24,7 @@ before_script:
   - rustc -V
   - cargo -V
   - if [[ "${TARGET}" == "x86_64-unknown-linux-musl" ]] || [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then rustup target add $TARGET; fi
-  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then choco install gnuwin; fi
+  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then wget install https://embedeo.org/ws/command_line/bc_dc_calculator_windows/bc-1.07.1-win32-embedeo-02.zip --no-check-certificate; unzip bc-1.07.1-win32-embedeo-02.zip; setx /M path "%path%;C:\bc-1.07.1-win32-embedeo-02\bin"; fi
   - git --version
   - echo $TRAVIS_BRANCH
   - git rev-parse HEAD

@@ -4,10 +4,12 @@ mod bc;
 use super::meta;
 use std::io::Write;
 use atty::Stream;
-use wincolor;
 
 #[cfg(target_os = "windows")]
 use winconsole::console as wconsole;
+
+#[cfg(target_os = "windows")]
+use ansi_term;
 
 #[derive(Debug, PartialEq)]
 pub struct Dntker {
@@ -70,29 +72,22 @@ impl DntkString {
         #[cfg(target_os = "windows")]
         match &self.dtype {
             DntkStringType::Ok => {
-                wincolor::Console::stdout().unwrap().fg(wincolor::Intense::Yes, wincolor::Color::Cyan).unwrap();
+                ansi_term::Colour::Cyan.paint(&self.data);
                 self
             },
             DntkStringType::Ng => {
-                wincolor::Console::stdout().unwrap().fg(wincolor::Intense::Yes, wincolor::Color::Magenta).unwrap();
+                ansi_term::Colour::Magenda.paint(&self.data);
                 self
             },
             DntkStringType::Warn => {
-                wincolor::Console::stdout().unwrap().fg(wincolor::Intense::Yes, wincolor::Color::Yellow).unwrap();
+                ansi_term::Colour::Yellow.paint(&self.data);
                 self
             },
         }
     }
 
-    #[cfg(not(target_os = "windows"))]
     pub fn cursorize(mut self) -> Self {
         self.data = format!("{}{}{}{}", &self.data, util::CURSOR_MOVE_ES_HEAD, &self.cur_pos_from_right, util::CURSOR_MOVE_ES_BACK);
-        self
-    }
-    #[cfg(target_os = "windows")]
-    pub fn cursorize(mut self) -> Self {
-        let vec_cur = wconsole::console::get_cursor_position().unwrap();
-        wconsole::console::set_cursor_position(vec_cur.x - &self.cur_pos_from_right, vec_cur.y).unwrap();
         self
     }
 

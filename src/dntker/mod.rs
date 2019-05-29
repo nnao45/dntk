@@ -322,7 +322,7 @@ impl Dntker {
         return ptr
     }
 
-    #[cfg(target_os = "macos")]
+    #[cfg(not(target_os = "windows"))]
     pub fn watch(&self,  ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
         loop{
             if unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) } > 0 {

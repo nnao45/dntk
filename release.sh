@@ -8,4 +8,4 @@ if ! printf ${ANSWER} | egrep ${SEMATIC_VERSION_REGEX} >/dev/null 2>&1; then
 fi
 echo "release ${ANSWER}"
 sed -i '' -e "s/version = \"$(./version.sh | cut -c 2-)\"/version = \"${ANSWER}\"/g" Cargo.toml
-sleep 3
+sleep 10

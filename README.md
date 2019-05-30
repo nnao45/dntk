@@ -101,10 +101,6 @@ All OK!! 😎
 ## Options
 ```
 ❯❯❯ dntk -h
-dntk 2.1.3
-nnao45 <n4sekai5y@gmail.com>
-Command line's Interactive calculator, GNU bc wrapper.
-
 USAGE:
     dntk [FLAGS] [OPTIONS]
 

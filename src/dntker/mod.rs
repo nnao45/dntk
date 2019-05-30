@@ -57,25 +57,27 @@ impl DntkString {
         self = self.colorize();
         #[cfg(not(target_os = "windows"))]
         {
-            self = self.cursorize();
+                self = self.cursorize();
         }
         self
     }
 
     pub fn colorize(mut self) -> Self {
-        match &self.dtype {
-            DntkStringType::Ok => {
-                self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();
-            },
-            DntkStringType::Ng => {
-                self.data = ansi_term::Colour::Purple.paint(&self.data).to_string();
-            },
-            DntkStringType::Warn => {
-                self.data = ansi_term::Colour::Yellow.paint(&self.data).to_string();
-            },
-            DntkStringType::Refresh => {
-                self.data = ansi_term::Colour::Green.paint(&self.data).to_string();
-            },
+        if ! meta::build_cli().get_matches().is_present("white") {
+            match &self.dtype {
+                DntkStringType::Ok => {
+                    self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();
+                },
+                DntkStringType::Ng => {
+                    self.data = ansi_term::Colour::Purple.paint(&self.data).to_string();
+                },
+                DntkStringType::Warn => {
+                    self.data = ansi_term::Colour::Yellow.paint(&self.data).to_string();
+                },
+                DntkStringType::Refresh => {
+                    self.data = ansi_term::Colour::Green.paint(&self.data).to_string();
+                },
+            }
         }
         self
     }
@@ -325,6 +327,11 @@ impl Dntker {
             println!("{}", &self.executer.exec(&s).unwrap());
             return
         };
+
+        if meta::build_cli().get_matches().is_present("show-limits") {
+            println!("{}", &self.executer.exec("limits").unwrap());
+            return
+        }
 
         let ptr: [libc::c_char; 3] = [0; 3];
 

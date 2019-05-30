@@ -101,14 +101,17 @@ All OK!! 😎
 ## Options
 ```
 ❯❯❯ dntk -h
+Command line's multi-platform interactive calculator, GNU bc wrapper.
+
 USAGE:
     dntk [FLAGS] [OPTIONS]
 
 FLAGS:
-    -h, --help       Prints help information
-    -q, --quiet      No print information message
-    -v, --version    Prints version information
-    -w, --white      Set White color in a output
+    -h, --help           Prints help information
+    -q, --quiet          No print information message
+        --show-limits    Print the local limits enforced by the local version of bc, and quit
+    -v, --version        Prints version information
+    -w, --white          Set White color in a output
 
 OPTIONS:
         --bc-path <PATH>    Use a specific bc command path [default: bc]

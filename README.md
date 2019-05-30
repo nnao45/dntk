@@ -6,7 +6,7 @@
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
 [![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20windows-orange.svg)]()
 
-dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
+dntk is command line's multi-platform ***Interactive*** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_demo.gif)
   
 ✔︎ dntk means calculator in a japanese.  

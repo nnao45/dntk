@@ -1,8 +1,8 @@
 # dntk
 [![Travis CI](https://travis-ci.org/nnao45/dntk.svg?branch=master)](https://travis-ci.org/nnao45/dntk)
-[![v2.1.2](https://img.shields.io/badge/package-v2.1.2-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v2.1.2)
-[![crates](https://img.shields.io/badge/crates.io-v2.1.2-319e8c.svg)](https://crates.io/crates/dntk)
-[![docker](https://img.shields.io/badge/docker-v2.1.2-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags)
+[![v2.1.3](https://img.shields.io/badge/package-v2.1.3-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v2.1.3)
+[![crates](https://img.shields.io/badge/crates.io-v2.1.3-319e8c.svg)](https://crates.io/crates/dntk)
+[![docker](https://img.shields.io/badge/docker-v2.1.3-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
 [![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20windows-orange.svg)]()
 
@@ -38,7 +38,7 @@ dntk is command line's ***Interactive*** calculator, [GNU bc](https://www.gnu.or
     </tr>
 </table>
 
-## ***Current dntk's version: v2.1.2***
+## ***Current dntk's version: v2.1.3***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## Install
@@ -49,20 +49,20 @@ $ brew install nnao45/dntk/dntk
 
 ### Linux
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.1.2/dntk-v2.1.2-x86_64-unknown-linux-gnu.zip
-$ unzip dntk-v2.1.2-x86_64-unknown-linux-gnu.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v2.1.3/dntk-v2.1.3-x86_64-unknown-linux-gnu.zip
+$ unzip dntk-v2.1.3-x86_64-unknown-linux-gnu.zip
 ```
 
 if can't move, try...
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.1.2/dntk-v2.1.2-x86_64-unknown-linux-musl.zip
-$ unzip dntk-v2.1.2-x86_64-unknown-linux-musl.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v2.1.3/dntk-v2.1.3-x86_64-unknown-linux-musl.zip
+$ unzip dntk-v2.1.3-x86_64-unknown-linux-musl.zip
 ```
 
 ### Windows
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.1.2/dntk-v2.1.2-x86_64-pc-windows-msvc.zip
-$ unzip dntk-v2.1.2-x86_64-pc-windows-msvc.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v2.1.3/dntk-v2.1.3-x86_64-pc-windows-msvc.zip
+$ unzip dntk-v2.1.3-x86_64-pc-windows-msvc.zip
 ```
 
 ### Cargo

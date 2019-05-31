@@ -94,13 +94,22 @@ impl DntkString {
 
 impl Dntker {
     pub fn new() -> Self {
+        let mut iv : Vec<u8> = Vec::new();
+        let mut bpsl = 0;
+        let mut ccp = 0;
+        if let Some(v) = meta::build_cli().get_matches().value_of("inject") {
+            let inject_bytes = &mut format!("{}", v).as_bytes().to_owned();
+            bpsl = inject_bytes.len();
+            ccp = inject_bytes.len();
+            iv.append(inject_bytes);
+        }
         Dntker {
             executer: bc::BcExecuter::new(),
-            input_vec: Vec::new(),
+            input_vec: iv,
             before_printed_len: 0,
             before_printed_result_len: 0,
-            before_printed_statement_len: 0,
-            currnet_cur_pos: 0,
+            before_printed_statement_len: bpsl,
+            currnet_cur_pos: ccp,
         }
     }
 
@@ -238,6 +247,27 @@ impl Dntker {
         std::io::stdout().flush().unwrap();
     }
 
+    fn calculate(&mut self, p1: &str, p2: &str, p3: &str) -> DntkResult {
+        match &self.executer.exec(p2) {
+            Ok(p4) => {
+                DntkResult::Output(self.output_ok(p1, p2, p3, p4)
+                                     .ancize()
+                                     .to_string())
+            },
+            Err(e) => {
+                match e {
+                    bc::BcError::PopenError(e) => panic!("call bc process open error: {:?}", e),
+                    bc::BcError::Timeout => panic!("call bc process is timeout"),
+                    _ => {
+                        DntkResult::Output(self.output_ng(p1, p2, p3)
+                                     .ancize()
+                                     .to_string())
+                    },
+                }
+            },
+        }
+    }
+
     fn dntk_exec(&mut self, ptr: [libc::c_char; 3]) -> DntkResult {
         let input_char = ptr[0] as u8;
         match &self.filter_char(input_char) {
@@ -285,34 +315,17 @@ impl Dntker {
         let p1 = format!("{}", util::DNTK_PROMPT);
         let p2 = &self.statement_from_utf8();
         let p3 = " = ";
-        match &self.executer.exec(p2) {
-            Ok(p4) => {
-                DntkResult::Output(self.output_ok(&p1, p2, p3, &p4)
-                                     .ancize()
-                                     .to_string())
-            },
-            Err(e) => {
-                match e {
-                    bc::BcError::PopenError(e) => panic!("call bc process open error: {:?}", e),
-                    bc::BcError::Timeout => panic!("call bc process is timeout"),
-                    _ => {
-                        DntkResult::Output(self.output_ng(&p1, p2, p3)
-                                     .ancize()
-                                     .to_string())
-                    },
-                }
-            },
-        }
+        self.calculate(&p1, p2, p3)
     }
 
     #[cfg(target_os = "windows")]
-    pub fn watch(&self,  mut ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
+    fn watch(&self,  mut ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
         ptr[0] = wconsole::getch(true).unwrap() as u8 as i8;
         return ptr
     }
 
     #[cfg(not(target_os = "windows"))]
-    pub fn watch(&self,  ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
+    fn watch(&self,  ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
         loop{
             if unsafe { libc::read(0, ptr.as_ptr() as *mut libc::c_void, 3) } > 0 {
                 return ptr
@@ -337,6 +350,17 @@ impl Dntker {
 
         print!("{}", util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
+
+        if meta::build_cli().get_matches().is_present("inject") {
+            let p1 = &format!("{}", util::DNTK_PROMPT);
+            let p2 = &mut self.statement_from_utf8();
+            let p3 = " = ";
+            if let DntkResult::Output(o) = self.calculate(p1, p2, p3) {
+                print!("{}", o);
+            }
+            std::io::stdout().flush().unwrap();
+        }
+
         loop {
             match self.dntk_exec(self.watch(ptr)) {
                 DntkResult::Fin => {
@@ -352,7 +376,9 @@ impl Dntker {
             }
             #[cfg(target_os = "windows")]
             wconsole::set_cursor_visible(false).unwrap();
+
             std::io::stdout().flush().unwrap();
+
             #[cfg(target_os = "windows")]
             {
                 let vec_cur = wconsole::get_cursor_position().unwrap();

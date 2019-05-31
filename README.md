@@ -114,8 +114,9 @@ FLAGS:
     -w, --white          Set White color in a output
 
 OPTIONS:
-        --bc-path <PATH>    Use a specific bc command path [default: bc]
-    -s, --scale <NUMBER>    Number of truncated after the decimal point
+        --bc-path <PATH>     Use a specific bc command path [default: bc]
+    -i, --inject <STRING>    First injection statement to the dntk
+    -s, --scale <NUMBER>     Number of truncated after the decimal point
 ```
 
 ## Windows Support

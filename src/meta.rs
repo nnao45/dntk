@@ -46,4 +46,11 @@ pub fn build_cli() -> App<'static, 'static> {
             .takes_value(true)
             .default_value(bc_path)
         )
+        .arg(Arg::with_name("inject")
+            .help("First injection statement to the dntk")
+            .short("i")
+            .long("inject")
+            .value_name("STRING")
+            .takes_value(true)
+        )
 }

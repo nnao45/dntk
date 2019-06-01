@@ -321,6 +321,22 @@ impl Dntker {
         }
     }
 
+    fn inject_filter2print(&mut self) {
+        let p1 = &format!("{}", util::DNTK_PROMPT);
+        let p2 = &mut self.statement_from_utf8();
+        let p3 = " = ";
+        for i in &self.input_vec {
+            match &self.filter_char(i.to_owned()) {
+                FilterResult::BcCode(_) => continue,
+                _ => panic!("Injection statement is including unrecoginezed char"),
+            }
+        }
+        if let DntkResult::Output(o) = self.calculate(p1, p2, p3) {
+            print!("{}", o);
+        }
+        std::io::stdout().flush().unwrap();
+    }
+
     pub fn run(&mut self) {
         if !atty::is(Stream::Stdin) {
             let mut s = String::new();
@@ -334,21 +350,14 @@ impl Dntker {
             return
         }
 
-        let ptr: [libc::c_char; 3] = [0; 3];
-
         print!("{}", util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
 
         if meta::build_cli().get_matches().is_present("inject") {
-            let p1 = &format!("{}", util::DNTK_PROMPT);
-            let p2 = &mut self.statement_from_utf8();
-            let p3 = " = ";
-            if let DntkResult::Output(o) = self.calculate(p1, p2, p3) {
-                print!("{}", o);
-            }
-            std::io::stdout().flush().unwrap();
+            self.inject_filter2print();
         }
 
+        let ptr: [libc::c_char; 3] = [0; 3];
         loop {
             match self.dntk_exec(self.watch(ptr)) {
                 DntkResult::Fin => {

@@ -357,6 +357,7 @@ impl Dntker {
             self.inject_filter2print();
 
             if util::DNTK_OPT.once {
+                print!("\n");
                 return
             }
         }
@@ -388,6 +389,7 @@ impl Dntker {
             }
 
             if util::DNTK_OPT.once {
+                print!("\n");
                 return
             }
         }

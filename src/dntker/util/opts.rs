@@ -9,7 +9,7 @@ use clap::{
 };
 
 lazy_static! {
-    pub static ref DNTK_OPT: Opt = Opt::from_args();
+    pub static ref DNTK_OPT: Opts = Opts::from_args();
 }
 
 #[derive(StructOpt, Debug)]
@@ -19,7 +19,7 @@ lazy_static! {
     raw(author = "crate_authors!()"),
     raw(about = "crate_description!()"),
 )]
-pub struct Opt {
+pub struct Opts {
     // Number of truncated after the decimal point
     #[structopt(short = "s", long = "scale", default_value = "20", help = "Number of truncated after the decimal point")]
     pub scale: usize,
@@ -50,7 +50,7 @@ pub struct Opt {
     #[structopt(short = "i", long = "inject", default_value = "", help = "Pre-run inject statement to the dntk")]
     pub inject: String,
 
-    // Run at once
-    #[structopt(long = "once", help = "Run at once (for test)")]
+    // Run at only once
+    #[structopt(long = "once", help = "Run at only once")]
     pub once: bool,
 }

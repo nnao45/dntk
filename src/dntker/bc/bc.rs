@@ -15,12 +15,6 @@ pub struct BcExecuter {
 impl BcExecuter {
     pub fn new() -> Self {
         let mut path = PathBuf::new();
-        //match meta::build_cli().get_matches().value_of("bc-path") {
-        //    Some(p) => {
-        //        path.push(p);
-        //    },
-        //    None => panic!("{}", "flag parse error occured"),
-        //}
         path.push(&util::DNTK_OPT.bc_path);
         BcExecuter {
             bc_path: path,

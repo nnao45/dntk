@@ -49,4 +49,8 @@ pub struct Opt {
     // Pre-run inject statement to the dntk
     #[structopt(short = "i", long = "inject", default_value = "", help = "Pre-run inject statement to the dntk")]
     pub inject: String,
+
+    // Run at once
+    #[structopt(long = "once", help = "Run at once (for test)")]
+    pub once: bool,
 }

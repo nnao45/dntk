@@ -355,6 +355,9 @@ impl Dntker {
 
         if util::DNTK_OPT.inject != "" {
             self.inject_filter2print();
+            if util::DNTK_OPT.once {
+                return
+            }
         }
 
         let ptr: [libc::c_char; 3] = [0; 3];
@@ -381,6 +384,10 @@ impl Dntker {
                 let vec_cur = wconsole::get_cursor_position().unwrap();
                 wconsole::set_cursor_visible(true).unwrap();
                 wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+            }
+
+            if util::DNTK_OPT.once {
+                return
             }
         }
     }

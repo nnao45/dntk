@@ -15,12 +15,13 @@ pub struct BcExecuter {
 impl BcExecuter {
     pub fn new() -> Self {
         let mut path = PathBuf::new();
-        match meta::build_cli().get_matches().value_of("bc-path") {
-            Some(p) => {
-                path.push(p);
-            },
-            None => panic!("{}", "flag parse error occured"),
-        }
+        //match meta::build_cli().get_matches().value_of("bc-path") {
+        //    Some(p) => {
+        //        path.push(p);
+        //    },
+        //    None => panic!("{}", "flag parse error occured"),
+        //}
+        path.push(&util::DNTK_OPT.bc_path);
         BcExecuter {
             bc_path: path,
         }
@@ -51,8 +52,8 @@ impl BcExecuter {
 
     pub fn exec(&self, statement: &str) -> Result<String, BcError> {
         let mut stdin = "".to_string();
-        if let Some(v) = meta::build_cli().get_matches().value_of("scale") {
-            stdin += &format!("{}{}{}","scale=", v, ";");
+        if util::DNTK_OPT.scale != 0 {
+            stdin += &format!("{}{}{}","scale=", util::DNTK_OPT.scale, ";");
         }
         stdin += &format!("{}\n", &statement);
         let process = Exec::cmd(&self.bc_path.as_os_str())

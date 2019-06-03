@@ -51,7 +51,7 @@ impl DntkString {
     }
 
     pub fn colorize(mut self) -> Self {
-        if ! meta::build_cli().get_matches().is_present("white") {
+        if ! util::DNTK_OPT.white {
             match &self.dtype {
                 DntkStringType::Ok => {
                     self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();
@@ -85,8 +85,8 @@ impl Dntker {
         let mut iv : Vec<u8> = Vec::new();
         let mut bpsl = 0;
         let mut ccp = 0;
-        if let Some(v) = meta::build_cli().get_matches().value_of("inject") {
-            let inject_bytes = &mut format!("{}", v).as_bytes().to_owned();
+        if util::DNTK_OPT.inject != "" {
+            let inject_bytes = &mut util::DNTK_OPT.inject.as_bytes().to_owned();
             bpsl = inject_bytes.len();
             ccp = inject_bytes.len();
             iv.append(inject_bytes);
@@ -207,7 +207,7 @@ impl Dntker {
     }
 
     fn inform(&mut self, msg: &str, dtype: DntkStringType) {
-        if ! meta::build_cli().get_matches().is_present("quiet") {
+        if ! util::DNTK_OPT.quiet {
             print!("{}", self.output_fill_whitespace(self.before_printed_len));
             print!("{}", DntkString {
                 data: format!("{}{}", "\r", msg),
@@ -345,7 +345,7 @@ impl Dntker {
             return
         };
 
-        if meta::build_cli().get_matches().is_present("show-limits") {
+        if util::DNTK_OPT.show_limits {
             println!("{}", &self.executer.exec("limits").unwrap());
             return
         }
@@ -353,7 +353,7 @@ impl Dntker {
         print!("{}", util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
 
-        if meta::build_cli().get_matches().is_present("inject") {
+        if util::DNTK_OPT.inject != "" {
             self.inject_filter2print();
         }
 

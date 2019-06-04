@@ -338,7 +338,7 @@ impl Dntker {
     }
 
     pub fn run(&mut self) {
-        if !atty::is(Stream::Stdin) {
+        if !atty::is(Stream::Stdin) && std::env::var("ENV") != Ok("TEST".to_string()) {
             let mut s = String::new();
             std::io::stdin().read_line(&mut s).ok();
             println!("{}", &self.executer.exec(&s).unwrap());
@@ -350,9 +350,6 @@ impl Dntker {
             return
         }
 
-        print!("{}", util::DNTK_PROMPT);
-        std::io::stdout().flush().unwrap();
-
         if util::DNTK_OPT.inject != "" {
             self.inject_filter2print();
 
@@ -361,6 +358,9 @@ impl Dntker {
                 return
             }
         }
+
+        print!("{}", util::DNTK_PROMPT);
+        std::io::stdout().flush().unwrap();
 
         let ptr: [libc::c_char; 3] = [0; 3];
         loop {

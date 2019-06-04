@@ -11,10 +11,16 @@ fn test_cmd_with_once() {
         .arg("--once")
         .arg("--inject")
         .arg("1/3");
+    #[cfg(not(target_os = "windows"))]
     cmd
         .assert()
         .success()
         .stdout("\u{1b}[36m\r(dntk): 1/3 = .33333333333333333333\u{1b}[0m\u{1b}[24D\n");
+    #[cfg(target_os = "windows")]
+    cmd
+        .assert()
+        .success()
+        .stdout("\u{1b}[36m\r(dntk): 1/3 = .33333333333333333333\u{1b}[0m\n");
 }
 
 #[test]
@@ -26,10 +32,16 @@ fn test_cmd_with_once_white() {
         .arg("--white")
         .arg("--inject")
         .arg("1+2");
+    #[cfg(not(target_os = "windows"))]
     cmd
         .assert()
         .success()
         .stdout("\r(dntk): 1+2 = 3\u{1b}[4D\n");
+    #[cfg(target_os = "windows")]
+    cmd
+        .assert()
+        .success()
+        .stdout("\r(dntk): 1+2 = 3\n");
 }
 
 #[test]
@@ -49,14 +61,28 @@ fn test_cmd_with_once_scale() {
         .arg("1")
         .arg("--inject")
         .arg("3/7");
-    cmd1
-        .assert()
-        .success()
-        .stdout("\u{1b}[36m\r(dntk): 3/7 = .4285714285\u{1b}[0m\u{1b}[14D\n");
-    cmd2
-        .assert()
-        .success()
-        .stdout("\u{1b}[36m\r(dntk): 3/7 = .4\u{1b}[0m\u{1b}[5D\n");
+    #[cfg(not(target_os = "windows"))]
+    {
+        cmd1
+            .assert()
+            .success()
+            .stdout("\u{1b}[36m\r(dntk): 3/7 = .4285714285\u{1b}[0m\u{1b}[14D\n");
+        cmd2
+            .assert()
+            .success()
+            .stdout("\u{1b}[36m\r(dntk): 3/7 = .4\u{1b}[0m\u{1b}[5D\n");
+    }
+    #[cfg(target_os = "windows")]
+    {
+        cmd1
+            .assert()
+            .success()
+            .stdout("\u{1b}[36m\r(dntk): 3/7 = .4285714285\u{1b}[0m\n");
+        cmd2
+            .assert()
+            .success()
+            .stdout("\u{1b}[36m\r(dntk): 3/7 = .4\u{1b}[0m\n");
+    }
 }
 
 #[test]

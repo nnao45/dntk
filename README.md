@@ -111,7 +111,7 @@ FLAGS:
         --once           Run at only once
     -q, --quiet          No print information message
         --show-limits    Print the local limits enforced by the local version of bc, and quit
-    -v, --version        Prints version information
+    -V, --version        Prints version information
     -w, --white          Set White color in a output
 
 OPTIONS:

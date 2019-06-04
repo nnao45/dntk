@@ -24,8 +24,12 @@ fn main() {
         }
     );
 
-    #[cfg(target_os = "windows")]
-    ansi_term::enable_ansi_support().unwrap();
+     #[cfg(target_os = "windows")]
+    {
+        if std::env::var("ENV") != Ok("TEST".to_string()) {
+            ansi_term::enable_ansi_support().unwrap();
+        }
+    }
 
     let dntker = &mut dntker::Dntker::new();
     dntker.run();

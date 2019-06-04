@@ -8,13 +8,13 @@ extern crate scopeguard;
 #[cfg(target_os = "windows")]
 extern crate winconsole;
 
+#[macro_use(lazy_static)]
+extern crate lazy_static;
+
 mod term;
 mod dntker;
-mod meta;
 
 fn main() {
-    let _matches = meta::build_cli().get_matches();
-
     #[cfg(not(target_os = "windows"))]
     let saved_termattr = term::get_termattr();
     #[cfg(not(target_os = "windows"))]
@@ -24,8 +24,12 @@ fn main() {
         }
     );
 
-    #[cfg(target_os = "windows")]
-    ansi_term::enable_ansi_support().unwrap();
+     #[cfg(target_os = "windows")]
+    {
+        if std::env::var("ENV") != Ok("TEST".to_string()) {
+            ansi_term::enable_ansi_support().unwrap();
+        }
+    }
 
     let dntker = &mut dntker::Dntker::new();
     dntker.run();

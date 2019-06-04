@@ -1,0 +1,1 @@
+extern crate assert_cmd;

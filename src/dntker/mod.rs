@@ -1,7 +1,6 @@
 mod util;
 mod bc;
 
-use super::meta;
 use std::io::Write;
 use atty::Stream;
 

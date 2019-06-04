@@ -13,12 +13,12 @@ fn test_cmd_with_once() {
     cmd
         .assert()
         .success()
-        .stdout("\u{1b}[36m\r(dntk): 1/3 = .33333333333333333333\u{1b}[0m\u{1b}[24D\n");
+        .stdout("\r(dntk): \u{1b}[36m\r(dntk): 1/3 = .33333333333333333333\u{1b}[0m\u{1b}[24D\n");
     #[cfg(target_os = "windows")]
     cmd
         .assert()
         .success()
-        .stdout("\u{1b}[36m\r(dntk): 1/3 = .33333333333333333333\u{1b}[0m\n");
+        .stdout("\r(dntk): \u{1b}[36m\r(dntk): 1/3 = .33333333333333333333\u{1b}[0m\n");
 }
 
 #[test]
@@ -34,12 +34,12 @@ fn test_cmd_with_once_white() {
     cmd
         .assert()
         .success()
-        .stdout("\r(dntk): 1+2 = 3\u{1b}[4D\n");
+        .stdout("\r(dntk): \r(dntk): 1+2 = 3\u{1b}[4D\n");
     #[cfg(target_os = "windows")]
     cmd
         .assert()
         .success()
-        .stdout("\r(dntk): 1+2 = 3\n");
+        .stdout("\r(dntk): \r(dntk): 1+2 = 3\n");
 }
 
 #[test]
@@ -64,22 +64,22 @@ fn test_cmd_with_once_scale() {
         cmd1
             .assert()
             .success()
-            .stdout("\u{1b}[36m\r(dntk): 3/7 = .4285714285\u{1b}[0m\u{1b}[14D\n");
+            .stdout("\r(dntk): \u{1b}[36m\r(dntk): 3/7 = .4285714285\u{1b}[0m\u{1b}[14D\n");
         cmd2
             .assert()
             .success()
-            .stdout("\u{1b}[36m\r(dntk): 3/7 = .4\u{1b}[0m\u{1b}[5D\n");
+            .stdout("\r(dntk): \u{1b}[36m\r(dntk): 3/7 = .4\u{1b}[0m\u{1b}[5D\n");
     }
     #[cfg(target_os = "windows")]
     {
         cmd1
             .assert()
             .success()
-            .stdout("\u{1b}[36m\r(dntk): 3/7 = .4285714285\u{1b}[0m\n");
+            .stdout("\r(dntk): \u{1b}[36m\r(dntk): 3/7 = .4285714285\u{1b}[0m\n");
         cmd2
             .assert()
             .success()
-            .stdout("\u{1b}[36m\r(dntk): 3/7 = .4\u{1b}[0m\n");
+            .stdout("\r(dntk): \u{1b}[36m\r(dntk): 3/7 = .4\u{1b}[0m\n");
     }
 }
 

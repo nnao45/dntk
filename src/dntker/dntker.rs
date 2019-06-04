@@ -337,6 +337,25 @@ impl Dntker {
         std::io::stdout().flush().unwrap();
     }
 
+    fn flush(&self) {
+        #[cfg(target_os = "windows")]
+        wconsole::set_cursor_visible(false).unwrap();
+
+        std::io::stdout().flush().unwrap();
+
+        #[cfg(target_os = "windows")]
+        {
+            let vec_cur = wconsole::get_cursor_position().unwrap();
+            wconsole::set_cursor_visible(true).unwrap();
+            wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+        }
+
+        if util::DNTK_OPT.once {
+            print!("\n");
+            return
+        }
+    }
+
     pub fn run(&mut self) {
         if !atty::is(Stream::Stdin) && std::env::var("ENV") != Ok("TEST".to_string()) {
             let mut s = String::new();
@@ -350,6 +369,9 @@ impl Dntker {
             return
         }
 
+        print!("{}", util::DNTK_PROMPT);
+        std::io::stdout().flush().unwrap();
+
         if util::DNTK_OPT.inject != "" {
             self.inject_filter2print();
 
@@ -358,9 +380,6 @@ impl Dntker {
                 return
             }
         }
-
-        print!("{}", util::DNTK_PROMPT);
-        std::io::stdout().flush().unwrap();
 
         let ptr: [libc::c_char; 3] = [0; 3];
         loop {
@@ -376,17 +395,18 @@ impl Dntker {
                     print!("{}", o);
                 },
             }
-            #[cfg(target_os = "windows")]
-            wconsole::set_cursor_visible(false).unwrap();
+            // #[cfg(target_os = "windows")]
+            // wconsole::set_cursor_visible(false).unwrap();
 
-            std::io::stdout().flush().unwrap();
+            // std::io::stdout().flush().unwrap();
 
-            #[cfg(target_os = "windows")]
-            {
-                let vec_cur = wconsole::get_cursor_position().unwrap();
-                wconsole::set_cursor_visible(true).unwrap();
-                wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
-            }
+            // #[cfg(target_os = "windows")]
+            // {
+            //     let vec_cur = wconsole::get_cursor_position().unwrap();
+            //     wconsole::set_cursor_visible(true).unwrap();
+            //     wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+            // }
+            self.flush();
 
             if util::DNTK_OPT.once {
                 print!("\n");

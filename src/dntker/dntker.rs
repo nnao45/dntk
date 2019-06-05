@@ -339,16 +339,20 @@ impl Dntker {
     }
 
     fn flush(&self) {
-        if cfg!(target_os = "windows") && std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
+        if std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
+            #[cfg(target_os = "windows")]
             wconsole::set_cursor_visible(false).unwrap();
         }
 
         std::io::stdout().flush().unwrap();
 
-        if cfg!(target_os = "windows") && std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
-            let vec_cur = wconsole::get_cursor_position().unwrap();
-            wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
-            wconsole::set_cursor_visible(true).unwrap();
+        if std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
+            #[cfg(target_os = "windows")]
+            {
+                let vec_cur = wconsole::get_cursor_position().unwrap();
+                wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+                wconsole::set_cursor_visible(true).unwrap();
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 pub fn enable_ansi() -> Result<(), u32> {
     if std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
         use winapi::um::processenv::GetStdHandle;

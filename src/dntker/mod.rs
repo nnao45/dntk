@@ -10,3 +10,4 @@ use winconsole::console as wconsole;
 use ansi_term;
 
 include!("dntker.rs");
+include!("tests.rs");

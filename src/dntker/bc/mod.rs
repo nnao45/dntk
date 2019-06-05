@@ -6,3 +6,4 @@ use subprocess::{Exec, PopenError, Redirection, ExitStatus};
 use super::util;
 
 include!("bc.rs");
+include!("tests.rs");

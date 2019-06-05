@@ -349,11 +349,6 @@ impl Dntker {
             wconsole::set_cursor_visible(true).unwrap();
             wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
         }
-
-        if util::DNTK_OPT.once {
-            print!("\n");
-            return
-        }
     }
 
     pub fn run(&mut self) {

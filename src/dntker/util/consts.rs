@@ -49,5 +49,7 @@ pub const ASCII_CODE_DELETE      : u8 = 0x7f; // delete key
 pub const ASCII_CODE_SPACE       : u8 = 0x20; // white space key
 
 // http://tldp.org/HOWTO/Bash-Prompt-HOWTO/x361.html
+#[allow(dead_code)]
 pub const CURSOR_MOVE_ES_HEAD    : &str = "\x1b[";
+#[allow(dead_code)]
 pub const CURSOR_MOVE_ES_BACK    : &str = "D";

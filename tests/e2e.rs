@@ -3,7 +3,7 @@ use std::process::Command;
 
 #[test]
 fn test_cmd_with_once() {
-    std::env::set_var("ENV", "TEST");
+    std::env::set_var("DNTK_ENV", "TEST");
     let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
     cmd
         .arg("--once")
@@ -23,7 +23,7 @@ fn test_cmd_with_once() {
 
 #[test]
 fn test_cmd_with_once_white() {
-    std::env::set_var("ENV", "TEST");
+    std::env::set_var("DNTK_ENV", "TEST");
     let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
     cmd
         .arg("--once")
@@ -44,7 +44,7 @@ fn test_cmd_with_once_white() {
 
 #[test]
 fn test_cmd_with_once_scale() {
-    std::env::set_var("ENV", "TEST");
+    std::env::set_var("DNTK_ENV", "TEST");
     let mut cmd1 = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
     cmd1
         .arg("--once")
@@ -85,7 +85,7 @@ fn test_cmd_with_once_scale() {
 
 #[test]
 fn test_cmd_with_version() {
-    std::env::set_var("ENV", "TEST");
+    std::env::set_var("DNTK_ENV", "TEST");
     let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
     cmd
         .arg("--version")
@@ -95,7 +95,7 @@ fn test_cmd_with_version() {
 
 #[test]
 fn test_cmd_with_help() {
-    std::env::set_var("ENV", "TEST");
+    std::env::set_var("DNTK_ENV", "TEST");
     let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
     cmd
         .arg("--help")
@@ -105,7 +105,7 @@ fn test_cmd_with_help() {
 
 #[test]
 fn test_cmd_with_show_limits() {
-    std::env::set_var("ENV", "TEST");
+    std::env::set_var("DNTK_ENV", "TEST");
     let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
     cmd
         .arg("--show-limits")

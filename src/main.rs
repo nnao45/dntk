@@ -1,8 +1,10 @@
 extern crate libc;
 extern crate clap;
+extern crate winapi;
 extern crate ansi_term;
 
 #[macro_use(defer)]
+#[allow(unused_imports)]
 extern crate scopeguard;
 
 #[cfg(target_os = "windows")]
@@ -24,12 +26,8 @@ fn main() {
         }
     );
 
-     #[cfg(target_os = "windows")]
-    {
-        if std::env::var("ENV") != Ok("TEST".to_string()) {
-            ansi_term::enable_ansi_support().unwrap();
-        }
-    }
+    #[cfg(target_os = "windows")] 
+    term::enable_ansi().unwrap();
 
     let dntker = &mut dntker::Dntker::new();
     dntker.run();

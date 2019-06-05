@@ -27,6 +27,7 @@ enum DntkResult {
     Continue,
 }
 
+#[allow(dead_code)]
 struct DntkString {
     data: String,
     dtype: DntkStringType,
@@ -70,6 +71,7 @@ impl DntkString {
         self
     }
 
+    #[allow(dead_code)]
     pub fn cursorize(mut self) -> Self {
         self.data = format!("{}{}{}{}", &self.data, util::CURSOR_MOVE_ES_HEAD, &self.cur_pos_from_right, util::CURSOR_MOVE_ES_BACK);
         self
@@ -334,7 +336,6 @@ impl Dntker {
         if let DntkResult::Output(o) = self.calculate(p1, p2, p3) {
             print!("{}", o);
         }
-        std::io::stdout().flush().unwrap();
     }
 
     fn flush(&self) {
@@ -346,13 +347,13 @@ impl Dntker {
         #[cfg(target_os = "windows")]
         {
             let vec_cur = wconsole::get_cursor_position().unwrap();
-            wconsole::set_cursor_visible(true).unwrap();
             wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+            wconsole::set_cursor_visible(true).unwrap();
         }
     }
 
     pub fn run(&mut self) {
-        if !atty::is(Stream::Stdin) && std::env::var("ENV") != Ok("TEST".to_string()) {
+        if !atty::is(Stream::Stdin) && std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
             let mut s = String::new();
             std::io::stdin().read_line(&mut s).ok();
             println!("{}", &self.executer.exec(&s).unwrap());
@@ -369,6 +370,7 @@ impl Dntker {
 
         if util::DNTK_OPT.inject != "" {
             self.inject_filter2print();
+            self.flush();
 
             if util::DNTK_OPT.once {
                 print!("\n");

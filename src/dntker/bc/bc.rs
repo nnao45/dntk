@@ -70,7 +70,7 @@ impl BcExecuter {
         if stderr.is_empty() {
             let stdout = capture.stdout_str().replace("\r", "");
 
-            if stdout.is_empty() {
+            if stdout.is_empty() || stdout.contains("syntax error") {
                 Err(BcError::NoResult)
             } else {
                 Ok(self.handle_output(stdout))

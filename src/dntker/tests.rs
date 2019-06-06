@@ -302,7 +302,7 @@ mod dntker_tests {
         assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_enter));
     }
 
-   #[test]
+    #[test]
     #[cfg(not(target_os = "windows"))]
     fn test_dntk_exec() {
         let d1 = &mut Dntker::new();

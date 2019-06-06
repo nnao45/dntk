@@ -42,7 +42,7 @@ dntk is command line's multi-platform ***Interactive*** calculator, [GNU bc](htt
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## Platform
-✔︎ dntk support multi-platform 😊 mac, alpine, linux, and **windows**!!!
+dntk support multi-platform 😊 mac, linux, freebsd, and **windows**!!!
 - i686-osx
 - x86_64-osx
 - i686-linux

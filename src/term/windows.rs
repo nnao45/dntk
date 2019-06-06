@@ -14,9 +14,9 @@ pub fn enable_ansi() -> Result<(), u32> {
             let std_out_handle = GetStdHandle(STD_OUT_HANDLE);
             if std_out_handle == INVALID_HANDLE_VALUE
             {
-                return Err(GetLastError()); 
+                return Err(GetLastError());
             }
-    
+
             // https://docs.microsoft.com/en-us/windows/console/getconsolemode
             let mut console_mode: u32 = 0;
             if 0 == GetConsoleMode(std_out_handle, &mut console_mode)
@@ -29,11 +29,11 @@ pub fn enable_ansi() -> Result<(), u32> {
                 // https://docs.microsoft.com/en-us/windows/console/setconsolemode
                 if 0 == SetConsoleMode(std_out_handle, console_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
                 {
-                    return Err(GetLastError()); 
+                    return Err(GetLastError());
                 }
             }
         }
     }
 
-    return Ok(());
+    Ok(())
 }

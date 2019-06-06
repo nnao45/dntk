@@ -317,7 +317,7 @@ impl Dntker {
     #[cfg(target_os = "windows")]
     fn watch(&self,  mut ptr: [libc::c_char; 3]) -> [libc::c_char; 3] {
         ptr[0] = wconsole::getch(true).unwrap() as u8 as i8;
-        return ptr
+        ptr
     }
 
     #[cfg(not(target_os = "windows"))]

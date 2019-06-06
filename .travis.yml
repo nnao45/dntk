@@ -27,11 +27,11 @@ matrix:
       env:
         - TARGET=i686-unknown-linux-gnu
           LINUX_TERM_LIB=linux_gnu.rs
-    - os: linux
-      rust: stable
-      env:
-        - TARGET=aarch64-unknown-linux-gnu
-          LINUX_TERM_LIB=linux_gnu.rs
+    #- os: linux
+    #  rust: stable
+    #  env:
+    #    - TARGET=aarch64-unknown-linux-gnu
+    #      LINUX_TERM_LIB=linux_gnu.rs
     - os: linux
       rust: stable
       env:

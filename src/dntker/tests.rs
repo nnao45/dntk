@@ -326,8 +326,8 @@ mod dntker_tests {
     //     assert_eq!(DntkResult::Fin, d1.dntk_exec(ptr_enter));
     // }
 
-    #[test]
-    #[cfg(all(not(target_os = "windows"), not(target_arch = "aarch64")))]
+   #[test]
+    #[cfg(not(target_os = "windows"))]
     fn test_dntk_exec() {
         let d1 = &mut Dntker::new();
         let ptr_escape: [libc::c_char; 3] = [util::ASCII_CODE_ESCAPE as i8; 3];

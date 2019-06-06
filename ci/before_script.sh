@@ -12,13 +12,13 @@ if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]] || [[ "${TARGET}" == "i686-pc-w
     export PATH=$PATH:"/c/Users/travis/build/nnao45/dntk/bc-1.07.1-win32-embedeo-02/bin"
 fi
 
-if [[ "${TARGET}" == "aarch64-unknown-linux-gnu" ]]; then
-    aarch64-linux-gnu-gcc -v
-    mkdir -p .cargo
-    echo "[target.${TARGET}]" > .cargo/config
-    echo "linker = \"aarch64-linux-gnu-gcc\"" >> .cargo/config
-    cat .cargo/config
-fi
+#if [[ "${TARGET}" == "aarch64-unknown-linux-gnu" ]]; then
+#    aarch64-linux-gnu-gcc -v
+#    mkdir -p .cargo
+#    echo "[target.${TARGET}]" > .cargo/config
+#    echo "linker = \"aarch64-linux-gnu-gcc\"" >> .cargo/config
+#    cat .cargo/config
+#fi
 
 git --version
 echo $TRAVIS_BRANCH

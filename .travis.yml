@@ -1,14 +1,14 @@
 language: rust
 rust:
   - stable
-addons:
-  apt:
-    packages:
-      - gcc-4.8-multilib
-      - gcc-4.8-aarch64-linux-gnu
-      - gcc-aarch64-linux-gnu
-      - libc6-arm64-cross
-      - libc6-dev-arm64-cross
+#addons:
+#  apt:
+#    packages:
+#      - gcc-4.8-multilib
+#      - gcc-4.8-aarch64-linux-gnu
+#      - gcc-aarch64-linux-gnu
+#      - libc6-arm64-cross
+#      - libc6-dev-arm64-cross
 matrix:
   include:
     - os: osx

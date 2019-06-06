@@ -17,16 +17,16 @@ matrix:
     - os: osx
       rust: stable
       env: TARGET=i686-apple-darwin
-    - os: linux
-      rust: stable
-      env:
-        - TARGET=x86_64-unknown-linux-gnu
-          LINUX_TERM_LIB=linux_gnu.rs
-    - os: linux
-      rust: stable
-      env:
-        - TARGET=i686-unknown-linux-gnu
-          LINUX_TERM_LIB=linux_gnu.rs
+#    - os: linux
+#      rust: stable
+#      env:
+#        - TARGET=x86_64-unknown-linux-gnu
+#          LINUX_TERM_LIB=linux_gnu.rs
+#    - os: linux
+#      rust: stable
+#      env:
+#        - TARGET=i686-unknown-linux-gnu
+#          LINUX_TERM_LIB=linux_gnu.rs
     #- os: linux
     #  rust: stable
     #  env:

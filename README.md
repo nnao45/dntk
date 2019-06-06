@@ -59,12 +59,6 @@ $ brew install nnao45/dntk/dntk
 
 ### Linux
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.1.13/dntk-v2.1.13-x86_64-unknown-linux-gnu.zip
-$ unzip dntk-v2.1.13-x86_64-unknown-linux-gnu.zip
-```
-
-if can't move, try...
-```bash
 $ wget https://github.com/nnao45/dntk/releases/download/v2.1.13/dntk-v2.1.13-x86_64-unknown-linux-musl.zip
 $ unzip dntk-v2.1.13-x86_64-unknown-linux-musl.zip
 ```
@@ -73,6 +67,12 @@ $ unzip dntk-v2.1.13-x86_64-unknown-linux-musl.zip
 ```bash
 $ wget https://github.com/nnao45/dntk/releases/download/v2.1.13/dntk-v2.1.13-x86_64-pc-windows-msvc.zip
 $ unzip dntk-v2.1.13-x86_64-pc-windows-msvc.zip
+```
+
+### FreeBSD
+```bash
+$ wget https://github.com/nnao45/dntk/releases/download/v2.1.13/dntk-v2.1.13-x86_64-unknown-freebsd.zip
+$ unzip dntk-v2.1.13-x86_64-unknown-freebsd.zip
 ```
 
 ### Cargo

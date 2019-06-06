@@ -11,7 +11,6 @@ dntk is command line's multi-platform ***Interactive*** calculator, [GNU bc](htt
   
 ✔︎ dntk means calculator in a japanese.  
 ✔︎ dntk is gnu bc wrapper. so, syntax is equal to gnu bc. [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)  
-✔︎ dntk support multi-platform 😊 mac, alpine, linux, and **windows**!!!  
 ✔︎ dntk is a NATIVE [The Rust Programming Language](https://rust-lang.org) application.  
 ✔︎ dntk can move cursor, can delete char, can refresh buffer.  
 ✔︎ dntk write color means,  

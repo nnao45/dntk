@@ -4,7 +4,7 @@
 [![crates](https://img.shields.io/badge/crates.io-v2.1.13-319e8c.svg)](https://crates.io/crates/dntk)
 [![docker](https://img.shields.io/badge/docker-v2.1.13-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
-[![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20windows-orange.svg)](https://github.com/nnao45/dntk/releases)
+[![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20freebsd%20|%20windows-orange.svg)](https://github.com/nnao45/dntk/releases)
 
 dntk is command line's multi-platform ***Interactive*** calculator, [GNU bc](https://www.gnu.org/software/bc/) wrapper.  
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_demo.gif)
@@ -41,6 +41,17 @@ dntk is command line's multi-platform ***Interactive*** calculator, [GNU bc](htt
 ## ***Current dntk's version: v2.1.13***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
+## Platform
+✔︎ dntk support multi-platform 😊 mac, alpine, raspberrypi, linux, and **windows**!!!
+- i686-osx
+- x86_64-osx
+- i686-linux
+- x86_64-linux
+- aarch64-linux
+- i686-windows
+- x86_64-windows
+- i686-freebsd
+- x86_64-freebsd
 ## Install
 ### Mac
 ```bash

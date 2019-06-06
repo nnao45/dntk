@@ -11,7 +11,7 @@ fi
 mkdir "dntk-${TRAVIS_TAG}-${TARGET}"
 cp target/$TARGET/release/dntk LICENSE README.md "dntk-${TRAVIS_TAG}-${TARGET}"
 
-if [[ ! "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then
+if [[ ! "${TARGET}" == "i686-pc-windows-msvc" ]] || [[ ! "${TARGET}" == "x86_64-pc-windows-msvc" ]] ; then
     zip "dntk-${TRAVIS_TAG}-${TARGET}.zip" -r "dntk-${TRAVIS_TAG}-${TARGET}"
 else
     7z.exe a "dntk-${TRAVIS_TAG}-${TARGET}.zip" "dntk-${TRAVIS_TAG}-${TARGET}"

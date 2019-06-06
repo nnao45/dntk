@@ -1,6 +1,6 @@
 # general
 VERSION = $(shell ./version.sh)
-PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-6 | rev)
+PRE-VERSION := $(shell grep 'Current' README.md | tr -d '***' | rev |cut -c 1-7 | rev)
 NAME = dntk
 TARGET = $(NAME)
 DOCKER_REPO = nnao45

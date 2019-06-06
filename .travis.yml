@@ -6,39 +6,47 @@ matrix:
     - os: osx
       rust: stable
       env: TARGET=x86_64-apple-darwin
-    - os: linux
+    - os: osx
       rust: stable
-      env:
-        - TARGET=x86_64-unknown-linux-gnu
-          LINUX_TERM_LIB=linux_gnu.rs
+      env: TARGET=i686-apple-darwin
     - os: linux
       rust: stable
       env:
         - TARGET=x86_64-unknown-linux-musl
           LINUX_TERM_LIB=linux_musl.rs
+    - os: linux
+      rust: stable
+      env:
+        - TARGET=i686-unknown-linux-musl
+          LINUX_TERM_LIB=linux_musl.rs
     - os: windows
       rust: stable
       env: TARGET=x86_64-pc-windows-msvc
+    - os: windows
+      rust: stable
+      env: TARGET=i686-pc-windows-msvc
+    - os: linux
+      rust: stable
+      env: TARGET=i686-unknown-freebsd
+    - os: linux
+      rust: stable
+      env: TARGET=x86_64-unknown-freebsd
+before_cache:
+    - chmod -R a+r ${HOME}/.cargo
+cache:
+    - cargo
 before_script:
   - rustc -V
   - cargo -V
-  - if [[ "${TARGET}" == "x86_64-unknown-linux-musl" ]] || [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then rustup target add $TARGET; fi
-  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then wget https://embedeo.org/ws/command_line/bc_dc_calculator_windows/bc-1.07.1-win32-embedeo-02.zip; unzip bc-1.07.1-win32-embedeo-02.zip; export PATH=$PATH:"/c/Users/travis/build/nnao45/dntk/bc-1.07.1-win32-embedeo-02/bin"; fi
+  - rustup target add $TARGET
+  - if [[ "${TARGET}" == "x86_64-pc-windows-msvc" ]] || [[ "${TARGET}" == "i686-pc-windows-msvc" ]] ; then wget https://embedeo.org/ws/command_line/bc_dc_calculator_windows/bc-1.07.1-win32-embedeo-02.zip; unzip bc-1.07.1-win32-embedeo-02.zip; export PATH=$PATH:"/c/Users/travis/build/nnao45/dntk/bc-1.07.1-win32-embedeo-02/bin"; fi
   - git --version
   - echo $TRAVIS_BRANCH
   - pwd
   - echo $PATH
   - git rev-parse HEAD
-script:
-  - export PKG_CONFIG_ALLOW_CROSS=1
-  - cargo test  --target $TARGET
-  - cargo build --target $TARGET
-before_deploy:
-  - export PKG_CONFIG_ALLOW_CROSS=1
-  - cargo build --target $TARGET --release
-  - mkdir "dntk-${TRAVIS_TAG}-${TARGET}"
-  - cp target/$TARGET/release/dntk LICENSE README.md "dntk-${TRAVIS_TAG}-${TARGET}"
-  - if [[ ! "${TARGET}" == "x86_64-pc-windows-msvc" ]]; then zip "dntk-${TRAVIS_TAG}-${TARGET}.zip" -r "dntk-${TRAVIS_TAG}-${TARGET}"; else 7z.exe a "dntk-${TRAVIS_TAG}-${TARGET}.zip" "dntk-${TRAVIS_TAG}-${TARGET}"; fi
+script: ci/script.sh
+before_deploy: ci/before_deploy.sh
 deploy:
   provider: releases
   skip_cleanup: true

@@ -4,7 +4,7 @@ mod bc_tests {
 
     #[test]
     fn test_handle_output(){
-        let b = BcExecuter::new();
+        let b: BcExecuter = Default::default();
         let input1 = "1";
         let input1_newline = format!("{}{}", input1, "\n");
         assert_eq!(b.handle_output(input1_newline.to_string()), input1.to_string());
@@ -18,7 +18,7 @@ mod bc_tests {
 
     #[test]
     fn test_exec(){
-        let b = BcExecuter::new();
+        let b: BcExecuter = Default::default();
         let input1 = "1+2";
         let output1= "3";
         assert_eq!(b.exec(input1).unwrap(), output1);

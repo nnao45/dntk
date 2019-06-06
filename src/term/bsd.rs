@@ -13,7 +13,7 @@ pub fn get_termattr() -> libc::termios {
         libc::tcgetattr(0, saved_termattr_ptr);
     }
     let mut termattr = saved_termattr;
-    termattr.c_lflag = termattr.c_lflag & !(libc::ICANON | libc::ECHO);
+    termattr.c_lflag &= !(libc::ICANON | libc::ECHO);
     termattr.c_cc[libc::VMIN] = 1;
     termattr.c_cc[libc::VTIME] = 0;
     unsafe {

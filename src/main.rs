@@ -29,6 +29,6 @@ fn main() {
     #[cfg(target_os = "windows")] 
     term::enable_ansi().unwrap();
 
-    let dntker = &mut dntker::Dntker::new();
+    let dntker: &mut dntker::Dntker = &mut Default::default();
     dntker.run();
 }

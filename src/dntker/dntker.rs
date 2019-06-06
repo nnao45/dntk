@@ -8,16 +8,39 @@ pub struct Dntker {
     pub currnet_cur_pos: usize,
 }
 
+impl Default for Dntker {
+    fn default() -> Self {
+        let mut iv : Vec<u8> = Vec::new();
+        let mut bpsl = 0;
+        let mut ccp = 0;
+        if util::DNTK_OPT.inject != "" {
+            let inject_bytes = &mut util::DNTK_OPT.inject.as_bytes().to_owned();
+            bpsl = inject_bytes.len();
+            ccp = inject_bytes.len();
+            iv.append(inject_bytes);
+        }
+        Dntker {
+            input_vec: iv,
+            before_printed_statement_len: bpsl,
+            currnet_cur_pos: ccp,
+
+            executer: Default::default(),
+            before_printed_len: Default::default(),
+            before_printed_result_len: Default::default(),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 enum FilterResult {
-    BcCode(u8),
-    EndCode,
-    EscCode,
-    RefreshCode,
-    DeleteCode,
-    CurLeftCode,
-    CurRightCode,
-    UnknownCode(u8),
+    Calculatable(u8),
+    End,
+    Esc,
+    Refresh,
+    Delete,
+    CurLeft,
+    CurRight,
+    Unknown(u8),
 }
 
 #[derive(Debug, PartialEq)]
@@ -76,105 +99,87 @@ impl DntkString {
         self.data = format!("{}{}{}{}", &self.data, util::CURSOR_MOVE_ES_HEAD, &self.cur_pos_from_right, util::CURSOR_MOVE_ES_BACK);
         self
     }
+}
 
-    pub fn to_string(self) -> String {
-        format!("{}", &self.data)
+impl ToString for DntkString {
+    fn to_string(&self) -> String {
+        self.data.to_string()
     }
 }
 
 impl Dntker {
-    pub fn new() -> Self {
-        let mut iv : Vec<u8> = Vec::new();
-        let mut bpsl = 0;
-        let mut ccp = 0;
-        if util::DNTK_OPT.inject != "" {
-            let inject_bytes = &mut util::DNTK_OPT.inject.as_bytes().to_owned();
-            bpsl = inject_bytes.len();
-            ccp = inject_bytes.len();
-            iv.append(inject_bytes);
-        }
-        Dntker {
-            executer: bc::BcExecuter::new(),
-            input_vec: iv,
-            before_printed_len: 0,
-            before_printed_result_len: 0,
-            before_printed_statement_len: bpsl,
-            currnet_cur_pos: ccp,
-        }
-    }
-
     fn filter_char(&self, ascii_char: u8) -> FilterResult {
         match ascii_char {
-            util::ASCII_CODE_ZERO        => FilterResult::BcCode(util::ASCII_CODE_ZERO      ), // 0
-            util::ASCII_CODE_ONE         => FilterResult::BcCode(util::ASCII_CODE_ONE       ), // 1
-            util::ASCII_CODE_TWO         => FilterResult::BcCode(util::ASCII_CODE_TWO       ), // 2
-            util::ASCII_CODE_THREE       => FilterResult::BcCode(util::ASCII_CODE_THREE     ), // 3
-            util::ASCII_CODE_FOUR        => FilterResult::BcCode(util::ASCII_CODE_FOUR      ), // 4
-            util::ASCII_CODE_FIVE        => FilterResult::BcCode(util::ASCII_CODE_FIVE      ), // 5
-            util::ASCII_CODE_SIX         => FilterResult::BcCode(util::ASCII_CODE_SIX       ), // 6
-            util::ASCII_CODE_SEVEN       => FilterResult::BcCode(util::ASCII_CODE_SEVEN     ), // 7
-            util::ASCII_CODE_EIGHT       => FilterResult::BcCode(util::ASCII_CODE_EIGHT     ), // 8
-            util::ASCII_CODE_NINE        => FilterResult::BcCode(util::ASCII_CODE_NINE      ), // 9
-            util::ASCII_CODE_S           => FilterResult::BcCode(util::ASCII_CODE_S         ), // s
-            util::ASCII_CODE_C           => FilterResult::BcCode(util::ASCII_CODE_C         ), // c
-            util::ASCII_CODE_A           => FilterResult::BcCode(util::ASCII_CODE_A         ), // a
-            util::ASCII_CODE_L           => FilterResult::BcCode(util::ASCII_CODE_L         ), // l
-            util::ASCII_CODE_E           => FilterResult::BcCode(util::ASCII_CODE_E         ), // e
-            util::ASCII_CODE_J           => FilterResult::BcCode(util::ASCII_CODE_J         ), // j
-            util::ASCII_CODE_R           => FilterResult::BcCode(util::ASCII_CODE_R         ), // r
-            util::ASCII_CODE_Q           => FilterResult::BcCode(util::ASCII_CODE_Q         ), // q
-            util::ASCII_CODE_T           => FilterResult::BcCode(util::ASCII_CODE_T         ), // t
-            util::ASCII_CODE_ROUNDLEFT   => FilterResult::BcCode(util::ASCII_CODE_ROUNDLEFT ), // (
-            util::ASCII_CODE_ROUNDRIGHT  => FilterResult::BcCode(util::ASCII_CODE_ROUNDRIGHT), // )
-            util::ASCII_CODE_SQUARELEFT  => FilterResult::CurLeftCode,                         // [
-            util::ASCII_CODE_SQUARERIGHT => FilterResult::CurRightCode,                        // ]
-            util::ASCII_CODE_LARGER      => FilterResult::BcCode(util::ASCII_CODE_LARGER    ), // <
-            util::ASCII_CODE_SMALLER     => FilterResult::BcCode(util::ASCII_CODE_SMALLER   ), // >
-            util::ASCII_CODE_PLUS        => FilterResult::BcCode(util::ASCII_CODE_PLUS      ), // +
-            util::ASCII_CODE_MINUS       => FilterResult::BcCode(util::ASCII_CODE_MINUS     ), // -
-            util::ASCII_CODE_ASTERISK    => FilterResult::BcCode(util::ASCII_CODE_ASTERISK  ), // *
-            util::ASCII_CODE_SLUSH       => FilterResult::BcCode(util::ASCII_CODE_SLUSH     ), // /
-            util::ASCII_CODE_HAT         => FilterResult::BcCode(util::ASCII_CODE_HAT       ), // ^
-            util::ASCII_CODE_PERCENT     => FilterResult::BcCode(util::ASCII_CODE_PERCENT   ), // %
-            util::ASCII_CODE_DOT         => FilterResult::BcCode(util::ASCII_CODE_DOT       ), // .
-            util::ASCII_CODE_BIKKURI     => FilterResult::BcCode(util::ASCII_CODE_BIKKURI   ), // !
-            util::ASCII_CODE_EQUAL       => FilterResult::BcCode(util::ASCII_CODE_EQUAL     ), // =
-            util::ASCII_CODE_PIPE        => FilterResult::BcCode(util::ASCII_CODE_PIPE      ), // |
-            util::ASCII_CODE_AND         => FilterResult::BcCode(util::ASCII_CODE_AND       ), // &
-            util::ASCII_CODE_SEMICOLON   => FilterResult::BcCode(util::ASCII_CODE_SEMICOLON ), // ;
-            util::ASCII_CODE_AT          => FilterResult::RefreshCode,                         // @
-            util::ASCII_CODE_WINENTER    => FilterResult::EndCode,                             // windows \n
-            util::ASCII_CODE_NEWLINE     => FilterResult::EndCode,                             // \n
-            util::ASCII_CODE_ESCAPE      => FilterResult::EscCode,                             // escape key
-            util::ASCII_CODE_BACKSPACE   => FilterResult::DeleteCode,                          // backspace key
-            util::ASCII_CODE_DELETE      => FilterResult::DeleteCode,                          // delete key
-            util::ASCII_CODE_SPACE       => FilterResult::BcCode(util::ASCII_CODE_SPACE     ), // white space key
-            unknown_code                 => FilterResult::UnknownCode(unknown_code),
+            util::ASCII_CODE_ZERO        => FilterResult::Calculatable(util::ASCII_CODE_ZERO      ), // 0
+            util::ASCII_CODE_ONE         => FilterResult::Calculatable(util::ASCII_CODE_ONE       ), // 1
+            util::ASCII_CODE_TWO         => FilterResult::Calculatable(util::ASCII_CODE_TWO       ), // 2
+            util::ASCII_CODE_THREE       => FilterResult::Calculatable(util::ASCII_CODE_THREE     ), // 3
+            util::ASCII_CODE_FOUR        => FilterResult::Calculatable(util::ASCII_CODE_FOUR      ), // 4
+            util::ASCII_CODE_FIVE        => FilterResult::Calculatable(util::ASCII_CODE_FIVE      ), // 5
+            util::ASCII_CODE_SIX         => FilterResult::Calculatable(util::ASCII_CODE_SIX       ), // 6
+            util::ASCII_CODE_SEVEN       => FilterResult::Calculatable(util::ASCII_CODE_SEVEN     ), // 7
+            util::ASCII_CODE_EIGHT       => FilterResult::Calculatable(util::ASCII_CODE_EIGHT     ), // 8
+            util::ASCII_CODE_NINE        => FilterResult::Calculatable(util::ASCII_CODE_NINE      ), // 9
+            util::ASCII_CODE_S           => FilterResult::Calculatable(util::ASCII_CODE_S         ), // s
+            util::ASCII_CODE_C           => FilterResult::Calculatable(util::ASCII_CODE_C         ), // c
+            util::ASCII_CODE_A           => FilterResult::Calculatable(util::ASCII_CODE_A         ), // a
+            util::ASCII_CODE_L           => FilterResult::Calculatable(util::ASCII_CODE_L         ), // l
+            util::ASCII_CODE_E           => FilterResult::Calculatable(util::ASCII_CODE_E         ), // e
+            util::ASCII_CODE_J           => FilterResult::Calculatable(util::ASCII_CODE_J         ), // j
+            util::ASCII_CODE_R           => FilterResult::Calculatable(util::ASCII_CODE_R         ), // r
+            util::ASCII_CODE_Q           => FilterResult::Calculatable(util::ASCII_CODE_Q         ), // q
+            util::ASCII_CODE_T           => FilterResult::Calculatable(util::ASCII_CODE_T         ), // t
+            util::ASCII_CODE_ROUNDLEFT   => FilterResult::Calculatable(util::ASCII_CODE_ROUNDLEFT ), // (
+            util::ASCII_CODE_ROUNDRIGHT  => FilterResult::Calculatable(util::ASCII_CODE_ROUNDRIGHT), // )
+            util::ASCII_CODE_SQUARELEFT  => FilterResult::CurLeft,                         // [
+            util::ASCII_CODE_SQUARERIGHT => FilterResult::CurRight,                        // ]
+            util::ASCII_CODE_LARGER      => FilterResult::Calculatable(util::ASCII_CODE_LARGER    ), // <
+            util::ASCII_CODE_SMALLER     => FilterResult::Calculatable(util::ASCII_CODE_SMALLER   ), // >
+            util::ASCII_CODE_PLUS        => FilterResult::Calculatable(util::ASCII_CODE_PLUS      ), // +
+            util::ASCII_CODE_MINUS       => FilterResult::Calculatable(util::ASCII_CODE_MINUS     ), // -
+            util::ASCII_CODE_ASTERISK    => FilterResult::Calculatable(util::ASCII_CODE_ASTERISK  ), // *
+            util::ASCII_CODE_SLUSH       => FilterResult::Calculatable(util::ASCII_CODE_SLUSH     ), // /
+            util::ASCII_CODE_HAT         => FilterResult::Calculatable(util::ASCII_CODE_HAT       ), // ^
+            util::ASCII_CODE_PERCENT     => FilterResult::Calculatable(util::ASCII_CODE_PERCENT   ), // %
+            util::ASCII_CODE_DOT         => FilterResult::Calculatable(util::ASCII_CODE_DOT       ), // .
+            util::ASCII_CODE_BIKKURI     => FilterResult::Calculatable(util::ASCII_CODE_BIKKURI   ), // !
+            util::ASCII_CODE_EQUAL       => FilterResult::Calculatable(util::ASCII_CODE_EQUAL     ), // =
+            util::ASCII_CODE_PIPE        => FilterResult::Calculatable(util::ASCII_CODE_PIPE      ), // |
+            util::ASCII_CODE_AND         => FilterResult::Calculatable(util::ASCII_CODE_AND       ), // &
+            util::ASCII_CODE_SEMICOLON   => FilterResult::Calculatable(util::ASCII_CODE_SEMICOLON ), // ;
+            util::ASCII_CODE_AT          => FilterResult::Refresh,                         // @
+            util::ASCII_CODE_WINENTER    => FilterResult::End,                             // windows \n
+            util::ASCII_CODE_NEWLINE     => FilterResult::End,                             // \n
+            util::ASCII_CODE_ESCAPE      => FilterResult::Esc,                             // escape key
+            util::ASCII_CODE_BACKSPACE   => FilterResult::Delete,                          // backspace key
+            util::ASCII_CODE_DELETE      => FilterResult::Delete,                          // delete key
+            util::ASCII_CODE_SPACE       => FilterResult::Calculatable(util::ASCII_CODE_SPACE     ), // white space key
+            unknown_code                 => FilterResult::Unknown(unknown_code),
         }
     }
 
     fn delete_column(&mut self) {
-        if &self.currnet_cur_pos > &0 {
+        if self.currnet_cur_pos > 0 {
             self.currnet_cur_pos -= 1;
-            &self.input_vec.remove(self.currnet_cur_pos);
+            self.input_vec.remove(self.currnet_cur_pos);
         }
     }
 
     fn cursor_move_left(&mut self) {
-        if &self.currnet_cur_pos > &0 {
+        if self.currnet_cur_pos > 0 {
             self.currnet_cur_pos -= 1;
         }
     }
 
     fn cursor_move_right(&mut self) {
-        if &self.currnet_cur_pos < &self.before_printed_statement_len {
+        if self.currnet_cur_pos < self.before_printed_statement_len {
             self.currnet_cur_pos += 1;
         }
     }
 
-    fn insert_column(&mut self, code: &u8) {
+    fn insert_column(&mut self, code: u8) {
         self.currnet_cur_pos += 1;
-        &self.input_vec.insert(self.currnet_cur_pos-1, code.to_owned());
+        self.input_vec.insert(self.currnet_cur_pos-1, code);
     }
 
     fn statement_from_utf8(&mut self) -> String {
@@ -193,18 +198,18 @@ impl Dntker {
         DntkString {
             data: format!("{}{}{}{}", p1, p2, p3, p4),
             dtype: DntkStringType::Ok,
-            cur_pos_from_right: (p3.to_string().len() + self.before_printed_result_len + &pos_differnce),
+            cur_pos_from_right: (p3.to_string().len() + self.before_printed_result_len + pos_differnce),
         }
     }
 
     fn output_ng(&mut self, p1: &str, p2: &str, p3: &str) -> DntkString {
         self.before_printed_statement_len = p2.to_string().len();
         self.before_printed_len = p1.to_string().len() +  self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
-        let pos_differnce =  self.before_printed_statement_len - &self.currnet_cur_pos;
+        let pos_differnce =  self.before_printed_statement_len - self.currnet_cur_pos;
         DntkString {
             data: format!("{}{}{}", p1, p2, p3),
             dtype: DntkStringType::Ng,
-            cur_pos_from_right: (p3.to_string().len() + &pos_differnce),
+            cur_pos_from_right: (p3.to_string().len() + pos_differnce),
         }
     }
 
@@ -225,14 +230,15 @@ impl Dntker {
         }
     }
 
-    fn warning(&mut self, unknown_code: &u8) {
-        self.inform(&format!("this char is no supported: {}", unknown_code.to_owned() as char), DntkStringType::Warn)
+    fn warning(&mut self, unknown_code: u8) {
+        self.inform(&format!("this char is no supported: {}", unknown_code as char), DntkStringType::Warn)
     }
 
     fn refresh(&mut self) {
         self.inform("refresh!!", DntkStringType::Refresh);
         print!("{}", self.output_fill_whitespace(self.before_printed_len));
-        *self = Dntker::new();
+        let dnew: Dntker = Default::default();
+        *self = dnew;
         print!("{}", util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
     }
@@ -261,17 +267,17 @@ impl Dntker {
     fn dntk_exec(&mut self, ptr: [libc::c_char; 3]) -> DntkResult {
         let input_char = ptr[0] as u8;
         match &self.filter_char(input_char) {
-            FilterResult::UnknownCode(unknown_code) => {
-                &self.warning(unknown_code);
+            FilterResult::Unknown(unknown_code) => {
+                self.warning(unknown_code.to_owned());
             },
-            FilterResult::EscCode => {
+            FilterResult::Esc => {
                 if ptr.len() >= 3 {
                     match ptr[2] as u8 {
                         util::ASCII_CODE_RIGHT => {
-                            &self.cursor_move_right();
+                            self.cursor_move_right();
                         },
                         util::ASCII_CODE_LEFT => {
-                            &self.cursor_move_left();
+                            self.cursor_move_left();
                         },
                         _ => {
                             return DntkResult::Fin
@@ -281,28 +287,28 @@ impl Dntker {
                     return DntkResult::Fin
                 }
             },
-            FilterResult::EndCode => {
+            FilterResult::End => {
                 return DntkResult::Fin
             },
-            FilterResult::RefreshCode => {
-                &self.refresh();
+            FilterResult::Refresh => {
+                self.refresh();
                 return DntkResult::Continue
             },
-            FilterResult::DeleteCode => {
-                &self.delete_column();
+            FilterResult::Delete => {
+                self.delete_column();
             },
-            FilterResult::CurLeftCode => {
-                &self.cursor_move_left();
+            FilterResult::CurLeft => {
+                self.cursor_move_left();
             },
-            FilterResult::CurRightCode => {
-                &self.cursor_move_right();
+            FilterResult::CurRight => {
+                self.cursor_move_right();
             },
-            FilterResult::BcCode(code) => {
-                &self.insert_column(code);
+            FilterResult::Calculatable(code) => {
+                self.insert_column(code.to_owned());
             },
         }
         print!("{}", self.output_fill_whitespace(self.before_printed_len));
-        let p1 = format!("{}", util::DNTK_PROMPT);
+        let p1 = util::DNTK_PROMPT.to_string();
         let p2 = &self.statement_from_utf8();
         let p3 = " = ";
         self.calculate(&p1, p2, p3)
@@ -324,12 +330,12 @@ impl Dntker {
     }
 
     fn inject_filter2print(&mut self) {
-        let p1 = &format!("{}", util::DNTK_PROMPT);
+        let p1 = &util::DNTK_PROMPT.to_string();
         let p2 = &mut self.statement_from_utf8();
         let p3 = " = ";
         for i in &self.input_vec {
             match &self.filter_char(i.to_owned()) {
-                FilterResult::BcCode(_) => continue,
+                FilterResult::Calculatable(_) => continue,
                 _ => panic!("Injection statement is including unrecoginezed char"),
             }
         }

@@ -12,15 +12,17 @@ pub struct BcExecuter {
     bc_path: PathBuf,
 }
 
-impl BcExecuter {
-    pub fn new() -> Self {
+impl Default for BcExecuter {
+    fn default() -> Self {
         let mut path = PathBuf::new();
         path.push(&util::DNTK_OPT.bc_path);
         BcExecuter {
             bc_path: path,
         }
     }
+}
 
+impl BcExecuter {
     fn handle_output(&self, output: String) -> String {
         let len = output.len();
 
@@ -44,21 +46,7 @@ impl BcExecuter {
         }
     }
 
-    pub fn exec(&self, statement: &str) -> Result<String, BcError> {
-        let mut stdin = "".to_string();
-        if util::DNTK_OPT.scale != 0 {
-            stdin += &format!("{}{}{}","scale=", util::DNTK_OPT.scale, ";");
-        }
-        stdin += &format!("{}\n", &statement);
-        let process = Exec::cmd(&self.bc_path.as_os_str())
-            .arg("-l")
-            .arg("-q")
-            .stdin(stdin.as_str())
-            .stdout(Redirection::Pipe)
-            .stderr(Redirection::Pipe);
-
-        let capture = process.capture().map_err(|err| BcError::PopenError(err))?;
-
+    fn handle(&self, capture: CaptureData) -> Result<String, BcError> {
         if let ExitStatus::Exited(status) = capture.exit_status {
             if status == 124 {
                 return Err(BcError::Timeout);
@@ -77,6 +65,25 @@ impl BcExecuter {
             }
         } else {
             Err(BcError::Error(self.handle_output(stderr)))
+        }
+    }
+
+    pub fn exec(&self, statement: &str) -> Result<String, BcError> {
+        let mut stdin = "".to_string();
+        if util::DNTK_OPT.scale != 0 {
+            stdin += &format!("{}{}{}","scale=", util::DNTK_OPT.scale, ";");
+        }
+        stdin += &format!("{}\n", &statement);
+        let process = Exec::cmd(&self.bc_path.as_os_str())
+            .arg("-l")
+            .arg("-q")
+            .stdin(stdin.as_str())
+            .stdout(Redirection::Pipe)
+            .stderr(Redirection::Pipe);
+
+        match process.capture() {
+            Ok(capture) => self.handle(capture),
+            Err(e) => Err(BcError::PopenError(e)),
         }
     }
 }

@@ -1,24 +1,47 @@
 language: rust
 rust:
   - stable
+cache: cargo
 matrix:
   include:
     - os: osx
       rust: stable
       env: TARGET=x86_64-apple-darwin
-    - os: linux
+    - os: osx
       rust: stable
+      env: TARGET=i686-apple-darwin
+    - rust: stable
       env:
         - TARGET=x86_64-unknown-linux-gnu
           LINUX_TERM_LIB=linux_gnu.rs
-    - os: linux
-      rust: stable
+    - rust: stable
+      env:
+        - TARGET=i686-unknown-linux-gnu
+          LINUX_TERM_LIB=linux_gnu.rs
+    - rust: stable
+      env:
+        - TARGET=arm-unknown-linux-gnu
+          LINUX_TERM_LIB=linux_gnu.rs
+    - rust: stable
+      env:
+        - TARGET=aarch64-unknown-linux-gnu
+          LINUX_TERM_LIB=linux_gnu.rs
+    - rust: stable
       env:
         - TARGET=x86_64-unknown-linux-musl
           LINUX_TERM_LIB=linux_musl.rs
-    - os: windows
-      rust: stable
+    - rust: stable
+      env:
+        - TARGET=i686-unknown-linux-musl
+          LINUX_TERM_LIB=linux_musl.rs
+    - rust: stable
       env: TARGET=x86_64-pc-windows-msvc
+    - rust: stable
+      env: TARGET=i686-pc-windows-msvc
+    - name: i686-unknown-freebsd
+      env: TARGET=i686-unknown-freebsd
+    - name: x86_64-unknown-freebsd
+      env: TARGET=x86_64-unknown-freebsd
 before_script:
   - rustc -V
   - cargo -V
@@ -29,6 +52,7 @@ before_script:
   - pwd
   - echo $PATH
   - git rev-parse HEAD
+  - cargo install --force cross
 script:
   - export PKG_CONFIG_ALLOW_CROSS=1
   - cargo test  --target $TARGET

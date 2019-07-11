@@ -3,14 +3,17 @@ FROM ekidd/rust-musl-builder:nightly-2019-04-25 as builder
 ENV LINUX_TERM_LIB linux_musl.rs
 
 ## Build Cache Dependency Library
-RUN mkdir /app
-WORKDIR /app
-COPY . .
-RUN --mount=type=cache,target=/root/.cargo \
-    --mount=type=cache,target=/app/target \
-    --mount=type=cache,target=/usr/local/cargo/git \
-    --mount=type=cache,target=/usr/local/cargo/registry \
-    cargo build --release -Z unstable-options --out-dir /output
+RUN mkdir /tmp/dntk
+RUN sudo chown -R rust:rust .
+WORKDIR /tmp/dntk
+COPY Cargo.toml Cargo.lock ./
+RUN mkdir -p src/ && \
+    touch src/lib.rs
+RUN cargo build --release
+## Build Base Library
+COPY ./src/ ./src/
+RUN sudo chown -R rust:rust .
+RUN cargo build --release
 
 # Setup Running Container
 FROM alpine:3.9
@@ -21,7 +24,7 @@ RUN adduser --uid 1000 -D nnao45
 ## Install Dependency Module
 RUN apk add --update --no-cache bc
 ## Copy The App
-COPY --from=builder /output/dntk /home/nnao45
+COPY --from=builder /tmp/dntk/target/x86_64-unknown-linux-musl/release/dntk /home/nnao45
 ## Setup The Using App User
 USER 1000:1000
 ## Run

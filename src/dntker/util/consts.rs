@@ -35,6 +35,7 @@ pub const ASCII_CODE_SLUSH       : u8 = 0x2f; // /
 pub const ASCII_CODE_HAT         : u8 = 0x5e; // ^
 pub const ASCII_CODE_PERCENT     : u8 = 0x25; // %
 pub const ASCII_CODE_DOT         : u8 = 0x2e; // .
+pub const ASCII_CODE_COMMA       : u8 = 0x2c; // ,
 pub const ASCII_CODE_BIKKURI     : u8 = 0x21; // !
 pub const ASCII_CODE_EQUAL       : u8 = 0x3d; // =
 pub const ASCII_CODE_PIPE        : u8 = 0x7c; // |

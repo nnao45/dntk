@@ -36,6 +36,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_HAT        ), FilterResult::Calculatable(util::ASCII_CODE_HAT       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_PERCENT    ), FilterResult::Calculatable(util::ASCII_CODE_PERCENT   ));
         assert_eq!(d.filter_char(util::ASCII_CODE_DOT        ), FilterResult::Calculatable(util::ASCII_CODE_DOT       ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_COMMA      ), FilterResult::Calculatable(util::ASCII_CODE_COMMA     ));
         assert_eq!(d.filter_char(util::ASCII_CODE_BIKKURI    ), FilterResult::Calculatable(util::ASCII_CODE_BIKKURI   ));
         assert_eq!(d.filter_char(util::ASCII_CODE_EQUAL      ), FilterResult::Calculatable(util::ASCII_CODE_EQUAL     ));
         assert_eq!(d.filter_char(util::ASCII_CODE_PIPE       ), FilterResult::Calculatable(util::ASCII_CODE_PIPE      ));

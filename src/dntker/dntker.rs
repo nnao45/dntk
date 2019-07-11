@@ -142,6 +142,7 @@ impl Dntker {
             util::ASCII_CODE_HAT         => FilterResult::Calculatable(util::ASCII_CODE_HAT       ), // ^
             util::ASCII_CODE_PERCENT     => FilterResult::Calculatable(util::ASCII_CODE_PERCENT   ), // %
             util::ASCII_CODE_DOT         => FilterResult::Calculatable(util::ASCII_CODE_DOT       ), // .
+            util::ASCII_CODE_COMMA       => FilterResult::Calculatable(util::ASCII_CODE_COMMA     ), // ,
             util::ASCII_CODE_BIKKURI     => FilterResult::Calculatable(util::ASCII_CODE_BIKKURI   ), // !
             util::ASCII_CODE_EQUAL       => FilterResult::Calculatable(util::ASCII_CODE_EQUAL     ), // =
             util::ASCII_CODE_PIPE        => FilterResult::Calculatable(util::ASCII_CODE_PIPE      ), // |

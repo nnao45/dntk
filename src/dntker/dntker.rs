@@ -115,9 +115,7 @@ impl Dntker {
     }
 
     fn write_stdout_ln(&self, buf: &str) -> Result<(), std::io::Error> {
-        let out = stdout();
-        let mut out = BufWriter::new(out.lock());
-        writeln!(out, "{}", buf)
+        self.write_stdout(&format!("{}\n", buf))
     }
 
     fn filter_char(&self, ascii_char: u8) -> FilterResult {

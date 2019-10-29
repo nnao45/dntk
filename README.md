@@ -303,6 +303,26 @@ $ echo "123 * 2" | dntk
 ```
 behave, like bc ☺️
 
+# Development Guide
+
+## Compile
+
+### Binary
+
+```bash
+$ make
+```
+
+### Docker
+
+```bash
+$ make docker-build
+```
+
+# Contribute
+
+Always Welcome!! 😄
+
 ***Have a nice rust hacking days***:sparkles::wink:
 ## Writer & License
 dntk was writed by nnao45 (WORK:Infrastructure Engineer, Twitter:@nnao45, MAIL:n4sekai5y@gmail.com).  

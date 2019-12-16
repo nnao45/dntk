@@ -35,11 +35,6 @@ before_cache:
     - chmod -R a+r ${HOME}/.cargo
 cache:
     - cargo
-addons:
-  apt:
-    packages:
-      - gcc-multilib
-      - build-essential
 before_script:
   - rustc -V
   - cargo -V

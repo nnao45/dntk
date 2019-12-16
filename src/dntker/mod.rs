@@ -8,6 +8,7 @@ use atty::Stream;
 use winconsole::console as wconsole;
 
 use ansi_term;
+use std::io::{stdout, BufWriter};
 
 include!("dntker.rs");
 include!("tests.rs");

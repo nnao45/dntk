@@ -25,6 +25,11 @@ test:
 clean:
 	cargo clean
 
+
+.PHONY: docker-login
+docker-login:
+	echo ${DOCKERHUB_PASSWORD} | docker login -u nnao45 --password-stdin
+
 .PHONY: docker-build
 docker-build:
 	docker rmi -f $(DOCKER_REPO)/$(TARGET):latest

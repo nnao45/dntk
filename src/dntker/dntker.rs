@@ -108,6 +108,17 @@ impl ToString for DntkString {
 }
 
 impl Dntker {
+    #[allow(unused_must_use)]
+    fn write_stdout(&self, buf: &str) {
+        let out = stdout();
+        let mut out = BufWriter::new(out.lock());
+        write!(out, "{}", buf);
+    }
+
+    fn write_stdout_ln(&self, buf: &str) {
+        self.write_stdout(&format!("{}\n", buf))
+    }
+
     fn filter_char(&self, ascii_char: u8) -> FilterResult {
         match ascii_char {
             util::ASCII_CODE_ZERO        => FilterResult::Calculatable(util::ASCII_CODE_ZERO      ), // 0
@@ -216,18 +227,19 @@ impl Dntker {
 
     fn inform(&mut self, msg: &str, dtype: DntkStringType) {
         if ! util::DNTK_OPT.quiet {
-            print!("{}", self.output_fill_whitespace(self.before_printed_len));
-            print!("{}", DntkString {
+            self.write_stdout(&self.output_fill_whitespace(self.before_printed_len));
+            self.write_stdout(DntkString {
                 data: format!("{}{}", "\r", msg),
                 dtype: dtype,
                 cur_pos_from_right: 0,
             }
                 .colorize()
                 .to_string()
+                .as_ref()
             );
             std::io::stdout().flush().unwrap();
             std::thread::sleep(std::time::Duration::from_millis(1000));
-            print!("{}", &self.output_fill_whitespace(msg.len()));
+            self.write_stdout(&self.output_fill_whitespace(msg.len()));
         }
     }
 
@@ -237,10 +249,10 @@ impl Dntker {
 
     fn refresh(&mut self) {
         self.inform("refresh!!", DntkStringType::Refresh);
-        print!("{}", self.output_fill_whitespace(self.before_printed_len));
+        self.write_stdout( &self.output_fill_whitespace(self.before_printed_len));
         let dnew: Dntker = Default::default();
         *self = dnew;
-        print!("{}", util::DNTK_PROMPT);
+        self.write_stdout(util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
     }
 
@@ -266,49 +278,54 @@ impl Dntker {
     }
 
     fn dntk_exec(&mut self, ptr: [libc::c_char; 3]) -> DntkResult {
-        let input_char = ptr[0] as u8;
-        match &self.filter_char(input_char) {
-            FilterResult::Unknown(unknown_code) => {
-                self.warning(unknown_code.to_owned());
-            },
-            FilterResult::Esc => {
-                if ptr.len() >= 3 {
-                    match ptr[2] as u8 {
-                        util::ASCII_CODE_RIGHT => {
-                            self.cursor_move_right();
-                        },
-                        util::ASCII_CODE_LEFT => {
-                            self.cursor_move_left();
-                        },
-                        _ => {
-                            return DntkResult::Fin
+        let mut filtered_vec = vec![ptr[0] as u8, ptr[1] as u8, ptr[2] as u8].into_iter().filter(|p| *p != 0).collect::<Vec<u8>>();
+        while !filtered_vec.is_empty() {
+            let input_char = &filtered_vec.remove(0);
+            match &self.filter_char(*input_char) {
+                FilterResult::Unknown(unknown_code) => {
+                    self.warning(unknown_code.to_owned());
+                },
+                FilterResult::Esc => {
+                    if ptr.len() >= 3 {
+                        match ptr[2] as u8 {
+                            util::ASCII_CODE_RIGHT => {
+                                self.cursor_move_right();
+                                break;
+                            },
+                            util::ASCII_CODE_LEFT => {
+                                self.cursor_move_left();
+                                break;
+                            },
+                            _ => {
+                                return DntkResult::Fin
+                            }
                         }
+                    } else {
+                        return DntkResult::Fin
                     }
-                } else {
+                },
+                FilterResult::End => {
                     return DntkResult::Fin
-                }
-            },
-            FilterResult::End => {
-                return DntkResult::Fin
-            },
-            FilterResult::Refresh => {
-                self.refresh();
-                return DntkResult::Continue
-            },
-            FilterResult::Delete => {
-                self.delete_column();
-            },
-            FilterResult::CurLeft => {
-                self.cursor_move_left();
-            },
-            FilterResult::CurRight => {
-                self.cursor_move_right();
-            },
-            FilterResult::Calculatable(code) => {
-                self.insert_column(code.to_owned());
-            },
+                },
+                FilterResult::Refresh => {
+                    self.refresh();
+                    return DntkResult::Continue
+                },
+                FilterResult::Delete => {
+                    self.delete_column();
+                },
+                FilterResult::CurLeft => {
+                    self.cursor_move_left();
+                },
+                FilterResult::CurRight => {
+                    self.cursor_move_right();
+                },
+                FilterResult::Calculatable(code) => {
+                    self.insert_column(code.to_owned());
+                },
+            }
         }
-        print!("{}", self.output_fill_whitespace(self.before_printed_len));
+        self.write_stdout(&self.output_fill_whitespace(self.before_printed_len));
         let p1 = util::DNTK_PROMPT.to_string();
         let p2 = &self.statement_from_utf8();
         let p3 = " = ";
@@ -341,7 +358,7 @@ impl Dntker {
             }
         }
         if let DntkResult::Output(o) = self.calculate(p1, p2, p3) {
-            print!("{}", o);
+            self.write_stdout(&o);
         }
     }
 
@@ -367,16 +384,16 @@ impl Dntker {
         if !atty::is(Stream::Stdin) && std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
             let mut s = String::new();
             std::io::stdin().read_line(&mut s).ok();
-            println!("{}", &self.executer.exec(&s).unwrap());
+            self.write_stdout_ln(&self.executer.exec(&s).unwrap());
             return
         };
 
         if util::DNTK_OPT.show_limits {
-            println!("{}", &self.executer.exec("limits").unwrap());
+            self.write_stdout_ln(&self.executer.exec("limits").unwrap());
             return
         }
 
-        print!("{}", util::DNTK_PROMPT);
+        self.write_stdout(util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
 
         if util::DNTK_OPT.inject != "" {
@@ -384,7 +401,7 @@ impl Dntker {
             self.flush();
 
             if util::DNTK_OPT.once {
-                print!("\n");
+                self.write_stdout("\n");
                 return
             }
         }
@@ -393,20 +410,20 @@ impl Dntker {
         loop {
             match self.dntk_exec(self.watch(ptr)) {
                 DntkResult::Fin => {
-                    print!("\n");
+                    self.write_stdout("\n");
                     break
                 },
                 DntkResult::Continue => {
                     continue
                 },
                 DntkResult::Output(o) => {
-                    print!("{}", o);
+                    self.write_stdout(&o);
                 },
             }
             self.flush();
 
             if util::DNTK_OPT.once {
-                print!("\n");
+                self.write_stdout("\n");
                 return
             }
         }

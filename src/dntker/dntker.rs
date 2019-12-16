@@ -109,10 +109,16 @@ impl ToString for DntkString {
 
 impl Dntker {
     #[allow(unused_must_use)]
+    #[cfg(not(target_os = "freebsd"))]
     fn write_stdout(&self, buf: &str) {
         let out = stdout();
         let mut out = BufWriter::new(out.lock());
         write!(out, "{}", buf);
+    }
+
+    #[cfg(target_os = "freebsd")]
+    fn write_stdout(&self, buf: &str) {
+        print!("{}", buf);
     }
 
     fn write_stdout_ln(&self, buf: &str) {

@@ -266,47 +266,50 @@ impl Dntker {
     }
 
     fn dntk_exec(&mut self, ptr: [libc::c_char; 3]) -> DntkResult {
-        let input_char = ptr[0] as u8;
-        match &self.filter_char(input_char) {
-            FilterResult::Unknown(unknown_code) => {
-                self.warning(unknown_code.to_owned());
-            },
-            FilterResult::Esc => {
-                if ptr.len() >= 3 {
-                    match ptr[2] as u8 {
-                        util::ASCII_CODE_RIGHT => {
-                            self.cursor_move_right();
-                        },
-                        util::ASCII_CODE_LEFT => {
-                            self.cursor_move_left();
-                        },
-                        _ => {
-                            return DntkResult::Fin
+        let mut filtered_vec = vec![ptr[0] as u8, ptr[1] as u8, ptr[2] as u8].into_iter().filter(|p| *p != 0).collect::<Vec<u8>>();
+        while !filtered_vec.is_empty() {
+            let input_char = &filtered_vec.remove(0);
+            match &self.filter_char(*input_char) {
+                FilterResult::Unknown(unknown_code) => {
+                    self.warning(unknown_code.to_owned());
+                },
+                FilterResult::Esc => {
+                    if ptr.len() >= 3 {
+                        match ptr[2] as u8 {
+                            util::ASCII_CODE_RIGHT => {
+                                self.cursor_move_right();
+                            },
+                            util::ASCII_CODE_LEFT => {
+                                self.cursor_move_left();
+                            },
+                            _ => {
+                                return DntkResult::Fin
+                            }
                         }
+                    } else {
+                        return DntkResult::Fin
                     }
-                } else {
+                },
+                FilterResult::End => {
                     return DntkResult::Fin
-                }
-            },
-            FilterResult::End => {
-                return DntkResult::Fin
-            },
-            FilterResult::Refresh => {
-                self.refresh();
-                return DntkResult::Continue
-            },
-            FilterResult::Delete => {
-                self.delete_column();
-            },
-            FilterResult::CurLeft => {
-                self.cursor_move_left();
-            },
-            FilterResult::CurRight => {
-                self.cursor_move_right();
-            },
-            FilterResult::Calculatable(code) => {
-                self.insert_column(code.to_owned());
-            },
+                },
+                FilterResult::Refresh => {
+                    self.refresh();
+                    return DntkResult::Continue
+                },
+                FilterResult::Delete => {
+                    self.delete_column();
+                },
+                FilterResult::CurLeft => {
+                    self.cursor_move_left();
+                },
+                FilterResult::CurRight => {
+                    self.cursor_move_right();
+                },
+                FilterResult::Calculatable(code) => {
+                    self.insert_column(code.to_owned());
+                },
+            }
         }
         print!("{}", self.output_fill_whitespace(self.before_printed_len));
         let p1 = util::DNTK_PROMPT.to_string();

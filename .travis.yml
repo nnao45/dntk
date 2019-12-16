@@ -39,7 +39,7 @@ addons:
   apt:
     packages:
       - gcc-multilib
-      - libexecinfo
+      - libc6-dev
 before_script:
   - rustc -V
   - cargo -V

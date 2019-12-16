@@ -31,10 +31,10 @@ matrix:
     - os: linux
       rust: stable
       env: TARGET=x86_64-unknown-freebsd
-#before_cache:
-#    - chmod -R a+r ${HOME}/.cargo
-#cache:
-#    - cargo
+before_cache:
+    - chmod -R a+r ${HOME}/.cargo
+cache:
+    - cargo
 before_script:
   - rustc -V
   - cargo -V

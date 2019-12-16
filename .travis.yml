@@ -41,6 +41,7 @@ addons:
       - gcc-multilib
       - gcc
       - build-essential
+      - libutil-freebsd-dev
 before_script:
   - rustc -V
   - cargo -V

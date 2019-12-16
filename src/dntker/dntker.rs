@@ -278,9 +278,11 @@ impl Dntker {
                         match ptr[2] as u8 {
                             util::ASCII_CODE_RIGHT => {
                                 self.cursor_move_right();
+                                break;
                             },
                             util::ASCII_CODE_LEFT => {
                                 self.cursor_move_left();
+                                break;
                             },
                             _ => {
                                 return DntkResult::Fin

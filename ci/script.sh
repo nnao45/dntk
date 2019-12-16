@@ -7,7 +7,7 @@ export PKG_CONFIG_ALLOW_CROSS=1
 #    cross clippy --target ${TARGET} -- -D warnings
 #    cross build --target ${TARGET} --release
 #else
-    cargo test  --target ${TARGET}
+#    cargo test  --target ${TARGET}
     cargo clippy --target ${TARGET} -- -D warnings
     cargo build --target ${TARGET} --release
 #fi

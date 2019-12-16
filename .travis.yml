@@ -47,9 +47,7 @@ before_script:
   - echo $PATH
   - git rev-parse HEAD
 script: ci/script.sh
-before_deploy:
-  - ci/before_deploy.sh
-  - if [[ "${TRAVIS_BRANCH}" = "master" ]]; then make docker-release; else make docker-build; fi
+before_deploy: ci/before_deploy.sh
 deploy:
   provider: releases
   skip_cleanup: true

@@ -37,7 +37,7 @@ dntk is command line's multi-platform ***Interactive*** calculator, [GNU bc](htt
     </tr>
 </table>
 
-## ***Current dntk's version: v2.2.0***
+## ***Current dntk's version:v2.2.1***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## Platform

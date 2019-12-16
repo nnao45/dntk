@@ -35,6 +35,11 @@ before_cache:
     - chmod -R a+r ${HOME}/.cargo
 cache:
     - cargo
+addons:
+  apt:
+    packages:
+      - gcc-multilib
+      - libexecinfo
 before_script:
   - rustc -V
   - cargo -V
@@ -47,7 +52,9 @@ before_script:
   - echo $PATH
   - git rev-parse HEAD
 script: ci/script.sh
-before_deploy: ci/before_deploy.sh
+before_deploy:
+  - ci/before_deploy.sh
+  - if [[ "${TRAVIS_BRANCH}" = "master" ]]; then make docker-release; else make docker-build; fi
 deploy:
   provider: releases
   skip_cleanup: true

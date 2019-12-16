@@ -68,9 +68,9 @@ impl DntkString {
     pub fn ancize(mut self) -> Self {
         self = self.colorize();
         #[cfg(not(target_os = "windows"))]
-        {
+            {
                 self = self.cursorize();
-        }
+            }
         self
     }
 
@@ -108,23 +108,6 @@ impl ToString for DntkString {
 }
 
 impl Dntker {
-    #[allow(unused_must_use)]
-    #[cfg(not(target_os = "freebsd"))]
-    fn write_stdout(&self, buf: &str) {
-        let out = stdout();
-        let mut out = BufWriter::new(out.lock());
-        write!(out, "{}", buf);
-    }
-
-    #[cfg(target_os = "freebsd")]
-    fn write_stdout(&self, buf: &str) {
-        print!("{}", buf);
-    }
-
-    fn write_stdout_ln(&self, buf: &str) {
-        self.write_stdout(&format!("{}\n", buf))
-    }
-
     fn filter_char(&self, ascii_char: u8) -> FilterResult {
         match ascii_char {
             util::ASCII_CODE_ZERO        => FilterResult::Calculatable(util::ASCII_CODE_ZERO      ), // 0
@@ -233,19 +216,18 @@ impl Dntker {
 
     fn inform(&mut self, msg: &str, dtype: DntkStringType) {
         if ! util::DNTK_OPT.quiet {
-            self.write_stdout(&self.output_fill_whitespace(self.before_printed_len));
-            self.write_stdout(DntkString {
+            print!("{}", self.output_fill_whitespace(self.before_printed_len));
+            print!("{}", DntkString {
                 data: format!("{}{}", "\r", msg),
                 dtype: dtype,
                 cur_pos_from_right: 0,
             }
                 .colorize()
                 .to_string()
-                .as_ref()
             );
             std::io::stdout().flush().unwrap();
             std::thread::sleep(std::time::Duration::from_millis(1000));
-            self.write_stdout(&self.output_fill_whitespace(msg.len()));
+            print!("{}", &self.output_fill_whitespace(msg.len()));
         }
     }
 
@@ -255,10 +237,10 @@ impl Dntker {
 
     fn refresh(&mut self) {
         self.inform("refresh!!", DntkStringType::Refresh);
-        self.write_stdout( &self.output_fill_whitespace(self.before_printed_len));
+        print!("{}", self.output_fill_whitespace(self.before_printed_len));
         let dnew: Dntker = Default::default();
         *self = dnew;
-        self.write_stdout(util::DNTK_PROMPT);
+        print!("{}", util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
     }
 
@@ -266,8 +248,8 @@ impl Dntker {
         match &self.executer.exec(p2) {
             Ok(p4) => {
                 DntkResult::Output(self.output_ok(p1, p2, p3, p4)
-                                     .ancize()
-                                     .to_string())
+                    .ancize()
+                    .to_string())
             },
             Err(e) => {
                 match e {
@@ -275,8 +257,8 @@ impl Dntker {
                     bc::BcError::Timeout => panic!("call bc process is timeout"),
                     _ => {
                         DntkResult::Output(self.output_ng(p1, p2, p3)
-                                     .ancize()
-                                     .to_string())
+                            .ancize()
+                            .to_string())
                     },
                 }
             },
@@ -331,7 +313,7 @@ impl Dntker {
                 },
             }
         }
-        self.write_stdout(&self.output_fill_whitespace(self.before_printed_len));
+        print!("{}", &self.output_fill_whitespace(self.before_printed_len));
         let p1 = util::DNTK_PROMPT.to_string();
         let p2 = &self.statement_from_utf8();
         let p3 = " = ";
@@ -364,25 +346,25 @@ impl Dntker {
             }
         }
         if let DntkResult::Output(o) = self.calculate(p1, p2, p3) {
-            self.write_stdout(&o);
+            print!("{}", o);
         }
     }
 
     fn flush(&self) {
         if std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
             #[cfg(target_os = "windows")]
-            wconsole::set_cursor_visible(false).unwrap();
+                wconsole::set_cursor_visible(false).unwrap();
         }
 
         std::io::stdout().flush().unwrap();
 
         if std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
             #[cfg(target_os = "windows")]
-            {
-                let vec_cur = wconsole::get_cursor_position().unwrap();
-                wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
-                wconsole::set_cursor_visible(true).unwrap();
-            }
+                {
+                    let vec_cur = wconsole::get_cursor_position().unwrap();
+                    wconsole::set_cursor_position(util::DNTK_PROMPT.to_string().len() as u16 + self.currnet_cur_pos as u16 -1, vec_cur.y).unwrap();
+                    wconsole::set_cursor_visible(true).unwrap();
+                }
         }
     }
 
@@ -390,16 +372,16 @@ impl Dntker {
         if !atty::is(Stream::Stdin) && std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
             let mut s = String::new();
             std::io::stdin().read_line(&mut s).ok();
-            self.write_stdout_ln(&self.executer.exec(&s).unwrap());
+            println!("{}", &self.executer.exec(&s).unwrap());
             return
         };
 
         if util::DNTK_OPT.show_limits {
-            self.write_stdout_ln(&self.executer.exec("limits").unwrap());
+            println!("{}", &self.executer.exec("limits").unwrap());
             return
         }
 
-        self.write_stdout(util::DNTK_PROMPT);
+        print!("{}", util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
 
         if util::DNTK_OPT.inject != "" {
@@ -407,7 +389,7 @@ impl Dntker {
             self.flush();
 
             if util::DNTK_OPT.once {
-                self.write_stdout("\n");
+                print!("\n");
                 return
             }
         }
@@ -416,20 +398,20 @@ impl Dntker {
         loop {
             match self.dntk_exec(self.watch(ptr)) {
                 DntkResult::Fin => {
-                    self.write_stdout("\n");
+                    print!("\n");
                     break
                 },
                 DntkResult::Continue => {
                     continue
                 },
                 DntkResult::Output(o) => {
-                    self.write_stdout(&o);
+                    print!("{}", o);
                 },
             }
             self.flush();
 
             if util::DNTK_OPT.once {
-                self.write_stdout("\n");
+                print!("\n");
                 return
             }
         }

@@ -8,6 +8,8 @@ use atty::Stream;
 use winconsole::console as wconsole;
 
 use ansi_term;
+
+#[cfg(not(target_os = "freebsd"))]
 use std::io::{stdout, BufWriter};
 
 include!("dntker.rs");

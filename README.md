@@ -2,7 +2,7 @@
 [![Travis CI](https://travis-ci.org/nnao45/dntk.svg?branch=master)](https://travis-ci.org/nnao45/dntk)
 [![v2.2.1](https://img.shields.io/badge/package-v2.2.1-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v2.2.1)
 [![crates](https://img.shields.io/badge/crates.io-v2.2.1-319e8c.svg)](https://crates.io/crates/dntk)
-[![docker](https://img.shields.io/badge/docker-v2.2.1-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags)
+[![docker](https://img.shields.io/badge/docker-v2.2.1-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags?name=v2.2.1)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
 [![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20freebsd%20|%20windows-orange.svg)](https://github.com/nnao45/dntk/releases)
 

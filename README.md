@@ -129,6 +129,20 @@ OPTIONS:
     -s, --scale <scale>        Number of truncated after the decimal point [default: 20]
 ```
 
+## Support Pipe
+```bash
+$ echo "123 * 2" | dntk
+246
+```
+behave, like bc ☺️
+
+## Support Paste
+```bash
+$ echo '( 1 + 2 + 3 + 4 + 51 ) / sqrt( 123 / 3 )' | pbcopy
+$ pbpaste | dntk
+9.52659947520496999698
+```
+
 ## Windows Support
 You may install bc.exe and set PATH.
 ```bash
@@ -295,13 +309,6 @@ you can use under function.
 </table>
 
 more detail 👉 https://www.gnu.org/software/bc/manual/html_mono/bc.html
-
-## Pipe Use...
-```bash
-$ echo "123 * 2" | dntk
-246
-```
-behave, like bc ☺️
 
 # Development Guide
 

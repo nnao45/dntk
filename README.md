@@ -129,14 +129,14 @@ OPTIONS:
     -s, --scale <scale>        Number of truncated after the decimal point [default: 20]
 ```
 
-## Support Pipe
+## Pipe Support
 ```bash
 $ echo "123 * 2" | dntk
 246
 ```
 behave, like bc ☺️
 
-## Support Paste
+## Paste Support
 ```bash
 $ echo '( 1 + 2 + 3 + 4 + 51 ) / sqrt( 123 / 3 )' | pbcopy
 $ pbpaste | dntk

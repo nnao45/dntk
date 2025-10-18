@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod bc_tests {
     use super::BcExecuter;
-    use rand::Rng;
+    use rand::{RngCore, SeedableRng};
 
     #[test]
     fn test_exec(){
@@ -100,7 +100,7 @@ mod bc_tests {
         assert_eq!(b.exec("scale").unwrap(), "5");
 
         assert_eq!(b.exec("obase=16; 255").unwrap(), "FF");
-        assert_eq!(b.exec("obase").unwrap(), "16");
+        assert_eq!(b.exec("obase").unwrap(), "10");
         assert_eq!(b.exec("obase=10; sqrt(16)").unwrap(), "4");
 
         let rand_seed_output = b.exec("srand(42)").unwrap();

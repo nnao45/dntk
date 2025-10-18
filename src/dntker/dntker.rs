@@ -263,16 +263,10 @@ impl Dntker {
                                      .ancize()
                                      .to_string())
             },
-            Err(e) => {
-                match e {
-                    bc::BcError::PopenError(e) => panic!("call bc process open error: {:?}", e),
-                    bc::BcError::Timeout => panic!("call bc process is timeout"),
-                    _ => {
-                        DntkResult::Output(self.output_ng(p1, p2, p3)
+            Err(_e) => {
+                DntkResult::Output(self.output_ng(p1, p2, p3)
                                      .ancize()
                                      .to_string())
-                    },
-                }
             },
         }
     }

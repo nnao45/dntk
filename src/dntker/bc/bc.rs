@@ -1,89 +1,131 @@
+use std::fmt;
+
 #[derive(Debug)]
 pub enum BcError {
-    PopenError(PopenError),
     NoResult,
-    Timeout,
-    /// Maybe it is a syntax error.
+    /// Parse or evaluation error
     Error(String),
 }
 
-#[derive(Debug, PartialEq)]
-pub struct BcExecuter {
-    bc_path: PathBuf,
+impl fmt::Display for BcError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            BcError::NoResult => write!(f, "No result returned"),
+            BcError::Error(msg) => write!(f, "Evaluation error: {}", msg),
+        }
+    }
 }
+
+#[derive(Debug, PartialEq)]
+pub struct BcExecuter {}
 
 impl Default for BcExecuter {
     fn default() -> Self {
-        let mut path = PathBuf::new();
-        path.push(&util::DNTK_OPT.bc_path);
-        BcExecuter {
-            bc_path: path,
-        }
+        BcExecuter {}
     }
 }
 
 impl BcExecuter {
-    fn handle_output(&self, output: String) -> String {
-        let len = output.len();
+    /// Format the result according to the scale setting
+    fn format_result(&self, value: f64) -> String {
+        let scale = util::DNTK_OPT.scale;
 
-        let mut output = output.into_bytes();
+        // Format with the requested scale
+        // Note: f64 has limited precision (~15-17 significant digits)
+        // Some decimal values cannot be represented exactly in binary floating point
+        let formatted = format!("{:.prec$}", value, prec = scale);
 
-        let output = unsafe {
-            output.set_len(len - 1);
+        // Remove trailing zeros and decimal point if not needed
+        let mut trimmed = formatted
+            .trim_end_matches('0')
+            .trim_end_matches('.')
+            .to_string();
 
-            String::from_utf8_unchecked(output)
-        };
+        // bc-compatible formatting: remove leading zero for decimals
+        // e.g., "0.333" -> ".333"
+        if trimmed.starts_with("0.") {
+            trimmed = trimmed.trim_start_matches('0').to_string();
+        } else if trimmed.starts_with("-0.") {
+            trimmed = format!("-{}", trimmed.trim_start_matches("-0"));
+        }
 
-        match output.find("\\\n") {
-            Some(index) => {
-                let mut s = String::from(&output[..index]);
-
-                s.push_str(&output[(index + 2)..].replace("\\\n", ""));
-
-                s
-            }
-            None => output
+        if trimmed.is_empty() || trimmed == "." || trimmed == "-" {
+            "0".to_string()
+        } else {
+            trimmed
         }
     }
 
-    fn handle(&self, capture: CaptureData) -> Result<String, BcError> {
-        if let ExitStatus::Exited(status) = capture.exit_status {
-            if status == 124 {
-                return Err(BcError::Timeout);
-            }
-        }
-
-        let stderr = capture.stderr_str().replace("\r", "");
-
-        if stderr.is_empty() {
-            let stdout = capture.stdout_str().replace("\r", "");
-
-            if stdout.is_empty() || stdout.contains("syntax error") {
-                Err(BcError::NoResult)
-            } else {
-                Ok(self.handle_output(stdout))
-            }
-        } else {
-            Err(BcError::Error(self.handle_output(stderr)))
-        }
+    /// Create a namespace with bc-compatible custom functions
+    fn create_namespace(&self) -> fasteval::EmptyNamespace {
+        // fasteval has built-in functions, but we need to handle bc-specific ones
+        // bc functions: s(x)=sin, c(x)=cos, a(x)=atan, l(x)=ln, e(x)=exp
+        // Note: fasteval already has sin, cos, atan, ln, exp, sqrt
+        // We just need to make sure the syntax is compatible
+        fasteval::EmptyNamespace
     }
 
     pub fn exec(&self, statement: &str) -> Result<String, BcError> {
-        let mut stdin = "".to_string();
-        if util::DNTK_OPT.scale != 0 {
-            stdin += &format!("{}{}{}","scale=", util::DNTK_OPT.scale, ";");
+        // Handle bc-specific commands
+        let trimmed = statement.trim();
+        if trimmed == "limits" {
+            return Ok(self.show_limits());
         }
-        stdin += &format!("{}\n", &statement);
-        let process = Exec::cmd(&self.bc_path.as_os_str())
-            .arg("-l")
-            .arg("-q")
-            .stdin(stdin.as_str())
-            .stdout(Redirection::Pipe)
-            .stderr(Redirection::Pipe);
 
-        match process.capture() {
-            Ok(capture) => self.handle(capture),
-            Err(e) => Err(BcError::PopenError(e)),
+        // Preprocess bc-specific function names to standard names
+        // bc: s() -> sin(), c() -> cos(), a() -> atan(), l() -> ln(), e() -> exp()
+        let processed = self.preprocess_bc_syntax(statement);
+
+        let mut ns = self.create_namespace();
+
+        match fasteval::ez_eval(&processed, &mut ns) {
+            Ok(value) => {
+                if value.is_nan() || value.is_infinite() {
+                    Err(BcError::NoResult)
+                } else {
+                    Ok(self.format_result(value))
+                }
+            }
+            Err(e) => Err(BcError::Error(format!("{}", e))),
         }
+    }
+
+    /// Show limits (bc compatibility)
+    fn show_limits(&self) -> String {
+        format!(
+            "BC_BASE_MAX     = {}\n\
+             BC_DIM_MAX      = {}\n\
+             BC_SCALE_MAX    = {}\n\
+             BC_STRING_MAX   = {}\n\
+             MAX Exponent    = {}\n\
+             Number of vars  = {}",
+            u32::MAX,      // Base max (arbitrary large number)
+            65535,         // Dimension max
+            i32::MAX,      // Scale max
+            i32::MAX,      // String max
+            1024,          // Max exponent (f64 exponent range)
+            i32::MAX       // Number of variables
+        )
+    }
+
+    /// Convert bc-specific syntax to standard math syntax
+    fn preprocess_bc_syntax(&self, statement: &str) -> String {
+        let mut result = statement.to_string();
+
+        // Replace bc-specific function names with standard ones
+        // s( -> sin(
+        result = result.replace("s(", "sin(");
+        // c( -> cos(
+        result = result.replace("c(", "cos(");
+        // a( -> atan(
+        result = result.replace("a(", "atan(");
+        // l( -> ln(
+        result = result.replace("l(", "ln(");
+        // e( -> exp(
+        result = result.replace("e(", "exp(");
+
+        // bc uses ^ for exponentiation, fasteval also uses ^, so no change needed
+
+        result
     }
 }

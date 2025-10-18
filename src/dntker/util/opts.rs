@@ -1,5 +1,6 @@
 use structopt::StructOpt;
-use std::path::PathBuf;
+// PathBuf is no longer needed since bc_path was removed
+// use std::path::PathBuf;
 
 use clap::{
     crate_name,
@@ -36,15 +37,16 @@ pub struct Opts {
     #[structopt(long = "show-limits", help = "Print the local limits enforced by the local version of bc, and quit")]
     pub show_limits: bool,
 
-    // Use a specific bc command path
-    #[cfg(not(target_os = "windows"))]
-    #[structopt(short = "b", long = "bc-path", parse(from_os_str), default_value = "bc", help = "Use a specific bc command path")]
-    pub bc_path: PathBuf,
-
-    // Use a specific bc command path
-    #[cfg(target_os = "windows")]
-    #[structopt(short = "b", long = "bc-path", parse(from_os_str), default_value = "bc.exe", help = "Use a specific bc command path")]
-    pub bc_path: PathBuf,
+    // bc_path is no longer needed since we're using fasteval internally
+    // // Use a specific bc command path
+    // #[cfg(not(target_os = "windows"))]
+    // #[structopt(short = "b", long = "bc-path", parse(from_os_str), default_value = "bc", help = "Use a specific bc command path")]
+    // pub bc_path: PathBuf,
+    //
+    // // Use a specific bc command path
+    // #[cfg(target_os = "windows")]
+    // #[structopt(short = "b", long = "bc-path", parse(from_os_str), default_value = "bc.exe", help = "Use a specific bc command path")]
+    // pub bc_path: PathBuf,
 
     // Pre-run inject statement to the dntk
     #[structopt(short = "i", long = "inject", default_value = "", help = "Pre-run inject statement to the dntk")]

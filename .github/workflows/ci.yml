@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            linux_term_lib: linux_musl.rs
+          - os: ubuntu-latest
+            target: i686-unknown-linux-musl
+            linux_term_lib: linux_musl.rs
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+          components: clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Set LINUX_TERM_LIB
+        if: matrix.linux_term_lib
+        run: echo "LINUX_TERM_LIB=${{ matrix.linux_term_lib }}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Run tests
+        run: cargo test --target ${{ matrix.target }}
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
+
+      - name: Run clippy
+        run: cargo clippy --target ${{ matrix.target }} -- -D warnings
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
+
+      - name: Build
+        run: cargo build --target ${{ matrix.target }} --release
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
+
+  test-freebsd:
+    name: Test FreeBSD
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - i686-unknown-freebsd
+          - x86_64-unknown-freebsd
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+          components: clippy
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Run clippy
+        run: cross clippy --target ${{ matrix.target }} -- -D warnings
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
+
+      - name: Build
+        run: cross build --target ${{ matrix.target }} --release
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1

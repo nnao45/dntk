@@ -1,0 +1,142 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  build-release:
+    name: Build Release
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            linux_term_lib: linux_musl.rs
+            use_cross: false
+          - os: ubuntu-latest
+            target: i686-unknown-linux-musl
+            linux_term_lib: linux_musl.rs
+            use_cross: false
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            use_cross: false
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            use_cross: false
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            use_cross: false
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            use_cross: false
+          - os: ubuntu-latest
+            target: i686-unknown-freebsd
+            use_cross: true
+          - os: ubuntu-latest
+            target: x86_64-unknown-freebsd
+            use_cross: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross
+        if: matrix.use_cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Set LINUX_TERM_LIB
+        if: matrix.linux_term_lib
+        run: echo "LINUX_TERM_LIB=${{ matrix.linux_term_lib }}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Get the version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Build with cargo
+        if: ${{ !matrix.use_cross }}
+        run: cargo build --target ${{ matrix.target }} --release
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
+
+      - name: Build with cross
+        if: matrix.use_cross
+        run: cross build --target ${{ matrix.target }} --release
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
+
+      - name: Get binary extension
+        id: get_ext
+        run: |
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            echo "EXT=.exe" >> $GITHUB_OUTPUT
+          else
+            echo "EXT=" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $VERSION = "${{ steps.get_version.outputs.VERSION }}"
+          $TARGET = "${{ matrix.target }}"
+          $ARCHIVE = "dntk-${VERSION}-${TARGET}"
+          New-Item -ItemType Directory -Path $ARCHIVE
+          Copy-Item "target/$TARGET/release/dntk.exe" $ARCHIVE/
+          Copy-Item LICENSE $ARCHIVE/
+          Copy-Item README.md $ARCHIVE/
+          Compress-Archive -Path $ARCHIVE -DestinationPath "${ARCHIVE}.zip"
+        shell: pwsh
+
+      - name: Package (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          TARGET="${{ matrix.target }}"
+          ARCHIVE="dntk-${VERSION}-${TARGET}"
+          mkdir "$ARCHIVE"
+          cp "target/$TARGET/release/dntk${{ steps.get_ext.outputs.EXT }}" "$ARCHIVE/"
+          cp LICENSE "$ARCHIVE/"
+          cp README.md "$ARCHIVE/"
+          zip -r "${ARCHIVE}.zip" "$ARCHIVE"
+        shell: bash
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./dntk-${{ steps.get_version.outputs.VERSION }}-${{ matrix.target }}.zip
+          asset_name: dntk-${{ steps.get_version.outputs.VERSION }}-${{ matrix.target }}.zip
+          asset_content_type: application/zip

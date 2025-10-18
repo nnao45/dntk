@@ -41,6 +41,7 @@ pub const ASCII_CODE_EQUAL       : u8 = 0x3d; // =
 pub const ASCII_CODE_PIPE        : u8 = 0x7c; // |
 pub const ASCII_CODE_AND         : u8 = 0x26; // &
 pub const ASCII_CODE_SEMICOLON   : u8 = 0x3b; // ;
+pub const ASCII_CODE_UNDERSCORE  : u8 = 0x5f; // _
 pub const ASCII_CODE_AT          : u8 = 0x40; // @
 pub const ASCII_CODE_WINENTER    : u8 = 0x0d; // windows \n
 pub const ASCII_CODE_NEWLINE     : u8 = 0x0a; // \n

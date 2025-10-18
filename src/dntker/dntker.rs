@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Dntker {
     pub executer: bc::BcExecuter,
     pub input_vec: Vec<u8>,
@@ -159,6 +159,9 @@ impl Dntker {
             util::ASCII_CODE_PIPE        => FilterResult::Calculatable(util::ASCII_CODE_PIPE      ), // |
             util::ASCII_CODE_AND         => FilterResult::Calculatable(util::ASCII_CODE_AND       ), // &
             util::ASCII_CODE_SEMICOLON   => FilterResult::Calculatable(util::ASCII_CODE_SEMICOLON ), // ;
+            util::ASCII_CODE_UNDERSCORE  => FilterResult::Calculatable(util::ASCII_CODE_UNDERSCORE), // _
+            b'A'..=b'Z'                  => FilterResult::Calculatable(ascii_char),
+            b'a'..=b'z'                  => FilterResult::Calculatable(ascii_char),
             util::ASCII_CODE_AT          => FilterResult::Refresh,                         // @
             util::ASCII_CODE_WINENTER    => FilterResult::End,                             // windows \n
             util::ASCII_CODE_NEWLINE     => FilterResult::End,                             // \n
@@ -257,11 +260,13 @@ impl Dntker {
     }
 
     fn calculate(&mut self, p1: &str, p2: &str, p3: &str) -> DntkResult {
-        match &self.executer.exec(p2) {
-            Ok(p4) => {
-                DntkResult::Output(self.output_ok(p1, p2, p3, p4)
-                                     .ancize()
-                                     .to_string())
+        match self.executer.exec(p2) {
+            Ok(result) => {
+                let rendered = self
+                    .output_ok(p1, p2, p3, &result)
+                    .ancize()
+                    .to_string();
+                DntkResult::Output(rendered)
             },
             Err(_e) => {
                 DntkResult::Output(self.output_ng(p1, p2, p3)
@@ -378,12 +383,14 @@ impl Dntker {
         if !atty::is(Stream::Stdin) && std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST")) {
             let mut s = String::new();
             std::io::stdin().read_line(&mut s).ok();
-            self.write_stdout_ln(&self.executer.exec(&s).unwrap());
+            let output = self.executer.exec(&s).unwrap();
+            self.write_stdout_ln(&output);
             return
         };
 
         if util::DNTK_OPT.show_limits {
-            self.write_stdout_ln(&self.executer.exec("limits").unwrap());
+            let limits = self.executer.exec("limits").unwrap();
+            self.write_stdout_ln(&limits);
             return
         }
 

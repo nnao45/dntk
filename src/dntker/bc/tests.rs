@@ -4,7 +4,7 @@ mod bc_tests {
 
     #[test]
     fn test_exec(){
-        let b: BcExecuter = Default::default();
+        let mut b: BcExecuter = Default::default();
 
         // Basic arithmetic
         let input1 = "1+2";
@@ -24,5 +24,21 @@ mod bc_tests {
         let input3 = "2^2^2^2";
         let output3 = "65536";
         assert_eq!(b.exec(input3).unwrap(), output3);
+    }
+
+    #[test]
+    fn test_exec_with_assignments_and_multi_statements() {
+        let mut b: BcExecuter = Default::default();
+        let script = "a=1+2; b=a*4; a+b";
+        let output = b.exec(script).unwrap();
+        assert_eq!(output, "15");
+    }
+
+    #[test]
+    fn test_exec_with_for_loop() {
+        let mut b: BcExecuter = Default::default();
+        let script = "sum=0; for(i=1; i<=3; i=i+1){ sum = sum + i; }; sum";
+        let output = b.exec(script).unwrap();
+        assert_eq!(output, "6");
     }
 }

@@ -17,6 +17,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_S          ), FilterResult::Calculatable(util::ASCII_CODE_S         ));
         assert_eq!(d.filter_char(util::ASCII_CODE_C          ), FilterResult::Calculatable(util::ASCII_CODE_C         ));
         assert_eq!(d.filter_char(util::ASCII_CODE_A          ), FilterResult::Calculatable(util::ASCII_CODE_A         ));
+        assert_eq!(d.filter_char(b'b'), FilterResult::Calculatable(b'b'));
         assert_eq!(d.filter_char(util::ASCII_CODE_L          ), FilterResult::Calculatable(util::ASCII_CODE_L         ));
         assert_eq!(d.filter_char(util::ASCII_CODE_E          ), FilterResult::Calculatable(util::ASCII_CODE_E         ));
         assert_eq!(d.filter_char(util::ASCII_CODE_J          ), FilterResult::Calculatable(util::ASCII_CODE_J         ));
@@ -42,6 +43,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_PIPE       ), FilterResult::Calculatable(util::ASCII_CODE_PIPE      ));
         assert_eq!(d.filter_char(util::ASCII_CODE_AND        ), FilterResult::Calculatable(util::ASCII_CODE_AND       ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SEMICOLON  ), FilterResult::Calculatable(util::ASCII_CODE_SEMICOLON ));
+        assert_eq!(d.filter_char(util::ASCII_CODE_UNDERSCORE ), FilterResult::Calculatable(util::ASCII_CODE_UNDERSCORE ));
         assert_eq!(d.filter_char(util::ASCII_CODE_AT         ), FilterResult::Refresh                                  );
         assert_eq!(d.filter_char(util::ASCII_CODE_WINENTER   ), FilterResult::End                                      );
         assert_eq!(d.filter_char(util::ASCII_CODE_NEWLINE    ), FilterResult::End                                      );
@@ -52,7 +54,7 @@ mod dntker_tests {
 
         assert_eq!(d.filter_char(0x00                        ), FilterResult::Unknown(0x00                            ));
         assert_eq!(d.filter_char(0x0e                        ), FilterResult::Unknown(0x0e                            ));
-        assert_eq!(d.filter_char(0x4f                        ), FilterResult::Unknown(0x4f                            ));
+        assert_eq!(d.filter_char(0x4f                        ), FilterResult::Calculatable(0x4f                       ));
     }
 
     #[test]
@@ -277,8 +279,12 @@ mod dntker_tests {
         };
         d.refresh();
 
-        let dnew: &mut Dntker = &mut Default::default();
-        assert_eq!(d, dnew);
+        assert!(d.input_vec.is_empty());
+        assert_eq!(d.currnet_cur_pos, 0);
+        assert_eq!(d.before_printed_len, 0);
+        assert_eq!(d.before_printed_result_len, 0);
+        assert_eq!(d.before_printed_statement_len, 0);
+        assert_eq!(d.statement_from_utf8(), "");
     }
 
     #[test]
@@ -297,7 +303,7 @@ mod dntker_tests {
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0 = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr3));
         let ptr4: [libc::c_char; 3] = [util::ASCII_CODE_DOT as i8, 0, 0];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr4));
-        let ptr_unknown_ascii: [libc::c_char; 3] = [0x4f as i8, 0, 0];
+        let ptr_unknown_ascii: [libc::c_char; 3] = [0x01 as i8, 0, 0];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m".to_string()), d1.dntk_exec(ptr_unknown_ascii));
         let ptr5: [libc::c_char; 3] = [util::ASCII_CODE_SEVEN as i8, 0, 0];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0.7 = 1.7\u{1b}[0m".to_string()), d1.dntk_exec(ptr5));
@@ -321,7 +327,7 @@ mod dntker_tests {
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0 = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr3));
         let ptr4: [libc::c_char; 3] = [util::ASCII_CODE_DOT as i8, 0, 0];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr4));
-        let ptr_unknown_ascii: [libc::c_char; 3] = [0x4f as i8, 0, 0];
+        let ptr_unknown_ascii: [libc::c_char; 3] = [0x01 as i8, 0, 0];
         assert_eq!(DntkResult::Output("\u{1b}[36m\r(dntk): 1+0. = 1\u{1b}[0m\u{1b}[4D".to_string()), d1.dntk_exec(ptr_unknown_ascii));
         let ptr5: [libc::c_char; 3] = [util::ASCII_CODE_SEVEN as i8, 0, 0];
         // Note: 1+0.7 results in floating point precision issues with f64

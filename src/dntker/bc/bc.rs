@@ -6,7 +6,7 @@ use std::fmt;
 use fasteval::Evaler;
 use fasteval::{Parser, Slab};
 use libm::jn;
-use rand::{rngs::SmallRng, Rng, SeedableRng};
+use rand::{rngs::SmallRng, Rng, RngCore, SeedableRng};
 use rust_decimal::prelude::{FromPrimitive, ToPrimitive, Zero};
 use rust_decimal::Decimal;
 

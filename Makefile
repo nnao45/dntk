@@ -57,7 +57,7 @@ cargo-release:
 
 .PHONY: readme-upde
 readme-upde:
-	sed -i '' -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
+	sed -i -e 's/$(PRE-VERSION)/$(VERSION)/g' README.md
 
 .PHONY: toml-upde
 toml-upde:

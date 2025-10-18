@@ -1,8 +1,8 @@
 # dntk
 [![Travis CI](https://travis-ci.org/nnao45/dntk.svg?branch=master)](https://travis-ci.org/nnao45/dntk)
-[![v2.2.1](https://img.shields.io/badge/package-v2.2.1-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v2.2.1)
-[![crates](https://img.shields.io/badge/crates.io-v2.2.1-319e8c.svg)](https://crates.io/crates/dntk)
-[![docker](https://img.shields.io/badge/docker-v2.2.1-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags?name=v2.2.1)
+[![v3.0.3](https://img.shields.io/badge/package-v3.0.3-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v3.0.3)
+[![crates](https://img.shields.io/badge/crates.io-v3.0.3-319e8c.svg)](https://crates.io/crates/dntk)
+[![docker](https://img.shields.io/badge/docker-v3.0.3-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags?name=v3.0.3)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
 [![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20freebsd%20|%20windows-orange.svg)](https://github.com/nnao45/dntk/releases)
 
@@ -82,20 +82,20 @@ $ brew install nnao45/dntk/dntk
 
 ### Linux
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.2.1/dntk-v2.2.1-x86_64-unknown-linux-musl.zip
-$ unzip dntk-v2.2.1-x86_64-unknown-linux-musl.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.3/dntk-v3.0.3-x86_64-unknown-linux-musl.zip
+$ unzip dntk-v3.0.3-x86_64-unknown-linux-musl.zip
 ```
 
 ### Windows
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.2.1/dntk-v2.2.1-x86_64-pc-windows-msvc.zip
-$ unzip dntk-v2.2.1-x86_64-pc-windows-msvc.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.3/dntk-v3.0.3-x86_64-pc-windows-msvc.zip
+$ unzip dntk-v3.0.3-x86_64-pc-windows-msvc.zip
 ```
 
 ### FreeBSD
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v2.2.1/dntk-v2.2.1-x86_64-unknown-freebsd.zip
-$ unzip dntk-v2.2.1-x86_64-unknown-freebsd.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.3/dntk-v3.0.3-x86_64-unknown-freebsd.zip
+$ unzip dntk-v3.0.3-x86_64-unknown-freebsd.zip
 ```
 
 ### Cargo
@@ -175,7 +175,7 @@ dntk works out of the box on Windows without installing bc.exe. Just download an
 
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_win_demo.gif)
 
-### Previous versions (v2.2.1 and earlier)
+### Previous versions (v3.0.3 and earlier)
 Older versions required bc.exe installation. If you're using an older version:
 ```bash
 $ choco install gnuwin

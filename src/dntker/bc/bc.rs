@@ -1,4 +1,6 @@
 use std::fmt;
+use rust_decimal::Decimal;
+use rust_decimal::prelude::FromPrimitive;
 
 #[derive(Debug)]
 pub enum BcError {
@@ -26,33 +28,33 @@ impl Default for BcExecuter {
 }
 
 impl BcExecuter {
-    /// Format the result according to the scale setting
-    fn format_result(&self, value: f64) -> String {
-        let scale = util::DNTK_OPT.scale;
+    /// Format the result according to the scale setting (Decimal version)
+    fn format_result(&self, value: Decimal) -> String {
+        let scale = util::DNTK_OPT.scale as u32;
 
-        // Format with the requested scale
-        // Note: f64 has limited precision (~15-17 significant digits)
-        // Some decimal values cannot be represented exactly in binary floating point
-        let formatted = format!("{:.prec$}", value, prec = scale);
+        // Round to the specified scale
+        let rounded = value.round_dp(scale);
 
-        // Remove trailing zeros and decimal point if not needed
-        let mut trimmed = formatted
-            .trim_end_matches('0')
-            .trim_end_matches('.')
-            .to_string();
+        // Format to string
+        let mut formatted = rounded.to_string();
+
+        // Remove trailing zeros
+        if formatted.contains('.') {
+            formatted = formatted.trim_end_matches('0').trim_end_matches('.').to_string();
+        }
 
         // bc-compatible formatting: remove leading zero for decimals
         // e.g., "0.333" -> ".333"
-        if trimmed.starts_with("0.") {
-            trimmed = trimmed.trim_start_matches('0').to_string();
-        } else if trimmed.starts_with("-0.") {
-            trimmed = format!("-{}", trimmed.trim_start_matches("-0"));
+        if formatted.starts_with("0.") {
+            formatted = formatted.trim_start_matches('0').to_string();
+        } else if formatted.starts_with("-0.") {
+            formatted = format!("-{}", formatted.trim_start_matches("-0"));
         }
 
-        if trimmed.is_empty() || trimmed == "." || trimmed == "-" {
+        if formatted.is_empty() || formatted == "." || formatted == "-" {
             "0".to_string()
         } else {
-            trimmed
+            formatted
         }
     }
 
@@ -72,19 +74,24 @@ impl BcExecuter {
             return Ok(self.show_limits());
         }
 
-        // Preprocess bc-specific function names to standard names
-        // bc: s() -> sin(), c() -> cos(), a() -> atan(), l() -> ln(), e() -> exp()
+        // Use fasteval for parsing and basic evaluation
+        // Then convert to Decimal for high-precision operations
         let processed = self.preprocess_bc_syntax(statement);
 
+        // First, try to evaluate with fasteval to get the structure
         let mut ns = self.create_namespace();
 
         match fasteval::ez_eval(&processed, &mut ns) {
-            Ok(value) => {
-                if value.is_nan() || value.is_infinite() {
-                    Err(BcError::NoResult)
-                } else {
-                    Ok(self.format_result(value))
+            Ok(f64_value) => {
+                if f64_value.is_nan() || f64_value.is_infinite() {
+                    return Err(BcError::NoResult);
                 }
+
+                // Convert to Decimal for high precision
+                let decimal_value = Decimal::from_f64(f64_value)
+                    .ok_or_else(|| BcError::Error("Failed to convert to decimal".to_string()))?;
+
+                Ok(self.format_result(decimal_value))
             }
             Err(e) => Err(BcError::Error(format!("{}", e))),
         }

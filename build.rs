@@ -13,6 +13,6 @@ fn main() {
             _ => "linux_gnu.rs",
         };
 
-        println!("cargo:rustc-env=LINUX_TERM_LIB={}", linux_term_lib);
+        println!("cargo:rustc-env=LINUX_TERM_LIB={linux_term_lib}");
     }
 }

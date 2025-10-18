@@ -1,4 +1,5 @@
 use std::env;
+use std::fmt;
 use std::fs::{self, OpenOptions};
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -19,7 +20,7 @@ impl Default for Dntker {
         let mut iv : Vec<u8> = Vec::new();
         let mut bpsl = 0;
         let mut ccp = 0;
-        if util::DNTK_OPT.inject != "" {
+        if !util::DNTK_OPT.inject.is_empty() {
             let inject_bytes = &mut util::DNTK_OPT.inject.as_bytes().to_owned();
             bpsl = inject_bytes.len();
             ccp = inject_bytes.len();
@@ -103,14 +104,20 @@ impl DntkString {
 
     #[allow(dead_code)]
     pub fn cursorize(mut self) -> Self {
-        self.data = format!("{}{}{}{}", &self.data, util::CURSOR_MOVE_ES_HEAD, &self.cur_pos_from_right, util::CURSOR_MOVE_ES_BACK);
+        self.data = format!(
+            "{}{}{}{}",
+            self.data,
+            util::CURSOR_MOVE_ES_HEAD,
+            self.cur_pos_from_right,
+            util::CURSOR_MOVE_ES_BACK
+        );
         self
     }
 }
 
-impl ToString for DntkString {
-    fn to_string(&self) -> String {
-        self.data.to_string()
+impl fmt::Display for DntkString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.data)
     }
 }
 
@@ -119,11 +126,11 @@ impl Dntker {
     fn write_stdout(&self, buf: &str) {
         let out = stdout();
         let mut out = BufWriter::new(out.lock());
-        write!(out, "{}", buf);
+        write!(out, "{buf}");
     }
 
     fn write_stdout_ln(&self, buf: &str) {
-        self.write_stdout(&format!("{}\n", buf))
+        self.write_stdout(&format!("{buf}\n"))
     }
 
     fn filter_char(&self, ascii_char: u8) -> FilterResult {
@@ -138,15 +145,6 @@ impl Dntker {
             util::ASCII_CODE_SEVEN       => FilterResult::Calculatable(util::ASCII_CODE_SEVEN     ), // 7
             util::ASCII_CODE_EIGHT       => FilterResult::Calculatable(util::ASCII_CODE_EIGHT     ), // 8
             util::ASCII_CODE_NINE        => FilterResult::Calculatable(util::ASCII_CODE_NINE      ), // 9
-            util::ASCII_CODE_S           => FilterResult::Calculatable(util::ASCII_CODE_S         ), // s
-            util::ASCII_CODE_C           => FilterResult::Calculatable(util::ASCII_CODE_C         ), // c
-            util::ASCII_CODE_A           => FilterResult::Calculatable(util::ASCII_CODE_A         ), // a
-            util::ASCII_CODE_L           => FilterResult::Calculatable(util::ASCII_CODE_L         ), // l
-            util::ASCII_CODE_E           => FilterResult::Calculatable(util::ASCII_CODE_E         ), // e
-            util::ASCII_CODE_J           => FilterResult::Calculatable(util::ASCII_CODE_J         ), // j
-            util::ASCII_CODE_R           => FilterResult::Calculatable(util::ASCII_CODE_R         ), // r
-            util::ASCII_CODE_Q           => FilterResult::Calculatable(util::ASCII_CODE_Q         ), // q
-            util::ASCII_CODE_T           => FilterResult::Calculatable(util::ASCII_CODE_T         ), // t
             util::ASCII_CODE_ROUNDLEFT   => FilterResult::Calculatable(util::ASCII_CODE_ROUNDLEFT ), // (
             util::ASCII_CODE_ROUNDRIGHT  => FilterResult::Calculatable(util::ASCII_CODE_ROUNDRIGHT), // )
             util::ASCII_CODE_SQUARELEFT  => FilterResult::CurLeft,                         // [
@@ -263,9 +261,9 @@ impl Dntker {
         self.before_printed_len = p1.to_string().len() + self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
         let pos_differnce = self.before_printed_statement_len - self.currnet_cur_pos;
         DntkString {
-            data: format!("{}{}{}{}", p1, p2, p3, p4),
+            data: format!("{p1}{p2}{p3}{p4}"),
             dtype: DntkStringType::Ok,
-            cur_pos_from_right: (p3.to_string().len() + self.before_printed_result_len + pos_differnce),
+            cur_pos_from_right: p3.to_string().len() + self.before_printed_result_len + pos_differnce,
         }
     }
 
@@ -274,9 +272,9 @@ impl Dntker {
         self.before_printed_len = p1.to_string().len() +  self.before_printed_statement_len + p3.to_string().len() + self.before_printed_result_len;
         let pos_differnce =  self.before_printed_statement_len - self.currnet_cur_pos;
         DntkString {
-            data: format!("{}{}{}", p1, p2, p3),
+            data: format!("{p1}{p2}{p3}"),
             dtype: DntkStringType::Ng,
-            cur_pos_from_right: (p3.to_string().len() + pos_differnce),
+            cur_pos_from_right: p3.to_string().len() + pos_differnce,
         }
     }
 
@@ -284,8 +282,8 @@ impl Dntker {
         if ! util::DNTK_OPT.quiet {
             self.write_stdout(&self.output_fill_whitespace(self.before_printed_len));
             self.write_stdout(DntkString {
-                data: format!("{}{}", "\r", msg),
-                dtype: dtype,
+                data: format!("\r{msg}"),
+                dtype,
                 cur_pos_from_right: 0,
             }
                 .colorize()
@@ -299,7 +297,8 @@ impl Dntker {
     }
 
     fn warning(&mut self, unknown_code: u8) {
-        self.inform(&format!("this char is no supported: {}", unknown_code as char), DntkStringType::Warn)
+        let ch = unknown_code as char;
+        self.inform(&format!("this char is no supported: {ch}"), DntkStringType::Warn)
     }
 
     fn refresh(&mut self) {
@@ -476,7 +475,7 @@ impl Dntker {
         self.write_stdout(util::DNTK_PROMPT);
         std::io::stdout().flush().unwrap();
 
-        if util::DNTK_OPT.inject != "" {
+        if !util::DNTK_OPT.inject.is_empty() {
             self.inject_filter2print();
             self.flush();
 
@@ -524,7 +523,7 @@ impl History {
         if let Some(history_path) = &path {
             if let Ok(file) = fs::File::open(history_path) {
                 let reader = BufReader::new(file);
-                for line in reader.lines().flatten() {
+                for line in reader.lines().map_while(Result::ok) {
                     let trimmed = line.trim();
                     if !trimmed.is_empty() {
                         entries.push(trimmed.to_string());
@@ -556,7 +555,7 @@ impl History {
             return;
         }
 
-        if self.entries.last().map_or(false, |last| last == trimmed) {
+        if self.entries.last().is_some_and(|last| last == trimmed) {
             self.cursor = None;
             return;
         }
@@ -569,7 +568,7 @@ impl History {
                 let _ = fs::create_dir_all(parent);
             }
             if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) {
-                let _ = writeln!(file, "{}", trimmed);
+                let _ = writeln!(file, "{trimmed}");
             }
         }
     }

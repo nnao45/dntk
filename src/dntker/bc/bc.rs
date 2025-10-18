@@ -21,7 +21,7 @@ impl fmt::Display for BcError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             BcError::NoResult => write!(f, "No result returned"),
-            BcError::Error(msg) => write!(f, "Evaluation error: {}", msg),
+            BcError::Error(msg) => write!(f, "Evaluation error: {msg}"),
         }
     }
 }
@@ -391,7 +391,7 @@ impl BcExecuter {
 
     fn eval_assignment(&mut self, name: &str, expr: &str) -> Result<Decimal, BcError> {
         if !Self::is_valid_identifier(name) {
-            return Err(BcError::Error(format!("Invalid identifier: {}", name)));
+            return Err(BcError::Error(format!("Invalid identifier: {name}")));
         }
 
         let value = self.eval_expression(expr)?;
@@ -451,12 +451,10 @@ impl BcExecuter {
     }
 
     fn find_scope_mut(&mut self, name: &str) -> Option<&mut BTreeMap<String, f64>> {
-        for scope in self.namespaces.iter_mut().rev() {
-            if scope.contains_key(name) {
-                return Some(scope);
-            }
-        }
-        None
+        self.namespaces
+            .iter_mut()
+            .rev()
+            .find(|scope| scope.contains_key(name))
     }
 
     fn eval_expression(&mut self, expr: &str) -> Result<Decimal, BcError> {
@@ -513,7 +511,7 @@ impl BcExecuter {
                 .ok_or_else(|| BcError::Error("Failed to convert function result".to_string()));
         }
 
-        Err(BcError::Error(format!("Undefined identifier: {}", name)))
+        Err(BcError::Error(format!("Undefined identifier: {name}")))
     }
 
     fn lookup_variable(&self, name: &str) -> Option<f64> {
@@ -675,9 +673,8 @@ impl BcExecuter {
                 }
                 Ok(self.rng.gen_range(0..upper) as f64)
             }
-            n => Err(BcError::Error(format!(
-                "rand() expects 0 or 1 arguments, got {}",
-                n
+              n => Err(BcError::Error(format!(
+                "rand() expects 0 or 1 arguments, got {n}",
             ))),
         }
     }
@@ -747,8 +744,7 @@ impl BcExecuter {
                 Self::validate_finite("log", result)
             }
             n => Err(BcError::Error(format!(
-                "log() expects 1 or 2 arguments, got {}",
-                n
+                "log() expects 1 or 2 arguments, got {n}",
             ))),
         }
     }
@@ -797,8 +793,7 @@ impl BcExecuter {
             Ok(value)
         } else {
             Err(BcError::Error(format!(
-                "{}() produced a non-finite result",
-                name
+                "{name}() produced a non-finite result",
             )))
         }
     }
@@ -828,7 +823,7 @@ impl BcExecuter {
                     '}' => if depth_curly > 0 { depth_curly -= 1; },
                     'e' | 'E' if depth_round == 0 && depth_square == 0 && depth_curly == 0 => {
                         if trimmed[idx..].starts_with("else")
-                            && Self::is_keyword_boundary(&trimmed, idx, idx + 4)
+                            && Self::is_keyword_boundary(trimmed, idx, idx + 4)
                         {
                             break;
                         }
@@ -975,8 +970,8 @@ impl BcExecuter {
         let before = start.checked_sub(1).and_then(|idx| bytes.get(idx));
         let after = bytes.get(end);
 
-        let prev_ok = before.map_or(true, |c| !Self::is_ident_char(*c));
-        let next_ok = after.map_or(true, |c| !Self::is_ident_char(*c));
+        let prev_ok = before.is_none_or(|c| !Self::is_ident_char(*c));
+        let next_ok = after.is_none_or(|c| !Self::is_ident_char(*c));
         prev_ok && next_ok
     }
 
@@ -1082,11 +1077,11 @@ impl BcExecuter {
             let base_decimal = Decimal::from(base as i64);
             let mut digits_written = 0;
             while digits_written < self.scale {
-                fraction = fraction * base_decimal;
+                fraction *= base_decimal;
                 let digit_dec = fraction.trunc();
                 let digit = digit_dec.to_u32()? as usize;
                 result.push(DIGITS[digit] as char);
-                fraction = fraction - digit_dec;
+                fraction -= digit_dec;
                 digits_written += 1;
                 if fraction.is_zero() {
                     break;

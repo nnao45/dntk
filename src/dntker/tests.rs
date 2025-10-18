@@ -14,16 +14,16 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_SEVEN      ), FilterResult::Calculatable(util::ASCII_CODE_SEVEN     ));
         assert_eq!(d.filter_char(util::ASCII_CODE_EIGHT      ), FilterResult::Calculatable(util::ASCII_CODE_EIGHT     ));
         assert_eq!(d.filter_char(util::ASCII_CODE_NINE       ), FilterResult::Calculatable(util::ASCII_CODE_NINE      ));
-        assert_eq!(d.filter_char(util::ASCII_CODE_S          ), FilterResult::Calculatable(util::ASCII_CODE_S         ));
-        assert_eq!(d.filter_char(util::ASCII_CODE_C          ), FilterResult::Calculatable(util::ASCII_CODE_C         ));
-        assert_eq!(d.filter_char(util::ASCII_CODE_A          ), FilterResult::Calculatable(util::ASCII_CODE_A         ));
+        assert_eq!(d.filter_char(b's'), FilterResult::Calculatable(b's'));
+        assert_eq!(d.filter_char(b'c'), FilterResult::Calculatable(b'c'));
+        assert_eq!(d.filter_char(b'a'), FilterResult::Calculatable(b'a'));
         assert_eq!(d.filter_char(b'b'), FilterResult::Calculatable(b'b'));
-        assert_eq!(d.filter_char(util::ASCII_CODE_L          ), FilterResult::Calculatable(util::ASCII_CODE_L         ));
-        assert_eq!(d.filter_char(util::ASCII_CODE_E          ), FilterResult::Calculatable(util::ASCII_CODE_E         ));
-        assert_eq!(d.filter_char(util::ASCII_CODE_J          ), FilterResult::Calculatable(util::ASCII_CODE_J         ));
-        assert_eq!(d.filter_char(util::ASCII_CODE_R          ), FilterResult::Calculatable(util::ASCII_CODE_R         ));
-        assert_eq!(d.filter_char(util::ASCII_CODE_Q          ), FilterResult::Calculatable(util::ASCII_CODE_Q         ));
-        assert_eq!(d.filter_char(util::ASCII_CODE_T          ), FilterResult::Calculatable(util::ASCII_CODE_T         ));
+        assert_eq!(d.filter_char(b'l'), FilterResult::Calculatable(b'l'));
+        assert_eq!(d.filter_char(b'e'), FilterResult::Calculatable(b'e'));
+        assert_eq!(d.filter_char(b'j'), FilterResult::Calculatable(b'j'));
+        assert_eq!(d.filter_char(b'r'), FilterResult::Calculatable(b'r'));
+        assert_eq!(d.filter_char(b'q'), FilterResult::Calculatable(b'q'));
+        assert_eq!(d.filter_char(b't'), FilterResult::Calculatable(b't'));
         assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDLEFT  ), FilterResult::Calculatable(util::ASCII_CODE_ROUNDLEFT ));
         assert_eq!(d.filter_char(util::ASCII_CODE_ROUNDRIGHT ), FilterResult::Calculatable(util::ASCII_CODE_ROUNDRIGHT));
         assert_eq!(d.filter_char(util::ASCII_CODE_LARGER     ), FilterResult::Calculatable(util::ASCII_CODE_LARGER    ));
@@ -204,7 +204,7 @@ mod dntker_tests {
     #[test]
     fn test_statement_from_utf8() {
         let test_input_vec1 = vec![util::ASCII_CODE_ONE , util::ASCII_CODE_PLUS, util::ASCII_CODE_TWO];
-        let test_input_vec2 = vec![util::ASCII_CODE_S, util::ASCII_CODE_ROUNDLEFT, util::ASCII_CODE_EIGHT, util::ASCII_CODE_ROUNDRIGHT];
+        let test_input_vec2 = vec![b's', util::ASCII_CODE_ROUNDLEFT, util::ASCII_CODE_EIGHT, util::ASCII_CODE_ROUNDRIGHT];
         let test_before_printed_len = 3;
         let test_before_printed_result_len = 1;
         let test_before_printed_statement_len = 3;

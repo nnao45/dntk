@@ -11,7 +11,7 @@ dntk is command line's multi-platform ***Interactive*** calculator with bc-compa
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_demo.gif)
 
 ✔︎ dntk means calculator in a japanese.
-✔︎ dntk is bc-compatible calculator with **28-digit precision** (no external bc required!)
+✔︎ dntk is bc-compatible calculator with **fast f64 floating-point math** (no external bc required!)
 ✔︎ dntk syntax is compatible with [GNU bc](https://www.gnu.org/software/bc/). [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)
 ✔︎ dntk is a NATIVE [The Rust Programming Language](https://rust-lang.org) application.
 ✔︎ dntk can move cursor, can delete char, can refresh buffer.
@@ -45,15 +45,15 @@ Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## ✨ Key Features
 
-### 🎯 High-Precision Arithmetic
-- **28 decimal digits** of precision (exceeds bc's default 20 digits)
-- **No floating-point errors**: `1 + 0.7 = 1.7` (not 1.69999...)
-- Accurate division: `1/3 = .33333333333333333333`
+### 🎯 Accurate Floating-Point Arithmetic
+- Native IEEE-754 `f64` math for blazing performance
+- `scale=` still lets you control display precision (defaults to 20)
+- `obase=` supports base-2〜36 formatting with fractional output
 
 ### ⚡ Fast & Lightweight
 - **No external dependencies** (bc command not required!)
 - Pure Rust implementation for maximum performance
-- Optimized expression evaluation with `fasteval` + `rust_decimal`
+- Optimized expression evaluation with `fasteval` + native `f64`
 
 ### 🌍 True Cross-Platform
 - Works out of the box on **Windows, Linux, macOS, and FreeBSD**
@@ -150,7 +150,7 @@ FLAGS:
 
 OPTIONS:
     -i, --inject <inject>      Pre-run inject statement to the dntk [default: ]
-    -s, --scale <scale>        Number of decimal places (max 28) [default: 20]
+    -s, --scale <scale>        Number of decimal places when formatting output [default: 20]
 ```
 
 **Note**: `--bc-path` option has been removed as dntk no longer requires external bc command!
@@ -307,20 +307,16 @@ more detail 👉 https://www.gnu.org/software/bc/manual/html_mono/bc.html
 dntk uses a hybrid approach for optimal performance and precision:
 
 1. **Expression Parsing**: `fasteval` - Fast and lightweight expression parser
-2. **High-Precision Arithmetic**: `rust_decimal` - 28-digit decimal precision
-3. **Result Formatting**: bc-compatible output format
+2. **Floating-Point Arithmetic**: Native `f64` (IEEE-754 double precision)
+3. **Result Formatting**: bc-compatible output format with `scale`/`obase`
 
 ### Precision Comparison
 
-| Calculator | Precision | Example: 1+0.7 | Example: 1/3 (20 digits) |
-|-----------|-----------|----------------|--------------------------|
-| bc | 20 digits (default) | 1.7 | .33333333333333333333 |
-| dntk (old) | ~15 digits (f64) | 1.69999... ❌ | .33333333333333331483 ❌ |
-| **dntk (new)** | **28 digits** | **1.7 ✅** | **.33333333333333333333 ✅** |
+> dntk uses native doubles; display precision is configurable via `scale=`.
 
 ### Dependencies
 - `fasteval` - Expression evaluation
-- `rust_decimal` - High-precision decimal arithmetic (up to 28 digits)
+- Native `f64` arithmetic (no external bc required)
 - Pure Rust implementation (no C library dependencies)
 
 ### Why No bc Command Required?
@@ -328,7 +324,7 @@ Previous versions wrapped the external `bc` command. The new version:
 - Implements bc-compatible arithmetic in pure Rust
 - Eliminates subprocess overhead
 - Works on all platforms without external dependencies
-- Provides better precision (28 vs 20 digits)
+- Keeps `scale`/`obase` controls while using fast floating-point math
 
 # Development Guide
 

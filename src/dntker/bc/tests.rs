@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod bc_tests {
-    use super::{BcExecuter};
+    use super::BcExecuter;
+    use rand::Rng;
 
     #[test]
     fn test_exec(){
@@ -40,5 +41,75 @@ mod bc_tests {
         let script = "sum=0; for(i=1; i<=3; i=i+1){ sum = sum + i; }; sum";
         let output = b.exec(script).unwrap();
         assert_eq!(output, "6");
+    }
+
+    #[test]
+    fn test_exec_with_if_else() {
+        let mut b: BcExecuter = Default::default();
+        let script = "a=5; if(a>3){ b=10; } else { b=1; }; b";
+        let output = b.exec(script).unwrap();
+        assert_eq!(output, "10");
+    }
+
+    #[test]
+    fn test_exec_with_while() {
+        let mut b: BcExecuter = Default::default();
+        let script = "i=0; total=0; while(i<4){ total=total+i; i=i+1; }; total";
+        let output = b.exec(script).unwrap();
+        assert_eq!(output, "6");
+    }
+
+    #[test]
+    fn test_exec_with_function_call() {
+        let mut b: BcExecuter = Default::default();
+        b.exec("define add_twice(x){ return x + x; }").unwrap();
+        b.exec("define mix(a,b){ tmp = add_twice(a); tmp + b; }").unwrap();
+        let output = b.exec("mix(3,4)").unwrap();
+        assert_eq!(output, "10");
+    }
+
+    #[test]
+    fn test_exec_with_additional_builtins() {
+        let mut b: BcExecuter = Default::default();
+        assert_eq!(b.exec("length(123456)").unwrap(), "6");
+        assert_eq!(b.exec("scale(12.345)").unwrap(), "3");
+        let bessel = b.exec("j(1, 2)");
+        assert!(bessel.is_ok());
+        let bessel_val: f64 = bessel.unwrap().parse().unwrap();
+        assert!((bessel_val - 0.5767248077568734).abs() < 1e-9);
+
+        assert_eq!(b.exec("sqrt(9)").unwrap(), "3");
+        assert_eq!(b.exec("abs(-5)").unwrap(), "5");
+        assert_eq!(b.exec("sign(-3)").unwrap(), "-1");
+        assert_eq!(b.exec("cbrt(27)").unwrap(), "3");
+        assert_eq!(b.exec("round(2.3)").unwrap(), "2");
+        assert_eq!(b.exec("floor(2.9)").unwrap(), "2");
+        assert_eq!(b.exec("ceil(2.1)").unwrap(), "3");
+        assert_eq!(b.exec("sin(0)").unwrap(), "0");
+        assert_eq!(b.exec("cos(0)").unwrap(), "1");
+        assert_eq!(b.exec("log(100)").unwrap(), "2");
+        assert_eq!(b.exec("log(2,8)").unwrap(), "3");
+        assert_eq!(b.exec("log10(1000)").unwrap(), "3");
+        assert_eq!(b.exec("log2(8)").unwrap(), "3");
+        assert_eq!(b.exec("pow(2,3)").unwrap(), "8");
+        assert_eq!(b.exec("hypot(3,4)").unwrap(), "5");
+        assert_eq!(b.exec("min(-2, 4)").unwrap(), "-2");
+        assert_eq!(b.exec("max(-2, 4, 1)").unwrap(), "4");
+
+        assert_eq!(b.exec("scale=5; 1/3").unwrap(), ".33333");
+        assert_eq!(b.exec("scale").unwrap(), "5");
+
+        assert_eq!(b.exec("obase=16; 255").unwrap(), "FF");
+        assert_eq!(b.exec("obase").unwrap(), "16");
+        assert_eq!(b.exec("obase=10; sqrt(16)").unwrap(), "4");
+
+        let rand_seed_output = b.exec("srand(42)").unwrap();
+        assert_eq!(rand_seed_output, "42");
+        let rand_value: f64 = b.exec("rand()").unwrap().parse().unwrap();
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(42);
+        let expected = (rng.next_u32() & 0x7fff) as f64;
+        assert_eq!(rand_value, expected);
+        let bounded: f64 = b.exec("rand(5)").unwrap().parse().unwrap();
+        assert!(bounded >= 0.0 && bounded < 5.0);
     }
 }

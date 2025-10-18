@@ -10,6 +10,7 @@ lazy_static! {
     version = env!("CARGO_PKG_VERSION"),
     author = env!("CARGO_PKG_AUTHORS"),
     about = env!("CARGO_PKG_DESCRIPTION"),
+    long_about = "Command line's multi-platform interactive calculator, bc-compatible with native built-ins (sin/cos/tan, sinh/cosh/tanh, exp/ln/log, pow/sqrt/cbrt, min/max/hypot, length/scale, obase output, rand()/srand(), j(n,x)).",
 )]
 pub struct Opts {
     // Number of truncated after the decimal point

@@ -99,3 +99,31 @@ fn test_cmd_with_multi_statements() {
     assert!(stdout.contains("a=1; b=a*2; b+3"));
     assert!(stdout.contains("= 5"));
 }
+
+#[test]
+fn test_cmd_with_function_definition() {
+    std::env::set_var("DNTK_ENV", "TEST");
+    let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
+    cmd.arg("--once")
+        .arg("--inject")
+        .arg("define add(x,y){ return x+y; }; add(2,3)");
+    let output = cmd.output().unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("add(2,3)"));
+    assert!(stdout.contains("= 5"));
+}
+
+#[test]
+fn test_cmd_with_builtin_length_scale() {
+    std::env::set_var("DNTK_ENV", "TEST");
+    let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
+    cmd.arg("--once")
+        .arg("--inject")
+        .arg("length(12345) + scale(12.345) + log(100)");
+    let output = cmd.output().unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("length(12345) + scale(12.345) + log(100)"));
+    assert!(stdout.contains("= 10"));
+}

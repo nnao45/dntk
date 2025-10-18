@@ -61,7 +61,7 @@ Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ### 🔧 bc-Compatible
 - Supports standard bc syntax and functions
-- `s()`, `c()`, `a()`, `l()`, `e()`, `sqrt()` functions
+- Rich math library: trig/hyperbolic (`sin`, `cos`, `tan`, …), logarithms (`log`, `ln`, `log10`, …), powers (`pow`, `sqrt`, `cbrt`), aggregations (`min`, `max`, `hypot`) plus `length`, `scale`, and Bessel `j(n,x)` — short aliases like `s()`, `c()`, `a()`, `l()`, `e()` still work
 - Interactive REPL with cursor movement and editing
 
 ## Platform
@@ -286,55 +286,17 @@ $ choco install gnuwin
 
 ### Using Function
 
-you can use under function.
+dntk ships the bc classics plus a broad math toolkit:
 
-<table>
-    <tr>
-        <td>function</td>
-        <td>key</td>
-        <td>feature</td>
-    </tr>
-    <tr>
-        <td>(x)</td>
-        <td>()</td>
-        <td>Simple round bracket</td>
-    </tr>
-    <tr>
-        <td>sin(x)</td>
-        <td>s()</td>
-        <td>Sin of trigonometric function</td>
-    </tr>
-    <tr>
-        <td>cos(x)</td>
-        <td>c()</td>
-        <td>Cosin of trigonometric function</td>
-    </tr>
-    <tr>
-        <td>atan(x)</td>
-        <td>a()</td>
-        <td>Tangent of inverse trigonometric function</td>
-    </tr>
-    <tr>
-        <td>log(x)</td>
-        <td>l()</td>
-        <td>Logarithm function</td>
-    </tr>
-    <tr>
-        <td>exp(x)</td>
-        <td>e()</td>
-        <td>Exponential function</td>
-    </tr>
-    <tr>
-        <td>sqrt(x)</td>
-        <td>sqrt()</td>
-        <td>Return square root of the expression function</td>
-    </tr>
-    <tr>
-        <td>j(n,x)</td>
-        <td>j()</td>
-        <td>The n-order Bessel function</td>
-    </tr>
-</table>
+- **Aliases for bc-style shortcuts**: `s(x) → sin(x)`, `c(x) → cos(x)`, `a(x) → atan(x)`, `l(x) → ln(x)`, `e(x) → exp(x)`
+- **Powers & roots**: `sqrt(x)`, `cbrt(x)`, `pow(x,y)`
+- **Logs & exponentials**: `ln(x)`, `log10(x)`, `log2(x)`, `log(base,value)` (arbitrary base), `exp(x)`, `expm1(x)`
+- **Trigonometric family**: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`
+- **Hyperbolic family**: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`
+- **Rounding helpers**: `abs`, `sign`, `floor`, `ceil`, `trunc`, `round`
+- **Aggregations**: `min(...)`, `max(...)`, `hypot(x,y)`
+- **Precision utilities**: `length(x)` (digit count), `scale(x)` (fractional digits), `obase=` for base-2〜36 output
+- **Randomness & special**: `rand()` / `rand(n)`, `srand(seed)`, `j(n,x)` Bessel (integer order `n`)
 
 more detail 👉 https://www.gnu.org/software/bc/manual/html_mono/bc.html
 

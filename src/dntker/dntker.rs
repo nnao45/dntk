@@ -1,3 +1,8 @@
+use std::env;
+use std::fs::{self, OpenOptions};
+use std::io::{BufRead, BufReader};
+use std::path::PathBuf;
+
 #[derive(Debug)]
 pub struct Dntker {
     pub executer: bc::BcExecuter,
@@ -6,6 +11,7 @@ pub struct Dntker {
     pub before_printed_result_len: usize,
     pub before_printed_statement_len: usize,
     pub currnet_cur_pos: usize,
+    history: History,
 }
 
 impl Default for Dntker {
@@ -27,6 +33,7 @@ impl Default for Dntker {
             executer: Default::default(),
             before_printed_len: Default::default(),
             before_printed_result_len: Default::default(),
+            history: History::load(),
         }
     }
 }
@@ -144,6 +151,9 @@ impl Dntker {
             util::ASCII_CODE_ROUNDRIGHT  => FilterResult::Calculatable(util::ASCII_CODE_ROUNDRIGHT), // )
             util::ASCII_CODE_SQUARELEFT  => FilterResult::CurLeft,                         // [
             util::ASCII_CODE_SQUARERIGHT => FilterResult::CurRight,                        // ]
+            util::ASCII_CODE_BACKSLASH   => FilterResult::Calculatable(util::ASCII_CODE_BACKSLASH), // \
+            util::ASCII_CODE_CURLYLEFT   => FilterResult::Calculatable(util::ASCII_CODE_CURLYLEFT  ), // {
+            util::ASCII_CODE_CURLYRIGHT  => FilterResult::Calculatable(util::ASCII_CODE_CURLYRIGHT ), // }
             util::ASCII_CODE_LARGER      => FilterResult::Calculatable(util::ASCII_CODE_LARGER    ), // <
             util::ASCII_CODE_SMALLER     => FilterResult::Calculatable(util::ASCII_CODE_SMALLER   ), // >
             util::ASCII_CODE_PLUS        => FilterResult::Calculatable(util::ASCII_CODE_PLUS      ), // +
@@ -177,6 +187,7 @@ impl Dntker {
         if self.currnet_cur_pos > 0 {
             self.currnet_cur_pos -= 1;
             self.input_vec.remove(self.currnet_cur_pos);
+            self.history.reset_navigation();
         }
     }
 
@@ -195,6 +206,47 @@ impl Dntker {
     fn insert_column(&mut self, code: u8) {
         self.currnet_cur_pos += 1;
         self.input_vec.insert(self.currnet_cur_pos-1, code);
+        self.history.reset_navigation();
+    }
+
+    fn replace_input_with(&mut self, statement: String) {
+        self.write_stdout(&self.output_fill_whitespace(self.before_printed_len));
+        self.input_vec.clear();
+        self.input_vec.extend_from_slice(statement.as_bytes());
+        self.currnet_cur_pos = self.input_vec.len();
+
+        if self.input_vec.is_empty() {
+            self.before_printed_statement_len = 0;
+            self.before_printed_result_len = 0;
+            self.before_printed_len = util::DNTK_PROMPT.len();
+            self.write_stdout(util::DNTK_PROMPT);
+            std::io::stdout().flush().unwrap();
+            return;
+        }
+
+        let statement_str = std::str::from_utf8(&self.input_vec).unwrap().to_string();
+        let prompt = util::DNTK_PROMPT.to_string();
+        let separator = " = ";
+        if let DntkResult::Output(output) = self.calculate(&prompt, &statement_str, separator) {
+            self.write_stdout(&output);
+            self.flush();
+        }
+    }
+
+    fn recall_history_previous(&mut self) -> bool {
+        if let Some(entry) = self.history.previous() {
+            self.replace_input_with(entry);
+            return true;
+        }
+        false
+    }
+
+    fn recall_history_next(&mut self) -> bool {
+        if let Some(entry) = self.history.next() {
+            self.replace_input_with(entry);
+            return true;
+        }
+        false
     }
 
     fn statement_from_utf8(&mut self) -> String {
@@ -295,6 +347,18 @@ impl Dntker {
                                 self.cursor_move_left();
                                 break;
                             },
+                            util::ASCII_CODE_UP => {
+                                if self.recall_history_previous() {
+                                    return DntkResult::Continue
+                                }
+                                break;
+                            },
+                            util::ASCII_CODE_DOWN => {
+                                if self.recall_history_next() {
+                                    return DntkResult::Continue
+                                }
+                                break;
+                            },
                             _ => {
                                 return DntkResult::Fin
                             }
@@ -304,6 +368,20 @@ impl Dntker {
                     }
                 },
                 FilterResult::End => {
+                    if self.currnet_cur_pos > 0 && self.input_vec.last() == Some(&b'\\') {
+                        self.input_vec.pop();
+                        if self.currnet_cur_pos > 0 {
+                            self.currnet_cur_pos -= 1;
+                        }
+                        self.input_vec.push(b' ');
+                        self.currnet_cur_pos += 1;
+                        self.history.reset_navigation();
+                        let statement = self.statement_from_utf8();
+                        self.replace_input_with(statement);
+                        return DntkResult::Continue
+                    }
+                    let statement = self.statement_from_utf8();
+                    self.history.push(&statement);
                     return DntkResult::Fin
                 },
                 FilterResult::Refresh => {
@@ -347,18 +425,19 @@ impl Dntker {
     }
 
     fn inject_filter2print(&mut self) {
-        let p1 = &util::DNTK_PROMPT.to_string();
-        let p2 = &mut self.statement_from_utf8();
-        let p3 = " = ";
+        let prompt = util::DNTK_PROMPT.to_string();
+        let statement = self.statement_from_utf8();
+        let separator = " = ";
         for i in &self.input_vec {
             match &self.filter_char(i.to_owned()) {
                 FilterResult::Calculatable(_) => continue,
                 _ => panic!("Injection statement is including unrecoginezed char"),
             }
         }
-        if let DntkResult::Output(o) = self.calculate(p1, p2, p3) {
+        if let DntkResult::Output(o) = self.calculate(&prompt, &statement, separator) {
             self.write_stdout(&o);
         }
+        self.history.push(&statement);
     }
 
     fn flush(&self) {
@@ -426,6 +505,125 @@ impl Dntker {
             if util::DNTK_OPT.once {
                 self.write_stdout("\n");
                 return
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+struct History {
+    entries: Vec<String>,
+    cursor: Option<usize>,
+    path: Option<PathBuf>,
+}
+
+impl History {
+    fn load() -> Self {
+        let path = Self::history_file_path();
+        let mut entries = Vec::new();
+        if let Some(history_path) = &path {
+            if let Ok(file) = fs::File::open(history_path) {
+                let reader = BufReader::new(file);
+                for line in reader.lines().flatten() {
+                    let trimmed = line.trim();
+                    if !trimmed.is_empty() {
+                        entries.push(trimmed.to_string());
+                    }
+                }
+            }
+        }
+
+        History {
+            entries,
+            cursor: None,
+            path,
+        }
+    }
+
+    #[cfg(test)]
+    fn new_in_memory() -> Self {
+        History {
+            entries: Vec::new(),
+            cursor: None,
+            path: None,
+        }
+    }
+
+    fn push(&mut self, entry: &str) {
+        let trimmed = entry.trim();
+        if trimmed.is_empty() {
+            self.cursor = None;
+            return;
+        }
+
+        if self.entries.last().map_or(false, |last| last == trimmed) {
+            self.cursor = None;
+            return;
+        }
+
+        self.entries.push(trimmed.to_string());
+        self.cursor = None;
+
+        if let Some(path) = &self.path {
+            if let Some(parent) = path.parent() {
+                let _ = fs::create_dir_all(parent);
+            }
+            if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) {
+                let _ = writeln!(file, "{}", trimmed);
+            }
+        }
+    }
+
+    fn previous(&mut self) -> Option<String> {
+        if self.entries.is_empty() {
+            return None;
+        }
+
+        let new_index = match self.cursor {
+            None => self.entries.len().saturating_sub(1),
+            Some(0) => 0,
+            Some(idx) => idx.saturating_sub(1),
+        };
+        self.cursor = Some(new_index);
+        self.entries.get(new_index).cloned()
+    }
+
+    fn next(&mut self) -> Option<String> {
+        match self.cursor {
+            None => None,
+            Some(idx) => {
+                if idx + 1 >= self.entries.len() {
+                    self.cursor = None;
+                    Some(String::new())
+                } else {
+                    let new_index = idx + 1;
+                    self.cursor = Some(new_index);
+                    self.entries.get(new_index).cloned()
+                }
+            }
+        }
+    }
+
+    fn reset_navigation(&mut self) {
+        self.cursor = None;
+    }
+
+    fn history_file_path() -> Option<PathBuf> {
+        if let Some(custom) = env::var_os("DNTK_HISTORY_FILE") {
+            return Some(PathBuf::from(custom));
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            env::var_os("APPDATA").map(|base| PathBuf::from(base).join("dntk").join("history"))
+        }
+
+        #[cfg(not(target_os = "windows"))]
+        {
+            if let Some(dir) = env::var_os("XDG_CONFIG_HOME") {
+                Some(PathBuf::from(dir).join("dntk").join("history"))
+            } else {
+                env::var_os("HOME").map(|home| PathBuf::from(home).join(".config").join("dntk").join("history"))
             }
         }
     }

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod dntker_tests {
-    use super::{Dntker, util, FilterResult, DntkResult, DntkString, DntkStringType};
+    use super::{Dntker, util, FilterResult, DntkResult, DntkString, DntkStringType, History};
     #[test]
     fn test_filter_char() {
         let d: Dntker = Default::default();
@@ -30,6 +30,7 @@ mod dntker_tests {
         assert_eq!(d.filter_char(util::ASCII_CODE_SMALLER    ), FilterResult::Calculatable(util::ASCII_CODE_SMALLER   ));
         assert_eq!(d.filter_char(util::ASCII_CODE_SQUARELEFT ), FilterResult::CurLeft                                  );
         assert_eq!(d.filter_char(util::ASCII_CODE_SQUARERIGHT), FilterResult::CurRight                                 );
+        assert_eq!(d.filter_char(util::ASCII_CODE_BACKSLASH  ), FilterResult::Calculatable(util::ASCII_CODE_BACKSLASH  ));
         assert_eq!(d.filter_char(util::ASCII_CODE_PLUS       ), FilterResult::Calculatable(util::ASCII_CODE_PLUS      ));
         assert_eq!(d.filter_char(util::ASCII_CODE_MINUS      ), FilterResult::Calculatable(util::ASCII_CODE_MINUS     ));
         assert_eq!(d.filter_char(util::ASCII_CODE_ASTERISK   ), FilterResult::Calculatable(util::ASCII_CODE_ASTERISK  ));
@@ -62,7 +63,7 @@ mod dntker_tests {
         let d1: &mut Dntker = &mut Default::default();
         d1.delete_column();
 
-        assert_eq!(d1.input_vec, vec![]);
+        assert!(d1.input_vec.is_empty());
         assert_eq!(d1.currnet_cur_pos, 0);
 
         assert_eq!(d1.before_printed_len, 0);
@@ -80,6 +81,7 @@ mod dntker_tests {
             before_printed_result_len: test_before_printed_result_len,
             before_printed_statement_len: test_before_printed_statement_len,
             currnet_cur_pos: test_currnet_cur_pos,
+            history: History::new_in_memory(),
         };
         d2.delete_column();
 
@@ -95,7 +97,7 @@ mod dntker_tests {
         let d1: &mut Dntker = &mut Default::default();
         d1.cursor_move_left();
 
-        assert_eq!(d1.input_vec, vec![]);
+        assert!(d1.input_vec.is_empty());
         assert_eq!(d1.currnet_cur_pos, 0);
 
         assert_eq!(d1.before_printed_len, 0);
@@ -114,6 +116,7 @@ mod dntker_tests {
             before_printed_result_len: test_before_printed_result_len,
             before_printed_statement_len: test_before_printed_statement_len,
             currnet_cur_pos: test_currnet_cur_pos,
+            history: History::new_in_memory(),
         };
         d2.cursor_move_left();
 
@@ -130,7 +133,7 @@ mod dntker_tests {
         let d1: &mut Dntker = &mut Default::default();
         d1.cursor_move_right();
 
-        assert_eq!(d1.input_vec, vec![]);
+        assert!(d1.input_vec.is_empty());
         assert_eq!(d1.currnet_cur_pos, 0);
 
         assert_eq!(d1.before_printed_len, 0);
@@ -149,6 +152,7 @@ mod dntker_tests {
             before_printed_result_len: test_before_printed_result_len,
             before_printed_statement_len: test_before_printed_statement_len,
             currnet_cur_pos: test_currnet_cur_pos,
+            history: History::new_in_memory(),
         };
         d2.cursor_move_right();
 
@@ -185,6 +189,7 @@ mod dntker_tests {
             before_printed_result_len: test_before_printed_result_len,
             before_printed_statement_len: test_before_printed_statement_len,
             currnet_cur_pos: test_currnet_cur_pos,
+            history: History::new_in_memory(),
         };
         d2.insert_column(test_item);
 
@@ -211,6 +216,7 @@ mod dntker_tests {
             before_printed_result_len: test_before_printed_result_len,
             before_printed_statement_len: test_before_printed_statement_len,
             currnet_cur_pos: test_currnet_cur_pos,
+            history: History::new_in_memory(),
         };
         let d2 = &mut Dntker {
             executer: Default::default(),
@@ -219,6 +225,7 @@ mod dntker_tests {
             before_printed_result_len: test_before_printed_result_len,
             before_printed_statement_len: test_before_printed_statement_len,
             currnet_cur_pos: test_currnet_cur_pos,
+            history: History::new_in_memory(),
         };
         assert_eq!("1+2".to_string(), d1.statement_from_utf8());
         assert_eq!("s(8)".to_string(), d2.statement_from_utf8());
@@ -276,6 +283,7 @@ mod dntker_tests {
             before_printed_result_len: test_before_printed_result_len,
             before_printed_statement_len: test_before_printed_statement_len,
             currnet_cur_pos: test_currnet_cur_pos,
+            history: History::new_in_memory(),
         };
         d.refresh();
 

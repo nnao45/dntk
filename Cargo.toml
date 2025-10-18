@@ -23,6 +23,7 @@ winapi = "0.3"
 fasteval = "0.2"
 rust_decimal = { version = "1.35", features = ["maths"] }
 libm = "0.2"
+rand = { version = "0.8", features = ["small_rng"] }
 
 [dependencies.winconsole]
 version = "0.10"

@@ -1,8 +1,8 @@
-mod util;
 mod bc;
+mod util;
 
-use std::io::Write;
 use atty::Stream;
+use std::io::Write;
 
 #[cfg(target_os = "windows")]
 use winconsole::console as wconsole;

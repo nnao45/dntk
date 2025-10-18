@@ -1,9 +1,9 @@
 # dntk
 [![CI](https://github.com/nnao45/dntk/actions/workflows/ci.yml/badge.svg)](https://github.com/nnao45/dntk/actions/workflows/ci.yml)
 [![Release](https://github.com/nnao45/dntk/actions/workflows/release.yml/badge.svg)](https://github.com/nnao45/dntk/actions/workflows/release.yml)
-[![v3.0.8](https://img.shields.io/badge/package-v3.0.8-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v3.0.8)
-[![crates](https://img.shields.io/badge/crates.io-v3.0.8-319e8c.svg)](https://crates.io/crates/dntk)
-[![docker](https://img.shields.io/badge/docker-v3.0.8-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags?name=v3.0.8)
+[![v3.0.9](https://img.shields.io/badge/package-v3.0.9-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v3.0.9)
+[![crates](https://img.shields.io/badge/crates.io-v3.0.9-319e8c.svg)](https://crates.io/crates/dntk)
+[![docker](https://img.shields.io/badge/docker-v3.0.9-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags?name=v3.0.9)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
 [![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20freebsd%20|%20windows-orange.svg)](https://github.com/nnao45/dntk/releases)
 
@@ -40,7 +40,7 @@ dntk is command line's multi-platform ***Interactive*** calculator with bc-compa
     </tr>
 </table>
 
-## ***Current dntk's version:v3.0.8***
+## ***Current dntk's version:v3.0.9***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## ✨ Key Features
@@ -83,20 +83,20 @@ $ brew install nnao45/dntk/dntk
 
 ### Linux
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v3.0.8/dntk-v3.0.8-x86_64-unknown-linux-musl.zip
-$ unzip dntk-v3.0.8-x86_64-unknown-linux-musl.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.9/dntk-v3.0.9-x86_64-unknown-linux-musl.zip
+$ unzip dntk-v3.0.9-x86_64-unknown-linux-musl.zip
 ```
 
 ### Windows
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v3.0.8/dntk-v3.0.8-x86_64-pc-windows-msvc.zip
-$ unzip dntk-v3.0.8-x86_64-pc-windows-msvc.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.9/dntk-v3.0.9-x86_64-pc-windows-msvc.zip
+$ unzip dntk-v3.0.9-x86_64-pc-windows-msvc.zip
 ```
 
 ### FreeBSD
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v3.0.8/dntk-v3.0.8-x86_64-unknown-freebsd.zip
-$ unzip dntk-v3.0.8-x86_64-unknown-freebsd.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.9/dntk-v3.0.9-x86_64-unknown-freebsd.zip
+$ unzip dntk-v3.0.9-x86_64-unknown-freebsd.zip
 ```
 
 ### Cargo
@@ -176,7 +176,7 @@ dntk works out of the box on Windows without installing bc.exe. Just download an
 
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_win_demo.gif)
 
-### Previous versions (v3.0.8 and earlier)
+### Previous versions (v3.0.9 and earlier)
 Older versions required bc.exe installation. If you're using an older version:
 ```bash
 $ choco install gnuwin

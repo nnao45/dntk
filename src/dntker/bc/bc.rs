@@ -7,8 +7,6 @@ use fasteval::Evaler;
 use fasteval::{Parser, Slab};
 use libm::jn;
 use rand::{rngs::SmallRng, Rng, RngCore, SeedableRng};
-use rust_decimal::prelude::{FromPrimitive, ToPrimitive, Zero};
-use rust_decimal::Decimal;
 
 #[derive(Debug)]
 pub enum BcError {
@@ -35,16 +33,16 @@ struct FunctionDef {
 #[derive(Clone, Copy, Debug)]
 enum StatementOutcome {
     None,
-    Value(Decimal),
-    Return(Decimal),
+    Value(f64),
+    Return(f64),
 }
 
 impl StatementOutcome {
-    fn value(value: Decimal) -> Self {
+    fn value(value: f64) -> Self {
         StatementOutcome::Value(value)
     }
 
-    fn ret(value: Decimal) -> Self {
+    fn ret(value: f64) -> Self {
         StatementOutcome::Return(value)
     }
 
@@ -93,7 +91,7 @@ impl BcExecuter {
         }
 
         let statements = self.split_statements(trimmed);
-        let mut last_value: Option<Decimal> = None;
+        let mut last_value: Option<f64> = None;
 
         for stmt in statements {
             match self.eval_statement(&stmt)? {
@@ -108,7 +106,7 @@ impl BcExecuter {
             }
         }
 
-        let value = last_value.unwrap_or_else(Decimal::zero);
+        let value = last_value.unwrap_or(0.0);
         Ok(self.format_result(value))
     }
 
@@ -169,7 +167,7 @@ impl BcExecuter {
         let mut remainder = rest[condition_end + 1..].trim_start();
 
         let condition_value = self.eval_expression(condition_expr)?;
-        let condition_true = !condition_value.is_zero();
+        let condition_true = condition_value.abs() > f64::EPSILON;
 
         let (then_branch, after_then) = self.parse_branch(remainder)?;
         remainder = after_then.trim_start();
@@ -220,7 +218,7 @@ impl BcExecuter {
 
         loop {
             let cond_value = self.eval_expression(condition_expr)?;
-            if cond_value.is_zero() {
+            if cond_value.abs() <= f64::EPSILON {
                 break;
             }
 
@@ -275,7 +273,7 @@ impl BcExecuter {
                 true
             } else {
                 let cond_value = self.eval_expression(condition)?;
-                !cond_value.is_zero()
+                cond_value.abs() > f64::EPSILON
             };
             if !should_continue {
                 break;
@@ -326,7 +324,7 @@ impl BcExecuter {
     fn eval_return(&mut self, stmt: &str) -> Result<StatementOutcome, BcError> {
         let rest = stmt.trim_start()["return".len()..].trim_start();
         if rest.is_empty() {
-            return Ok(StatementOutcome::ret(Decimal::zero()));
+            return Ok(StatementOutcome::ret(0.0));
         }
         let expression = if rest.starts_with('(') && rest.ends_with(')') {
             &rest[1..rest.len() - 1]
@@ -389,40 +387,36 @@ impl BcExecuter {
         }
     }
 
-    fn eval_assignment(&mut self, name: &str, expr: &str) -> Result<Decimal, BcError> {
+    fn eval_assignment(&mut self, name: &str, expr: &str) -> Result<f64, BcError> {
         if !Self::is_valid_identifier(name) {
             return Err(BcError::Error(format!("Invalid identifier: {name}")));
         }
 
         let value = self.eval_expression(expr)?;
-        if self.apply_special_assignment(name, &value)? {
+        if self.apply_special_assignment(name, value)? {
             return Ok(value);
         }
 
-        let value_f64 = value
-            .to_f64()
-            .ok_or_else(|| BcError::Error("Failed to convert to f64".to_string()))?;
-
         if let Some(scope) = self.find_scope_mut(name) {
-            scope.insert(name.to_string(), value_f64);
+            scope.insert(name.to_string(), value);
         } else if let Some(scope) = self.namespaces.last_mut() {
-            scope.insert(name.to_string(), value_f64);
+            scope.insert(name.to_string(), value);
         }
 
         Ok(value)
     }
 
-    fn apply_special_assignment(&mut self, name: &str, value: &Decimal) -> Result<bool, BcError> {
+    fn apply_special_assignment(&mut self, name: &str, value: f64) -> Result<bool, BcError> {
         match name {
             "scale" => {
                 if value.is_sign_negative() {
                     return Err(BcError::Error("scale() must be non-negative".to_string()));
                 }
-                let new_scale = value
-                    .trunc()
-                    .to_u32()
-                    .ok_or_else(|| BcError::Error("scale() out of range".to_string()))?
-                    .min(28);
+                let new_scale = value.trunc();
+                if new_scale < 0.0 {
+                    return Err(BcError::Error("scale() must be non-negative".to_string()));
+                }
+                let new_scale = new_scale.min(28.0) as u32;
                 self.scale = new_scale;
                 if let Some(scope) = self.namespaces.last_mut() {
                     scope.insert("scale".to_string(), new_scale as f64);
@@ -433,13 +427,11 @@ impl BcExecuter {
                 if value.is_sign_negative() {
                     return Err(BcError::Error("obase must be positive".to_string()));
                 }
-                let new_obase = value
-                    .trunc()
-                    .to_u32()
-                    .ok_or_else(|| BcError::Error("obase out of range".to_string()))?;
-                if !(2..=36).contains(&new_obase) {
+                let new_obase = value.trunc();
+                if !(2.0..=36.0).contains(&new_obase) {
                     return Err(BcError::Error("obase must be between 2 and 36".to_string()));
                 }
+                let new_obase = new_obase as u32;
                 self.obase = new_obase;
                 if let Some(scope) = self.namespaces.last_mut() {
                     scope.insert("obase".to_string(), new_obase as f64);
@@ -457,12 +449,12 @@ impl BcExecuter {
             .find(|scope| scope.contains_key(name))
     }
 
-    fn eval_expression(&mut self, expr: &str) -> Result<Decimal, BcError> {
+    fn eval_expression(&mut self, expr: &str) -> Result<f64, BcError> {
         let trimmed = expr.trim();
 
-        // Try to parse as a simple numeric literal first (preserves full precision)
-        if let Ok(decimal_value) = trimmed.parse::<Decimal>() {
-            return Ok(decimal_value);
+        // Try to parse as a simple numeric literal first
+        if let Ok(value) = trimmed.parse::<f64>() {
+            return Ok(value);
         }
 
         // Fall back to fasteval for expressions with operators/functions
@@ -498,8 +490,7 @@ impl BcExecuter {
             return Err(err);
         }
 
-        Decimal::from_f64(result)
-            .ok_or_else(|| BcError::Error("Failed to convert to decimal".to_string()))
+        Ok(result)
     }
 
     fn resolve_name(&mut self, name: &str, args: Vec<f64>) -> Result<f64, BcError> {
@@ -514,9 +505,7 @@ impl BcExecuter {
         }
 
         if let Some(func_value) = self.call_function(name, args)? {
-            return func_value
-                .to_f64()
-                .ok_or_else(|| BcError::Error("Failed to convert function result".to_string()));
+            return Ok(func_value);
         }
 
         Err(BcError::Error(format!("Undefined identifier: {name}")))
@@ -531,7 +520,7 @@ impl BcExecuter {
         None
     }
 
-    fn call_function(&mut self, name: &str, args: Vec<f64>) -> Result<Option<Decimal>, BcError> {
+    fn call_function(&mut self, name: &str, args: Vec<f64>) -> Result<Option<f64>, BcError> {
         let def = match self.functions.get(name) {
             Some(def) => def.clone(),
             None => return Ok(None),
@@ -557,7 +546,7 @@ impl BcExecuter {
 
         let result = match outcome {
             StatementOutcome::Return(value) | StatementOutcome::Value(value) => value,
-            StatementOutcome::None => Decimal::zero(),
+            StatementOutcome::None => 0.0,
         };
 
         Ok(Some(result))
@@ -616,19 +605,16 @@ impl BcExecuter {
                 args.len()
             )));
         }
-        let decimal = Decimal::from_f64(args[0])
-            .ok_or_else(|| BcError::Error("Failed to convert argument to decimal".to_string()))?;
-        let mut digits = decimal
-            .normalize()
-            .abs()
-            .to_string()
-            .chars()
-            .filter(|c| *c != '-' && *c != '.')
-            .collect::<String>();
-        if digits.is_empty() {
-            digits.push('0');
+        let value = args[0].abs();
+        if value == 0.0 {
+            return Ok(1.0);
         }
-        Ok(digits.chars().count() as f64)
+        let digits = if value >= 1.0 {
+            value.log10().floor() as i32 + 1
+        } else {
+            0
+        };
+        Ok(digits.max(0) as f64)
     }
 
     fn builtin_scale(args: &[f64]) -> Result<f64, BcError> {
@@ -638,9 +624,21 @@ impl BcExecuter {
                 args.len()
             )));
         }
-        let decimal = Decimal::from_f64(args[0])
-            .ok_or_else(|| BcError::Error("Failed to convert argument to decimal".to_string()))?;
-        Ok(decimal.normalize().scale() as f64)
+        let mut s = format!("{}", args[0].abs());
+        if let Some(pos) = s.find(['e', 'E']) {
+            let mantissa: f64 = s[..pos].parse::<f64>().unwrap_or(0.0_f64).abs();
+            let exponent: i32 = s[pos + 1..].parse().unwrap_or(0);
+            if exponent >= 0 {
+                return Ok(0.0);
+            }
+            s = format!("{:.*}", (-exponent) as usize + 8, mantissa);
+        }
+        if let Some(pos) = s.find('.') {
+            let digits = s[pos + 1..].trim_end_matches('0').len();
+            Ok(digits as f64)
+        } else {
+            Ok(0.0)
+        }
     }
 
     fn builtin_bessel(args: &[f64]) -> Result<f64, BcError> {
@@ -1015,7 +1013,7 @@ impl BcExecuter {
         )
     }
 
-    fn format_result(&self, value: Decimal) -> String {
+    fn format_result(&self, value: f64) -> String {
         if self.obase == 10 {
             return self.format_result_decimal(value);
         }
@@ -1026,53 +1024,69 @@ impl BcExecuter {
         }
     }
 
-    fn format_result_decimal(&self, value: Decimal) -> String {
-        let scale = self.scale;
-        let rounded = value.round_dp(scale);
-        let mut formatted = rounded.to_string();
+    fn format_result_decimal(&self, value: f64) -> String {
+        let precision = self.scale as usize;
 
-        if formatted.contains('.') {
-            formatted = formatted
-                .trim_end_matches('0')
-                .trim_end_matches('.')
-                .to_string();
+        if value == 0.0 {
+            return "0".to_string();
         }
 
-        if formatted.starts_with("0.") {
-            formatted = formatted.trim_start_matches('0').to_string();
-        } else if formatted.starts_with("-0.") {
-            formatted = format!("-{}", formatted.trim_start_matches("-0"));
-        }
-
-        if formatted.is_empty() || formatted == "." || formatted == "-" {
-            "0".to_string()
+        let mut formatted = if precision == 0 {
+            format!("{value:.0}")
         } else {
-            formatted
+            format!("{value:.precision$}")
+        };
+
+        if formatted == "-0" || (formatted.starts_with("-0.") && formatted.chars().skip(3).all(|c| c == '0')) {
+            if precision == 0 {
+                formatted = "0".to_string();
+            } else {
+                let zeros = "0".repeat(precision);
+                formatted = format!("0.{zeros}");
+            }
         }
+
+        if precision > 0 {
+            if formatted.starts_with("-0.") && formatted.chars().skip(3).any(|c| c != '0') {
+                formatted = format!("-{}", &formatted[2..]);
+            } else if formatted.starts_with("0.") && formatted.chars().skip(2).any(|c| c != '0') {
+                formatted = formatted[1..].to_string();
+            }
+            if let Some(pos) = formatted.find('.') {
+                if formatted[pos + 1..].chars().all(|c| c == '0') {
+                    formatted.truncate(pos);
+                }
+            }
+        }
+
+        formatted
     }
 
-    fn format_result_obase(&self, value: Decimal) -> Option<String> {
+    fn format_result_obase(&self, value: f64) -> Option<String> {
         const DIGITS: &[u8; 36] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        let base = self.obase as i32;
+        if !value.is_finite() {
+            return None;
+        }
+
+        let base = self.obase as f64;
         let negative = value.is_sign_negative();
         let abs_value = value.abs();
         let integer_part = abs_value.trunc();
-        let mut integer = integer_part.to_i128()?;
-
+        let mut integer = integer_part as i128;
         let mut int_buf = Vec::new();
         if integer == 0 {
             int_buf.push('0');
         } else {
             while integer > 0 {
-                let digit = (integer % base as i128) as usize;
+                let digit = (integer % self.obase as i128) as usize;
                 int_buf.push(DIGITS[digit] as char);
-                integer /= base as i128;
+                integer /= self.obase as i128;
             }
             int_buf.reverse();
         }
 
         let mut result = String::new();
-        if negative && (!int_buf.is_empty() || !abs_value.fract().is_zero()) {
+        if negative && (!int_buf.is_empty() || abs_value.fract() > f64::EPSILON) {
             result.push('-');
         }
         for ch in int_buf {
@@ -1080,18 +1094,14 @@ impl BcExecuter {
         }
 
         let mut fraction = abs_value - integer_part;
-        if !fraction.is_zero() && self.scale > 0 {
+        if self.scale > 0 && fraction > f64::EPSILON {
             result.push('.');
-            let base_decimal = Decimal::from(base as i64);
-            let mut digits_written = 0;
-            while digits_written < self.scale {
-                fraction *= base_decimal;
-                let digit_dec = fraction.trunc();
-                let digit = digit_dec.to_u32()? as usize;
-                result.push(DIGITS[digit] as char);
-                fraction -= digit_dec;
-                digits_written += 1;
-                if fraction.is_zero() {
+            for _ in 0..self.scale {
+                fraction *= base;
+                let digit = fraction.trunc();
+                result.push(DIGITS[digit as usize] as char);
+                fraction -= digit;
+                if fraction.abs() < f64::EPSILON {
                     break;
                 }
             }

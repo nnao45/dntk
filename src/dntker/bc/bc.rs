@@ -458,6 +458,14 @@ impl BcExecuter {
     }
 
     fn eval_expression(&mut self, expr: &str) -> Result<Decimal, BcError> {
+        let trimmed = expr.trim();
+
+        // Try to parse as a simple numeric literal first (preserves full precision)
+        if let Ok(decimal_value) = trimmed.parse::<Decimal>() {
+            return Ok(decimal_value);
+        }
+
+        // Fall back to fasteval for expressions with operators/functions
         let processed = self.preprocess_bc_syntax(expr);
         let mut slab = Slab::new();
         let expr_idx = self

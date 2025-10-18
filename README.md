@@ -39,7 +39,7 @@ dntk is command line's multi-platform ***Interactive*** calculator with bc-compa
     </tr>
 </table>
 
-## ***Current dntk's versv3.0.2***
+## ***Current dntk's verv3.0.3***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## ✨ Key Features

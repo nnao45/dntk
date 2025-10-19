@@ -25,6 +25,9 @@ test:
 clean:
 	cargo clean
 
+.PHONY: check
+check:
+	cargo fmt && cargo test && cargo clippy -- -D warnings
 
 .PHONY: docker-login
 docker-login:

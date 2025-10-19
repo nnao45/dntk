@@ -1,6 +1,7 @@
 use std::collections::{BTreeMap, HashMap};
 use std::f64;
 use std::fmt;
+use std::iter;
 
 use dashu::base::{Abs, Approximation, Sign, UnsignedAbs};
 use dashu::Decimal;
@@ -113,7 +114,7 @@ impl BcExecuter {
             }
         }
 
-        let value = last_value.unwrap_or_else(|| Decimal::ZERO);
+        let value = last_value.unwrap_or(Decimal::ZERO);
         Ok(self.format_result(value))
     }
 
@@ -1492,12 +1493,12 @@ impl BcExecuter {
         let exponent = repr.exponent();
 
         if exponent >= 0 {
-            digits.extend(std::iter::repeat('0').take(exponent as usize));
+            digits.extend(iter::repeat_n('0', exponent as usize));
         } else {
             let shift = (-exponent) as usize;
             if digits.len() <= shift {
                 let mut buffer = String::from("0.");
-                buffer.extend(std::iter::repeat('0').take(shift - digits.len()));
+                buffer.extend(iter::repeat_n('0', shift - digits.len()));
                 buffer.push_str(&digits);
                 digits = buffer;
             } else {
@@ -1528,8 +1529,7 @@ impl BcExecuter {
             } else {
                 let frac_len = formatted.len() - point_index - 1;
                 if frac_len < scale as usize {
-                    formatted
-                        .extend(std::iter::repeat('0').take(scale as usize - frac_len));
+                    formatted.extend(iter::repeat_n('0', scale as usize - frac_len));
                 }
             }
         }

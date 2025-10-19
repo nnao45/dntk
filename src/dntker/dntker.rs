@@ -283,7 +283,30 @@ impl Dntker {
                     }
                     let statement = self.statement_from_utf8();
                     self.history.push(&statement);
-                    return DntkResult::Fin;
+                    self.write_stdout(&self.prompt.whitespace());
+
+                    if !statement.trim().is_empty() {
+                        let prompt = util::DNTK_PROMPT.to_string();
+                        let separator = " = ";
+                        if let DntkResult::Output(output) =
+                            self.calculate(&prompt, &statement, separator)
+                        {
+                            self.write_stdout(&output);
+                        }
+                    }
+
+                    self.write_stdout("\n");
+                    if util::DNTK_OPT.once {
+                        self.flush();
+                        return DntkResult::Fin;
+                    }
+
+                    self.prompt.reset();
+                    self.buffer.replace("");
+                    self.write_stdout(util::DNTK_PROMPT);
+                    self.flush();
+
+                    return DntkResult::Continue;
                 }
                 FilterResult::Refresh => {
                     self.refresh();

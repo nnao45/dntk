@@ -249,7 +249,7 @@ checksum = "6184e33543162437515c2e2b48714794e37845ec9851711914eec9d308f6ebe8"
 
 [[package]]
 name = "dntk"
-version = "3.0.18"
+version = "3.0.19"
 dependencies = [
  "anstyle",
  "assert_cmd",

@@ -1,4 +1,16 @@
 use super::util;
 
-include!("bc.rs");
-include!("tests.rs");
+mod error;
+mod execution;
+mod expression;
+mod formatting;
+mod literals;
+mod parsing;
+mod runtime;
+
+#[allow(unused_imports)]
+pub use error::BcError;
+pub use execution::BcExecuter;
+
+#[cfg(test)]
+mod tests;

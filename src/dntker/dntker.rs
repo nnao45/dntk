@@ -78,7 +78,9 @@ impl Dntker {
             util::ASCII_CODE_ROUNDLEFT => FilterResult::Calculatable(util::ASCII_CODE_ROUNDLEFT),
             util::ASCII_CODE_ROUNDRIGHT => FilterResult::Calculatable(util::ASCII_CODE_ROUNDRIGHT),
             util::ASCII_CODE_SQUARELEFT => FilterResult::Calculatable(util::ASCII_CODE_SQUARELEFT),
-            util::ASCII_CODE_SQUARERIGHT => FilterResult::Calculatable(util::ASCII_CODE_SQUARERIGHT),
+            util::ASCII_CODE_SQUARERIGHT => {
+                FilterResult::Calculatable(util::ASCII_CODE_SQUARERIGHT)
+            }
             util::ASCII_CODE_BACKSLASH => FilterResult::Calculatable(util::ASCII_CODE_BACKSLASH),
             util::ASCII_CODE_CURLYLEFT => FilterResult::Calculatable(util::ASCII_CODE_CURLYLEFT),
             util::ASCII_CODE_CURLYRIGHT => FilterResult::Calculatable(util::ASCII_CODE_CURLYRIGHT),

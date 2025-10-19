@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod bc_tests {
-    use super::BcExecuter;
+    use crate::dntker::bc::BcExecuter;
     use dashu::base::Approximation;
     use dashu::Decimal;
     use rand::{RngCore, SeedableRng};
@@ -12,12 +12,12 @@ mod bc_tests {
     }
 
     #[test]
-    fn test_exec(){
+    fn test_exec() {
         let mut b: BcExecuter = Default::default();
 
         // Basic arithmetic
         let input1 = "1+2";
-        let output1= "3";
+        let output1 = "3";
         assert_eq!(b.exec(input1).unwrap(), output1);
 
         // Division with atan function (bc: a() = atan())
@@ -26,8 +26,12 @@ mod bc_tests {
         // Check that the result is approximately correct
         let expected_approx = 0.07679182076851013335;
         let actual: f64 = result2.parse().unwrap();
-        assert!((actual - expected_approx).abs() < 1e-10,
-                "Expected ~{}, got {}", expected_approx, actual);
+        assert!(
+            (actual - expected_approx).abs() < 1e-10,
+            "Expected ~{}, got {}",
+            expected_approx,
+            actual
+        );
 
         // Exponentiation
         let input3 = "2^2^2^2";
@@ -120,7 +124,8 @@ mod bc_tests {
     fn test_exec_with_function_call() {
         let mut b: BcExecuter = Default::default();
         b.exec("define add_twice(x){ return x + x; }").unwrap();
-        b.exec("define mix(a,b){ tmp = add_twice(a); tmp + b; }").unwrap();
+        b.exec("define mix(a,b){ tmp = add_twice(a); tmp + b; }")
+            .unwrap();
         let output = b.exec("mix(3,4)").unwrap();
         assert_eq!(output, "10");
     }

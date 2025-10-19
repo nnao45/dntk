@@ -10,35 +10,13 @@
 dntk is command line's multi-platform ***Interactive*** calculator with bc-compatible syntax and **high-precision arithmetic**.
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_demo.gif)
 
-✔︎ dntk means calculator in a japanese.
-✔︎ dntk is bc-compatible calculator with bc-style configurable precision powered by `dashu-decimal` (no external bc required!)
-✔︎ dntk syntax is compatible with [GNU bc](https://www.gnu.org/software/bc/). [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)
-✔︎ dntk is a NATIVE [The Rust Programming Language](https://rust-lang.org) application.
-✔︎ dntk can move cursor, can delete char, can refresh buffer.
-✔︎ dntk provides **accurate decimal arithmetic** without floating-point errors.
-✔︎ dntk write color means,  
-<table>
-    <tr>
-        <td>color</td>
-        <td>means</td>
-    </tr>
-    <tr>
-        <td>cyan</td>
-        <td>can caluclate & can output</td>
-    </tr>
-    <tr>
-        <td>megenta</td>
-        <td>can't caluclate, can't output</td>
-    </tr>
-    <tr>
-        <td>yellow</td>
-        <td>danger input char, output warning</td>
-    </tr>
-    <tr>
-        <td>green</td>
-        <td>clean buffer message</td>
-    </tr>
-</table>
+✔︎ dntk means calculator in a japanese.<br>
+✔︎ dntk is bc-compatible calculator with bc-style configurable precision powered by `dashu-decimal` (no external bc required!)<br>
+✔︎ dntk syntax is compatible with [GNU bc](https://www.gnu.org/software/bc/). [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)<br>
+✔︎ dntk is a NATIVE [The Rust Programming Language](https://rust-lang.org) application.<br>
+✔︎ dntk can move cursor, can delete char, can refresh buffer.<br>
+✔︎ dntk provides **accurate decimal arithmetic** without floating-point errors.<br>
+
 
 ## ***Current dntk's version:v3.0.15***
 Download Page: https://github.com/nnao45/dntk/releases/latest
@@ -65,6 +43,31 @@ Download Page: https://github.com/nnao45/dntk/releases/latest
 - Supports standard bc syntax and functions
 - Rich math library: trig/hyperbolic (`sin`, `cos`, `tan`, …), logarithms (`log`, `ln`, `log10`, …), powers (`pow`, `sqrt`, `cbrt`), aggregations (`min`, `max`, `hypot`) plus `length`, `scale`, and Bessel `j(n,x)` — short aliases like `s()`, `c()`, `a()`, `l()`, `e()` still work
 - Interactive REPL with cursor movement and editing
+
+### 🏳️‍🌈 Colorful output
+- write color means,
+<table>
+    <tr>
+        <td>color</td>
+        <td>means</td>
+    </tr>
+    <tr>
+        <td>cyan</td>
+        <td>can caluclate & can output</td>
+    </tr>
+    <tr>
+        <td>megenta</td>
+        <td>can't caluclate, can't output</td>
+    </tr>
+    <tr>
+        <td>yellow</td>
+        <td>danger input char, output warning</td>
+    </tr>
+    <tr>
+        <td>green</td>
+        <td>clean buffer message</td>
+    </tr>
+</table>
 
 ## Platform
 dntk support multi-platform 😊 mac, linux, freebsd, and **windows**!!!

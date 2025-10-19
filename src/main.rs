@@ -1,6 +1,8 @@
 extern crate ansi_term;
 extern crate clap;
 extern crate libc;
+
+#[cfg(target_os = "windows")]
 extern crate winapi;
 
 #[macro_use(defer)]

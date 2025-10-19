@@ -15,6 +15,7 @@ pub(crate) enum DntkStringType {
 pub(crate) struct DntkString {
     data: String,
     dtype: DntkStringType,
+    #[cfg(not(target_os = "windows"))]
     cur_pos_from_right: usize,
 }
 
@@ -23,6 +24,7 @@ impl DntkString {
         Self {
             data,
             dtype,
+            #[cfg(not(target_os = "windows"))]
             cur_pos_from_right,
         }
     }
@@ -56,6 +58,7 @@ impl DntkString {
         self
     }
 
+    #[cfg(not(target_os = "windows"))]
     pub(crate) fn cursorize(mut self) -> Self {
         self.data = format!(
             "{}{}{}{}",

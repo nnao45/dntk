@@ -1,6 +1,6 @@
 [package]
 name = "dntk"
-version = "3.1.0"
+version = "3.1.1"
 authors = ["nnao45 <n4sekai5y@gmail.com>"]
 edition = "2018"
 license = "MIT"

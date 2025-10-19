@@ -1,15 +1,23 @@
 #[cfg(test)]
 mod bc_tests {
-    use super::BcExecuter;
+    use crate::dntker::bc::BcExecuter;
+    use dashu::base::Approximation;
+    use dashu::Decimal;
     use rand::{RngCore, SeedableRng};
 
+    fn with_precision(value: Decimal, precision: usize) -> Decimal {
+        match value.with_precision(precision) {
+            Approximation::Exact(v) | Approximation::Inexact(v, _) => v,
+        }
+    }
+
     #[test]
-    fn test_exec(){
+    fn test_exec() {
         let mut b: BcExecuter = Default::default();
 
         // Basic arithmetic
         let input1 = "1+2";
-        let output1= "3";
+        let output1 = "3";
         assert_eq!(b.exec(input1).unwrap(), output1);
 
         // Division with atan function (bc: a() = atan())
@@ -18,13 +26,66 @@ mod bc_tests {
         // Check that the result is approximately correct
         let expected_approx = 0.07679182076851013335;
         let actual: f64 = result2.parse().unwrap();
-        assert!((actual - expected_approx).abs() < 1e-10,
-                "Expected ~{}, got {}", expected_approx, actual);
+        assert!(
+            (actual - expected_approx).abs() < 1e-10,
+            "Expected ~{}, got {}",
+            expected_approx,
+            actual
+        );
 
         // Exponentiation
         let input3 = "2^2^2^2";
         let output3 = "65536";
         assert_eq!(b.exec(input3).unwrap(), output3);
+    }
+
+    #[test]
+    fn test_high_precision_division_matches_dashu() {
+        let mut exec: BcExecuter = Default::default();
+        let output = exec.exec("scale=50; 2/3").unwrap();
+        let decimal_result: Decimal = output.parse().unwrap();
+
+        let numerator = with_precision(Decimal::from(2), 200);
+        let denominator = with_precision(Decimal::from(3), 200);
+        let expected = numerator / denominator;
+        let expected = BcExecuter::truncate_decimal_to_scale(&expected, 50);
+
+        assert_eq!(decimal_result, expected);
+        let expected_string = exec.format_result_decimal(&expected);
+        assert_eq!(output, expected_string);
+    }
+
+    #[test]
+    fn test_variable_preserves_high_precision() {
+        let mut exec: BcExecuter = Default::default();
+        exec.exec("scale=40; a=10/3").unwrap();
+        let output = exec.exec("a").unwrap();
+        let decimal_result: Decimal = output.parse().unwrap();
+
+        let numerator = with_precision(Decimal::from(10), 200);
+        let denominator = with_precision(Decimal::from(3), 200);
+        let expected = numerator / denominator;
+        let expected = BcExecuter::truncate_decimal_to_scale(&expected, 40);
+        assert_eq!(decimal_result, expected);
+        assert_eq!(output, exec.format_result_decimal(&expected));
+    }
+
+    #[test]
+    fn test_scale_zero_truncates_results() {
+        let mut exec: BcExecuter = Default::default();
+        exec.exec("scale=0").unwrap();
+        assert_eq!(exec.exec("2/3").unwrap(), "0");
+        assert_eq!(exec.exec("-2/3").unwrap(), "0");
+        assert_eq!(exec.exec("5/2").unwrap(), "2");
+    }
+
+    #[test]
+    fn test_scale_padding_preserves_trailing_zeros() {
+        let mut exec: BcExecuter = Default::default();
+        exec.exec("scale=5").unwrap();
+        assert_eq!(exec.exec("1/2").unwrap(), ".50000");
+        assert_eq!(exec.exec("1/5").unwrap(), ".20000");
+        assert_eq!(exec.exec("10/5").unwrap(), "2");
     }
 
     #[test]
@@ -63,7 +124,8 @@ mod bc_tests {
     fn test_exec_with_function_call() {
         let mut b: BcExecuter = Default::default();
         b.exec("define add_twice(x){ return x + x; }").unwrap();
-        b.exec("define mix(a,b){ tmp = add_twice(a); tmp + b; }").unwrap();
+        b.exec("define mix(a,b){ tmp = add_twice(a); tmp + b; }")
+            .unwrap();
         let output = b.exec("mix(3,4)").unwrap();
         assert_eq!(output, "10");
     }

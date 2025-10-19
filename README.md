@@ -1,9 +1,9 @@
 # dntk
 [![CI](https://github.com/nnao45/dntk/actions/workflows/ci.yml/badge.svg)](https://github.com/nnao45/dntk/actions/workflows/ci.yml)
 [![Release](https://github.com/nnao45/dntk/actions/workflows/release.yml/badge.svg)](https://github.com/nnao45/dntk/actions/workflows/release.yml)
-[![v3.0.14](https://img.shields.io/badge/package-v3.0.14-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v3.0.14)
-[![crates](https://img.shields.io/badge/crates.io-v3.0.14-319e8c.svg)](https://crates.io/crates/dntk)
-[![docker](https://img.shields.io/badge/docker-v3.0.14-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags?name=v3.0.14)
+[![v3.0.13](https://img.shields.io/badge/package-v3.0.13-ff69b4.svg)](https://github.com/nnao45/dntk/releases/tag/v3.0.13)
+[![crates](https://img.shields.io/badge/crates.io-v3.0.13-319e8c.svg)](https://crates.io/crates/dntk)
+[![docker](https://img.shields.io/badge/docker-v3.0.13-blue.svg)](https://hub.docker.com/r/nnao45/dntk/tags?name=v3.0.13)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/nnao45/dntk/master/LICENSE)
 [![platform](https://img.shields.io/badge/platform-%20osx%20|%20linux%20|%20freebsd%20|%20windows-orange.svg)](https://github.com/nnao45/dntk/releases)
 
@@ -11,11 +11,11 @@ dntk is command line's multi-platform ***Interactive*** calculator with bc-compa
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_demo.gif)
 
 ✔︎ dntk means calculator in a japanese.
-✔︎ dntk is bc-compatible calculator with **fast f64 floating-point math** (no external bc required!)
+✔︎ dntk is bc-compatible calculator with bc-style configurable precision powered by `dashu-decimal` (no external bc required!)
 ✔︎ dntk syntax is compatible with [GNU bc](https://www.gnu.org/software/bc/). [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)
 ✔︎ dntk is a NATIVE [The Rust Programming Language](https://rust-lang.org) application.
 ✔︎ dntk can move cursor, can delete char, can refresh buffer.
-✔︎ dntk provides **accurate decimal arithmetic** without floating-point errors.  
+✔︎ dntk provides **accurate decimal arithmetic** without floating-point errors.
 ✔︎ dntk write color means,  
 <table>
     <tr>
@@ -40,20 +40,21 @@ dntk is command line's multi-platform ***Interactive*** calculator with bc-compa
     </tr>
 </table>
 
-## ***Current dntk's version:v3.0.14***
+## ***Current dntk's version:v3.0.13***
 Download Page: https://github.com/nnao45/dntk/releases/latest
 
 ## ✨ Key Features
 
-### 🎯 Accurate Floating-Point Arithmetic
-- Native IEEE-754 `f64` math for blazing performance
-- `scale=` still lets you control display precision (defaults to 20)
-- `obase=` supports base-2〜36 formatting with fractional output
+### 🎯 High-Precision Arithmetic
+- Powered by [`dashu-decimal`](https://crates.io/crates/dashu-decimal) for arbitrary-precision decimals with predictable bc semantics
+- Configurable scale (default **20** fractional digits) with faithful truncation just like GNU bc
+- **No floating-point errors**: `1 + 0.7 = 1.7` (not 1.69999...)
+- Accurate division: `1/3 = .33333333333333333333`
 
 ### ⚡ Fast & Lightweight
 - **No external dependencies** (bc command not required!)
 - Pure Rust implementation for maximum performance
-- Optimized expression evaluation with `fasteval` + native `f64`
+- Optimized expression evaluation with `fasteval` + `dashu-decimal`
 
 ### 🌍 True Cross-Platform
 - Works out of the box on **Windows, Linux, macOS, and FreeBSD**
@@ -83,20 +84,20 @@ $ brew install nnao45/dntk/dntk
 
 ### Linux
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v3.0.14/dntk-v3.0.14-x86_64-unknown-linux-musl.zip
-$ unzip dntk-v3.0.14-x86_64-unknown-linux-musl.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.13/dntk-v3.0.13-x86_64-unknown-linux-musl.zip
+$ unzip dntk-v3.0.13-x86_64-unknown-linux-musl.zip
 ```
 
 ### Windows
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v3.0.14/dntk-v3.0.14-x86_64-pc-windows-msvc.zip
-$ unzip dntk-v3.0.14-x86_64-pc-windows-msvc.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.13/dntk-v3.0.13-x86_64-pc-windows-msvc.zip
+$ unzip dntk-v3.0.13-x86_64-pc-windows-msvc.zip
 ```
 
 ### FreeBSD
 ```bash
-$ wget https://github.com/nnao45/dntk/releases/download/v3.0.14/dntk-v3.0.14-x86_64-unknown-freebsd.zip
-$ unzip dntk-v3.0.14-x86_64-unknown-freebsd.zip
+$ wget https://github.com/nnao45/dntk/releases/download/v3.0.13/dntk-v3.0.13-x86_64-unknown-freebsd.zip
+$ unzip dntk-v3.0.13-x86_64-unknown-freebsd.zip
 ```
 
 ### Cargo
@@ -150,7 +151,7 @@ FLAGS:
 
 OPTIONS:
     -i, --inject <inject>      Pre-run inject statement to the dntk [default: ]
-    -s, --scale <scale>        Number of decimal places when formatting output [default: 20]
+    -s, --scale <scale>        Number of decimal places (max 28) [default: 20]
 ```
 
 **Note**: `--bc-path` option has been removed as dntk no longer requires external bc command!
@@ -176,7 +177,7 @@ dntk works out of the box on Windows without installing bc.exe. Just download an
 
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_win_demo.gif)
 
-### Previous versions (v3.0.14 and earlier)
+### Previous versions (v3.0.13 and earlier)
 Older versions required bc.exe installation. If you're using an older version:
 ```bash
 $ choco install gnuwin
@@ -307,16 +308,20 @@ more detail 👉 https://www.gnu.org/software/bc/manual/html_mono/bc.html
 dntk uses a hybrid approach for optimal performance and precision:
 
 1. **Expression Parsing**: `fasteval` - Fast and lightweight expression parser
-2. **Floating-Point Arithmetic**: Native `f64` (IEEE-754 double precision)
-3. **Result Formatting**: bc-compatible output format with `scale`/`obase`
+2. **High-Precision Arithmetic**: `rust_decimal` - 28-digit decimal precision
+3. **Result Formatting**: bc-compatible output format
 
 ### Precision Comparison
 
-> dntk uses native doubles; display precision is configurable via `scale=`.
+| Calculator | Precision | Example: 1+0.7 | Example: 1/3 (20 digits) |
+|-----------|-----------|----------------|--------------------------|
+| bc | 20 digits (default) | 1.7 | .33333333333333333333 |
+| dntk (old) | ~15 digits (f64) | 1.69999... ❌ | .33333333333333331483 ❌ |
+| **dntk (new)** | **28 digits** | **1.7 ✅** | **.33333333333333333333 ✅** |
 
 ### Dependencies
 - `fasteval` - Expression evaluation
-- Native `f64` arithmetic (no external bc required)
+- `rust_decimal` - High-precision decimal arithmetic (up to 28 digits)
 - Pure Rust implementation (no C library dependencies)
 
 ### Why No bc Command Required?
@@ -324,7 +329,7 @@ Previous versions wrapped the external `bc` command. The new version:
 - Implements bc-compatible arithmetic in pure Rust
 - Eliminates subprocess overhead
 - Works on all platforms without external dependencies
-- Keeps `scale`/`obase` controls while using fast floating-point math
+- Provides better precision (28 vs 20 digits)
 
 # Development Guide
 

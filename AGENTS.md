@@ -17,5 +17,8 @@ Rust 2018 edition defaults apply with 4-space indentation. Keep modules and file
 ## Testing Guidelines
 Write integration tests under `tests/` using `assert_cmd` to spawn the compiled binary; mimic existing `test_cmd_with_*` patterns. Name tests with descriptive verbs (`test_cmd_with_show_limits`) and reset state via `DNTK_ENV=TEST` when output should be deterministic. When adding platform-dependent assertions, gate them with `cfg(target_os)` like the current suite. Coverage is not enforced, but new CLI options should include at least one regression test.
 
+## Verification Checklist
+Before wrapping up any change, run `cargo fmt`, `cargo test`, and `cargo clippy -- -D warnings` to match the expected review flow.
+
 ## Commit & Pull Request Guidelines
 History favors short, lowercase, imperative subjects (`readme update`, `release 2.2.1`). Follow that tone, scope commits narrowly, and reference issues with `#id` when relevant. Pull requests should list the main changes, note any platform-specific impact, and describe how to reproduce verification (commands run, targets exercised). Include screenshots or terminal captures only when behavior changes are user-facing.

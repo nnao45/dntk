@@ -1,4 +1,5 @@
 [target.i686-unknown-freebsd]
-image = "japaric/i686-unknown-freebsd:v0.1.14"
+image = "ghcr.io/cross-rs/i686-unknown-freebsd:main"
+
 [target.x86_64-unknown-freebsd]
-image = "japaric/x86_64-unknown-freebsd:v0.1.14"
+image = "ghcr.io/cross-rs/x86_64-unknown-freebsd:main"

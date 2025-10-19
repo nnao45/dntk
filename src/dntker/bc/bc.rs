@@ -3,12 +3,13 @@ use std::collections::{BTreeMap, HashMap};
 use std::f64;
 use std::fmt;
 
+use dashu::base::{Abs, Sign, UnsignedAbs};
+use dashu::Decimal;
 use fasteval::Evaler;
 use fasteval::{Parser, Slab};
 use libm::jn;
+use num_traits::{ToPrimitive, Zero};
 use rand::{rngs::SmallRng, Rng, RngCore, SeedableRng};
-use rust_decimal::prelude::{FromPrimitive, ToPrimitive, Zero};
-use rust_decimal::Decimal;
 
 #[derive(Debug)]
 pub enum BcError {
@@ -32,7 +33,7 @@ struct FunctionDef {
     body: Vec<String>,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 enum StatementOutcome {
     None,
     Value(Decimal),
@@ -108,7 +109,7 @@ impl BcExecuter {
             }
         }
 
-        let value = last_value.unwrap_or_else(Decimal::zero);
+        let value = last_value.unwrap_or_else(|| Decimal::ZERO);
         Ok(self.format_result(value))
     }
 
@@ -326,7 +327,7 @@ impl BcExecuter {
     fn eval_return(&mut self, stmt: &str) -> Result<StatementOutcome, BcError> {
         let rest = stmt.trim_start()["return".len()..].trim_start();
         if rest.is_empty() {
-            return Ok(StatementOutcome::ret(Decimal::zero()));
+            return Ok(StatementOutcome::ret(Decimal::ZERO));
         }
         let expression = if rest.starts_with('(') && rest.ends_with(')') {
             &rest[1..rest.len() - 1]
@@ -399,8 +400,7 @@ impl BcExecuter {
             return Ok(value);
         }
 
-        let value_f64 = value
-            .to_f64()
+        let value_f64 = ToPrimitive::to_f64(&value)
             .ok_or_else(|| BcError::Error("Failed to convert to f64".to_string()))?;
 
         if let Some(scope) = self.find_scope_mut(name) {
@@ -415,12 +415,10 @@ impl BcExecuter {
     fn apply_special_assignment(&mut self, name: &str, value: &Decimal) -> Result<bool, BcError> {
         match name {
             "scale" => {
-                if value.is_sign_negative() {
+                if value.sign() == Sign::Negative {
                     return Err(BcError::Error("scale() must be non-negative".to_string()));
                 }
-                let new_scale = value
-                    .trunc()
-                    .to_u32()
+                let new_scale = ToPrimitive::to_u32(&value.trunc())
                     .ok_or_else(|| BcError::Error("scale() out of range".to_string()))?
                     .min(28);
                 self.scale = new_scale;
@@ -430,12 +428,10 @@ impl BcExecuter {
                 Ok(true)
             }
             "obase" => {
-                if value.is_sign_negative() {
+                if value.sign() == Sign::Negative {
                     return Err(BcError::Error("obase must be positive".to_string()));
                 }
-                let new_obase = value
-                    .trunc()
-                    .to_u32()
+                let new_obase = ToPrimitive::to_u32(&value.trunc())
                     .ok_or_else(|| BcError::Error("obase out of range".to_string()))?;
                 if !(2..=36).contains(&new_obase) {
                     return Err(BcError::Error("obase must be between 2 and 36".to_string()));
@@ -498,8 +494,7 @@ impl BcExecuter {
             return Err(err);
         }
 
-        Decimal::from_f64(result)
-            .ok_or_else(|| BcError::Error("Failed to convert to decimal".to_string()))
+        Self::decimal_from_f64(result, "Failed to convert to decimal")
     }
 
     fn resolve_name(&mut self, name: &str, args: Vec<f64>) -> Result<f64, BcError> {
@@ -514,9 +509,9 @@ impl BcExecuter {
         }
 
         if let Some(func_value) = self.call_function(name, args)? {
-            return func_value
-                .to_f64()
-                .ok_or_else(|| BcError::Error("Failed to convert function result".to_string()));
+            return ToPrimitive::to_f64(&func_value).ok_or_else(|| {
+                BcError::Error("Failed to convert function result".to_string())
+            });
         }
 
         Err(BcError::Error(format!("Undefined identifier: {name}")))
@@ -557,7 +552,7 @@ impl BcExecuter {
 
         let result = match outcome {
             StatementOutcome::Return(value) | StatementOutcome::Value(value) => value,
-            StatementOutcome::None => Decimal::zero(),
+            StatementOutcome::None => Decimal::ZERO,
         };
 
         Ok(Some(result))
@@ -616,19 +611,14 @@ impl BcExecuter {
                 args.len()
             )));
         }
-        let decimal = Decimal::from_f64(args[0])
-            .ok_or_else(|| BcError::Error("Failed to convert argument to decimal".to_string()))?;
-        let mut digits = decimal
-            .normalize()
-            .abs()
-            .to_string()
+        let decimal = Self::decimal_from_f64(args[0], "Failed to convert argument to decimal")?;
+        let normalized = Self::decimal_to_plain_string(&decimal.abs());
+        let digit_count = normalized
             .chars()
-            .filter(|c| *c != '-' && *c != '.')
-            .collect::<String>();
-        if digits.is_empty() {
-            digits.push('0');
-        }
-        Ok(digits.chars().count() as f64)
+            .filter(|c| c.is_ascii_digit())
+            .count()
+            .max(1);
+        Ok(digit_count as f64)
     }
 
     fn builtin_scale(args: &[f64]) -> Result<f64, BcError> {
@@ -638,9 +628,13 @@ impl BcExecuter {
                 args.len()
             )));
         }
-        let decimal = Decimal::from_f64(args[0])
-            .ok_or_else(|| BcError::Error("Failed to convert argument to decimal".to_string()))?;
-        Ok(decimal.normalize().scale() as f64)
+        let decimal = Self::decimal_from_f64(args[0], "Failed to convert argument to decimal")?;
+        let exponent = decimal.repr().exponent();
+        Ok(if exponent >= 0 {
+            0.0
+        } else {
+            (-exponent) as f64
+        })
     }
 
     fn builtin_bessel(args: &[f64]) -> Result<f64, BcError> {
@@ -1017,19 +1011,71 @@ impl BcExecuter {
 
     fn format_result(&self, value: Decimal) -> String {
         if self.obase == 10 {
-            return self.format_result_decimal(value);
+            return self.format_result_decimal(&value);
         }
-        if let Some(formatted) = self.format_result_obase(value) {
+        if let Some(formatted) = self.format_result_obase(&value) {
             formatted
         } else {
-            self.format_result_decimal(value)
+            self.format_result_decimal(&value)
         }
     }
 
-    fn format_result_decimal(&self, value: Decimal) -> String {
+    fn decimal_from_f64(value: f64, err: &str) -> Result<Decimal, BcError> {
+        value
+            .to_string()
+            .parse::<Decimal>()
+            .map_err(|_| BcError::Error(err.to_string()))
+    }
+
+    fn round_decimal_to_scale(value: &Decimal, scale: u32) -> Decimal {
+        if scale == 0 {
+            return value.round();
+        }
+
+        let factor = Decimal::from(10).powi(scale.into());
+        let rounded = (value.clone() * &factor).round();
+        rounded / factor
+    }
+
+    fn decimal_to_plain_string(value: &Decimal) -> String {
+        let repr = value.repr();
+        if repr.significand().is_zero() {
+            return "0".to_string();
+        }
+
+        let mut digits = repr.significand().unsigned_abs().to_string();
+        let exponent = repr.exponent();
+
+        if exponent >= 0 {
+            digits.extend(std::iter::repeat('0').take(exponent as usize));
+        } else {
+            let shift = (-exponent) as usize;
+            if digits.len() <= shift {
+                let mut buffer = String::from("0.");
+                buffer.extend(std::iter::repeat('0').take(shift - digits.len()));
+                buffer.push_str(&digits);
+                digits = buffer;
+            } else {
+                let split = digits.len() - shift;
+                let (int_part, frac_part) = digits.split_at(split);
+                let mut buffer = int_part.to_string();
+                buffer.push('.');
+                buffer.push_str(frac_part);
+                digits = buffer;
+            }
+        }
+
+        if repr.sign() == Sign::Negative {
+            format!("-{}", digits)
+        } else {
+            digits
+        }
+    }
+
+    fn format_result_decimal(&self, value: &Decimal) -> String {
         let scale = self.scale;
-        let rounded = value.round_dp(scale);
-        let mut formatted = rounded.to_string();
+        let rounded = Self::round_decimal_to_scale(value, scale);
+        let mut formatted = Self::decimal_to_plain_string(&rounded);
 
         if formatted.contains('.') {
             formatted = formatted
@@ -1051,13 +1097,13 @@ impl BcExecuter {
         }
     }
 
-    fn format_result_obase(&self, value: Decimal) -> Option<String> {
+    fn format_result_obase(&self, value: &Decimal) -> Option<String> {
         const DIGITS: &[u8; 36] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         let base = self.obase as i32;
-        let negative = value.is_sign_negative();
-        let abs_value = value.abs();
+        let negative = value.sign() == Sign::Negative;
+        let abs_value = value.clone().abs();
         let integer_part = abs_value.trunc();
-        let mut integer = integer_part.to_i128()?;
+        let mut integer = ToPrimitive::to_i128(&integer_part)?;
 
         let mut int_buf = Vec::new();
         if integer == 0 {
@@ -1085,9 +1131,9 @@ impl BcExecuter {
             let base_decimal = Decimal::from(base as i64);
             let mut digits_written = 0;
             while digits_written < self.scale {
-                fraction *= base_decimal;
+                fraction *= base_decimal.clone();
                 let digit_dec = fraction.trunc();
-                let digit = digit_dec.to_u32()? as usize;
+                let digit = ToPrimitive::to_u32(&digit_dec)? as usize;
                 result.push(DIGITS[digit] as char);
                 fraction -= digit_dec;
                 digits_written += 1;

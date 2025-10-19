@@ -13,12 +13,12 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 libc = "0.2"
-scopeguard = "1.0.0"
-atty = "0.2"
+scopeguard = "1.2"
 clap = { version = "4.5", features = ["derive"] }
-ansi_term = "0.11"
-lazy_static = "1.3.0"
-assert_cmd = "0.11.1"
+anstyle = "1.0"
+owo-colors = "4.1"
+lazy_static = "1.5"
+assert_cmd = "2.0"
 fasteval = "0.2"
 dashu = { version = "0.4", features = ["num-traits_v02"] }
 libm = "0.2"

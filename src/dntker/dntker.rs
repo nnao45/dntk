@@ -3,9 +3,8 @@ use super::history::History;
 use super::prompt::{self, DntkString, DntkStringType, PromptState};
 use super::util;
 use crate::dntker::bc;
-use atty::Stream;
 use std::io::Write;
-use std::io::{stdout, BufWriter};
+use std::io::{stdout, BufWriter, IsTerminal};
 
 #[cfg(target_os = "windows")]
 use winconsole::console as wconsole;
@@ -362,7 +361,7 @@ impl Dntker {
     }
 
     pub fn run(&mut self) {
-        if !atty::is(Stream::Stdin)
+        if !std::io::stdin().is_terminal()
             && std::env::var_os("DNTK_ENV") != Some(std::ffi::OsString::from("TEST"))
         {
             let mut s = String::new();

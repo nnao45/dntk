@@ -1,6 +1,7 @@
 use std::fmt;
 
 use super::util;
+use owo_colors::OwoColorize;
 
 #[derive(Debug, PartialEq)]
 pub(crate) enum DntkStringType {
@@ -39,16 +40,16 @@ impl DntkString {
         if !util::DNTK_OPT.white {
             match &self.dtype {
                 DntkStringType::Ok => {
-                    self.data = ansi_term::Colour::Cyan.paint(&self.data).to_string();
+                    self.data = self.data.cyan().to_string();
                 }
                 DntkStringType::Ng => {
-                    self.data = ansi_term::Colour::Purple.paint(&self.data).to_string();
+                    self.data = self.data.purple().to_string();
                 }
                 DntkStringType::Warn => {
-                    self.data = ansi_term::Colour::Yellow.paint(&self.data).to_string();
+                    self.data = self.data.yellow().to_string();
                 }
                 DntkStringType::Refresh => {
-                    self.data = ansi_term::Colour::Green.paint(&self.data).to_string();
+                    self.data = self.data.green().to_string();
                 }
             }
         }

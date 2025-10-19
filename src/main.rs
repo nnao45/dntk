@@ -1,4 +1,3 @@
-extern crate ansi_term;
 extern crate clap;
 extern crate libc;
 

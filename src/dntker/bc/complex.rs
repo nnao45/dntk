@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use dashu::Decimal;
-use libm::sqrt;
+use libm::{cos, cosh, sin, sinh, sqrt};
 use num_traits::{ToPrimitive, Zero};
 
 use super::error::BcError;
@@ -35,6 +35,21 @@ impl super::BcExecuter {
             return Ok(Some(self.format_result_decimal(&decimal)));
         }
 
+        if let Some(inner) = Self::strip_wrapped_function(trimmed, "sin")? {
+            let parsed = match ComplexExpression::parse(self, inner) {
+                Ok(parsed) => parsed,
+                Err(ComplexParseError::NotComplex) => return Ok(None),
+                Err(ComplexParseError::Invalid(msg)) => return Err(BcError::Error(msg)),
+            };
+            let (real_f, imag_f) = parsed
+                .value
+                .sin_components()
+                .map_err(|err| BcError::Error(err.into_message()))?;
+            let real = self.decimal_from_f64(real_f, "complex sin overflowed")?;
+            let imag = self.decimal_from_f64(imag_f, "complex sin overflowed")?;
+            return Ok(Some(self.format_complex_result(real, imag)));
+        }
+
         let parsed = match ComplexExpression::parse(self, trimmed) {
             Ok(parsed) => parsed,
             Err(ComplexParseError::NotComplex) => return Ok(None),
@@ -43,6 +58,21 @@ impl super::BcExecuter {
         let real = self.promote_precision(parsed.value.real);
         let imag = self.promote_precision(parsed.value.imag);
         Ok(Some(self.format_complex_result(real, imag)))
+    }
+
+    pub(super) fn parse_complex_literal(
+        &self,
+        expr: &str,
+    ) -> Result<Option<ComplexNumber>, ComplexParseError> {
+        let trimmed = expr.trim();
+        if trimmed.is_empty() {
+            return Ok(None);
+        }
+        match ComplexExpression::parse(self, trimmed) {
+            Ok(parsed) => Ok(Some(parsed.value)),
+            Err(ComplexParseError::NotComplex) => Ok(None),
+            Err(err) => Err(err),
+        }
     }
 
     fn strip_wrapped_function<'a>(input: &'a str, name: &str) -> Result<Option<&'a str>, BcError> {
@@ -63,7 +93,7 @@ impl super::BcExecuter {
 }
 
 struct ComplexExpression {
-    value: ComplexValue,
+    value: ComplexNumber,
 }
 
 impl ComplexExpression {
@@ -94,7 +124,7 @@ impl<'a> ComplexParser<'a> {
         }
     }
 
-    fn parse_expression(&mut self) -> Result<ComplexValue, ComplexParseError> {
+    fn parse_expression(&mut self) -> Result<ComplexNumber, ComplexParseError> {
         let mut value = self.parse_term()?;
         while let Some(token) = self.peek() {
             match token {
@@ -114,7 +144,7 @@ impl<'a> ComplexParser<'a> {
         Ok(value)
     }
 
-    fn parse_term(&mut self) -> Result<ComplexValue, ComplexParseError> {
+    fn parse_term(&mut self) -> Result<ComplexNumber, ComplexParseError> {
         let mut value = self.parse_unary()?;
         while let Some(token) = self.peek() {
             match token {
@@ -134,7 +164,7 @@ impl<'a> ComplexParser<'a> {
         Ok(value)
     }
 
-    fn parse_unary(&mut self) -> Result<ComplexValue, ComplexParseError> {
+    fn parse_unary(&mut self) -> Result<ComplexNumber, ComplexParseError> {
         if let Some(token) = self.peek() {
             match token {
                 ComplexToken::Plus => {
@@ -152,23 +182,23 @@ impl<'a> ComplexParser<'a> {
         self.parse_primary()
     }
 
-    fn parse_primary(&mut self) -> Result<ComplexValue, ComplexParseError> {
+    fn parse_primary(&mut self) -> Result<ComplexNumber, ComplexParseError> {
         match self.next() {
             Some(ComplexToken::Number(value)) => {
                 let promoted = self.exec.promote_precision(value);
                 if self.peek_is_i() {
                     self.next();
                     let zero = self.exec.promote_precision(Decimal::ZERO);
-                    Ok(ComplexValue::new(zero, promoted))
+                    Ok(ComplexNumber::new(zero, promoted))
                 } else {
                     let zero = self.exec.promote_precision(Decimal::ZERO);
-                    Ok(ComplexValue::new(promoted, zero))
+                    Ok(ComplexNumber::new(promoted, zero))
                 }
             }
             Some(ComplexToken::ImaginaryUnit) => {
                 let real_zero = self.exec.promote_precision(Decimal::ZERO);
                 let imag_one = self.exec.promote_precision(Decimal::from(1));
-                Ok(ComplexValue::new(real_zero, imag_one))
+                Ok(ComplexNumber::new(real_zero, imag_one))
             }
             Some(ComplexToken::LParen) => {
                 let value = self.parse_expression()?;
@@ -277,6 +307,9 @@ impl ComplexLexer {
                     remaining = rest;
                 }
                 _ => {
+                    if ch == '[' || ch == ']' {
+                        return Err(ComplexParseError::NotComplex);
+                    }
                     if ch.is_alphabetic() {
                         return Err(ComplexParseError::NotComplex);
                     }
@@ -359,38 +392,45 @@ impl ComplexLexer {
 }
 
 #[derive(Clone)]
-struct ComplexValue {
-    real: Decimal,
-    imag: Decimal,
+pub(super) struct ComplexNumber {
+    pub(super) real: Decimal,
+    pub(super) imag: Decimal,
 }
 
-impl ComplexValue {
-    fn new(real: Decimal, imag: Decimal) -> Self {
+impl ComplexNumber {
+    pub(super) fn new(real: Decimal, imag: Decimal) -> Self {
         Self { real, imag }
     }
 
-    fn add(&self, other: &Self) -> Self {
+    pub(super) fn from_real(real: Decimal) -> Self {
+        Self {
+            real,
+            imag: Decimal::ZERO,
+        }
+    }
+
+    pub(super) fn add(&self, other: &Self) -> Self {
         Self {
             real: self.real.clone() + other.real.clone(),
             imag: self.imag.clone() + other.imag.clone(),
         }
     }
 
-    fn sub(&self, other: &Self) -> Self {
+    pub(super) fn sub(&self, other: &Self) -> Self {
         Self {
             real: self.real.clone() - other.real.clone(),
             imag: self.imag.clone() - other.imag.clone(),
         }
     }
 
-    fn mul(&self, other: &Self) -> Self {
+    pub(super) fn mul(&self, other: &Self) -> Self {
         Self {
             real: self.real.clone() * other.real.clone() - self.imag.clone() * other.imag.clone(),
             imag: self.real.clone() * other.imag.clone() + self.imag.clone() * other.real.clone(),
         }
     }
 
-    fn div(&self, other: &Self) -> Result<Self, ComplexParseError> {
+    pub(super) fn div(&self, other: &Self) -> Result<Self, ComplexParseError> {
         let denom =
             other.real.clone() * other.real.clone() + other.imag.clone() * other.imag.clone();
         if denom.is_zero() {
@@ -405,24 +445,38 @@ impl ComplexValue {
         Ok(Self { real, imag })
     }
 
-    fn negate(&self) -> Self {
+    pub(super) fn negate(&self) -> Self {
         Self {
             real: -self.real.clone(),
             imag: -self.imag.clone(),
         }
     }
 
-    fn magnitude(&self) -> Result<f64, ComplexParseError> {
+    pub(super) fn magnitude(&self) -> Result<f64, ComplexParseError> {
         let real = ToPrimitive::to_f64(&self.real)
             .ok_or_else(|| ComplexParseError::invalid("complex abs real part out of range"))?;
         let imag = ToPrimitive::to_f64(&self.imag)
             .ok_or_else(|| ComplexParseError::invalid("complex abs imaginary part out of range"))?;
         Ok(sqrt(real * real + imag * imag))
     }
+
+    pub(super) fn sin_components(&self) -> Result<(f64, f64), ComplexParseError> {
+        let real = ToPrimitive::to_f64(&self.real)
+            .ok_or_else(|| ComplexParseError::invalid("complex sin real part out of range"))?;
+        let imag = ToPrimitive::to_f64(&self.imag)
+            .ok_or_else(|| ComplexParseError::invalid("complex sin imaginary part out of range"))?;
+        let real_part = sin(real) * cosh(imag);
+        let imag_part = cos(real) * sinh(imag);
+        Ok((real_part, imag_part))
+    }
+
+    pub(super) fn is_zero(&self) -> bool {
+        self.real.is_zero() && self.imag.is_zero()
+    }
 }
 
 #[derive(Debug)]
-enum ComplexParseError {
+pub(super) enum ComplexParseError {
     NotComplex,
     Invalid(String),
 }
@@ -430,5 +484,12 @@ enum ComplexParseError {
 impl ComplexParseError {
     fn invalid(message: &str) -> Self {
         ComplexParseError::Invalid(message.to_string())
+    }
+
+    pub(super) fn into_message(self) -> String {
+        match self {
+            ComplexParseError::NotComplex => "failed to parse complex literal".to_string(),
+            ComplexParseError::Invalid(msg) => msg,
+        }
     }
 }

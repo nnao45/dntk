@@ -24,7 +24,6 @@ dashu = { version = "0.4", features = ["num-traits_v02"] }
 libm = "0.2"
 num-traits = "0.2.19"
 rand = { version = "0.8", features = ["small_rng"] }
-serde_json = "1.0"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["handleapi", "processenv", "errhandlingapi", "consoleapi"] }

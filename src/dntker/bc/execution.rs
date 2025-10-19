@@ -5,8 +5,8 @@ use dashu::base::{Abs, Sign};
 use dashu::Decimal;
 use fasteval::Parser;
 use num_traits::{ToPrimitive, Zero};
-use serde_json::Value;
 
+use super::complex::ComplexNumber;
 use super::error::BcError;
 use super::literals::LiteralTable;
 use super::runtime::{FunctionDef, Runtime, StatementOutcome};
@@ -429,12 +429,18 @@ impl BcExecuter {
         }
     }
 
-    pub(super) fn format_matrix(&self, matrix: &[Vec<Decimal>]) -> String {
+    pub(super) fn format_matrix(&self, matrix: &[Vec<ComplexNumber>]) -> String {
         let mut rows = Vec::with_capacity(matrix.len());
         for row in matrix {
             let formatted: Vec<String> = row
                 .iter()
-                .map(|value| self.format_result_decimal(value))
+                .map(|value| {
+                    if value.imag.is_zero() {
+                        self.format_result_decimal(&value.real)
+                    } else {
+                        self.format_complex_result(value.real.clone(), value.imag.clone())
+                    }
+                })
                 .collect();
             rows.push(format!("[{}]", formatted.join(", ")));
         }
@@ -470,72 +476,187 @@ impl BcExecuter {
         Ok((literal, remainder))
     }
 
-    pub(super) fn parse_matrix(literal: &str) -> Result<Vec<Vec<Decimal>>, BcError> {
-        let value: Value = serde_json::from_str(literal)
-            .map_err(|_| BcError::Error("failed to parse matrix literal".to_string()))?;
-        match value {
-            Value::Array(rows) => {
-                if rows.is_empty() {
+    pub(super) fn parse_matrix(&self, literal: &str) -> Result<Vec<Vec<ComplexNumber>>, BcError> {
+        let trimmed = literal.trim();
+        if !trimmed.starts_with('[') || !trimmed.ends_with(']') {
+            return Err(BcError::Error(
+                "matrix literal must be an array".to_string(),
+            ));
+        }
+        let mut rows = Vec::new();
+        let mut index = 1usize;
+        let len = trimmed.len();
+        let mut expected_len: Option<usize> = None;
+        while index < len - 1 {
+            index = Self::skip_whitespace(trimmed, index);
+            if index >= len - 1 {
+                break;
+            }
+            if !trimmed[index..].starts_with('[') {
+                return Err(BcError::Error(
+                    "matrix must be an array of arrays".to_string(),
+                ));
+            }
+            let (row, next_index) = self.parse_matrix_row(trimmed, index)?;
+            if row.is_empty() {
+                return Err(BcError::Error(
+                    "matrix rows must contain at least one element".to_string(),
+                ));
+            }
+            if let Some(expected) = expected_len {
+                if row.len() != expected {
                     return Err(BcError::Error(
-                        "matrix must contain at least one row".to_string(),
+                        "matrix rows must have consistent length".to_string(),
                     ));
                 }
-                let mut parsed = Vec::with_capacity(rows.len());
-                let mut expected_len = None;
-                for row in rows {
-                    match row {
-                        Value::Array(values) => {
-                            if values.is_empty() {
-                                return Err(BcError::Error(
-                                    "matrix rows must contain at least one element".to_string(),
-                                ));
-                            }
-                            if let Some(expected) = expected_len {
-                                if values.len() != expected {
-                                    return Err(BcError::Error(
-                                        "matrix rows must have consistent length".to_string(),
-                                    ));
-                                }
-                            } else {
-                                expected_len = Some(values.len());
-                            }
-                            let mut parsed_row = Vec::with_capacity(values.len());
-                            for value in values {
-                                if let Value::Number(num) = value {
-                                    let decimal =
-                                        Decimal::from_str(&num.to_string()).map_err(|_| {
-                                            BcError::Error(
-                                                "matrix entry is not a number".to_string(),
-                                            )
-                                        })?;
-                                    parsed_row.push(decimal);
-                                } else {
-                                    return Err(BcError::Error(
-                                        "matrix entries must be numeric".to_string(),
-                                    ));
-                                }
-                            }
-                            parsed.push(parsed_row);
-                        }
-                        _ => {
-                            return Err(BcError::Error(
-                                "matrix must be an array of arrays".to_string(),
-                            ));
-                        }
-                    }
-                }
-                Ok(parsed)
+            } else {
+                expected_len = Some(row.len());
             }
-            _ => Err(BcError::Error(
-                "matrix literal must be an array".to_string(),
-            )),
+            rows.push(row);
+            index = Self::skip_whitespace(trimmed, next_index);
+            if index >= len - 1 {
+                break;
+            }
+            match trimmed.as_bytes()[index] {
+                b',' | b';' => index += 1,
+                b']' => break,
+                _ => {
+                    return Err(BcError::Error(
+                        "matrix literal has invalid separators".to_string(),
+                    ));
+                }
+            }
+        }
+        if rows.is_empty() {
+            return Err(BcError::Error(
+                "matrix must contain at least one row".to_string(),
+            ));
+        }
+        Ok(rows)
+    }
+
+    fn parse_matrix_row(
+        &self,
+        literal: &str,
+        start: usize,
+    ) -> Result<(Vec<ComplexNumber>, usize), BcError> {
+        let mut index = start;
+        if !literal[index..].starts_with('[') {
+            return Err(BcError::Error(
+                "matrix must be an array of arrays".to_string(),
+            ));
+        }
+        index += 1;
+        let mut entries = Vec::new();
+        loop {
+            index = Self::skip_whitespace(literal, index);
+            if index >= literal.len() {
+                return Err(BcError::Error(
+                    "matrix literal has unbalanced brackets".to_string(),
+                ));
+            }
+            if literal.as_bytes()[index] == b']' {
+                index += 1;
+                break;
+            }
+            let (entry, next_index) = Self::extract_matrix_entry(literal, index)?;
+            let value = self.parse_matrix_entry(entry)?;
+            entries.push(value);
+            index = Self::skip_whitespace(literal, next_index);
+            if index >= literal.len() {
+                return Err(BcError::Error(
+                    "matrix literal has unbalanced brackets".to_string(),
+                ));
+            }
+            match literal.as_bytes()[index] {
+                b',' => index += 1,
+                b']' => {
+                    index += 1;
+                    break;
+                }
+                _ => {
+                    return Err(BcError::Error(
+                        "matrix literal has invalid separators".to_string(),
+                    ));
+                }
+            }
+        }
+        Ok((entries, index))
+    }
+
+    fn extract_matrix_entry<'a>(
+        literal: &'a str,
+        start: usize,
+    ) -> Result<(&'a str, usize), BcError> {
+        let mut depth = 0i32;
+        let mut chars = literal[start..].char_indices();
+        while let Some((offset, ch)) = chars.next() {
+            match ch {
+                '[' => {
+                    return Err(BcError::Error(
+                        "matrix entries must be scalar values".to_string(),
+                    ));
+                }
+                '(' => depth += 1,
+                ')' => {
+                    if depth == 0 {
+                        return Err(BcError::Error(
+                            "matrix entry has mismatched parentheses".to_string(),
+                        ));
+                    }
+                    depth -= 1;
+                }
+                ',' | ']' if depth == 0 => {
+                    let end = start + offset;
+                    let entry = literal[start..end].trim();
+                    if entry.is_empty() {
+                        return Err(BcError::Error("matrix entry cannot be empty".to_string()));
+                    }
+                    return Ok((entry, end));
+                }
+                _ => {}
+            }
+        }
+        if depth != 0 {
+            return Err(BcError::Error(
+                "matrix entry has mismatched parentheses".to_string(),
+            ));
+        }
+        let entry = literal[start..].trim();
+        if entry.is_empty() {
+            return Err(BcError::Error("matrix entry cannot be empty".to_string()));
+        }
+        Ok((entry, literal.len()))
+    }
+
+    fn parse_matrix_entry(&self, entry: &str) -> Result<ComplexNumber, BcError> {
+        match self.parse_complex_literal(entry) {
+            Ok(Some(value)) => Ok(value),
+            Ok(None) => {
+                let decimal = Decimal::from_str(entry)
+                    .map_err(|_| BcError::Error("matrix entry is not a number".to_string()))?;
+                Ok(ComplexNumber::from_real(decimal))
+            }
+            Err(error) => Err(BcError::Error(error.into_message())),
         }
     }
 
+    fn skip_whitespace(input: &str, mut index: usize) -> usize {
+        while index < input.len() {
+            let ch = input[index..].chars().next().unwrap();
+            if ch.is_whitespace() {
+                index += ch.len_utf8();
+            } else {
+                break;
+            }
+        }
+        index
+    }
+
     pub(super) fn matrix_add(
-        lhs: &[Vec<Decimal>],
-        rhs: &[Vec<Decimal>],
-    ) -> Result<Vec<Vec<Decimal>>, BcError> {
+        lhs: &[Vec<ComplexNumber>],
+        rhs: &[Vec<ComplexNumber>],
+    ) -> Result<Vec<Vec<ComplexNumber>>, BcError> {
         if lhs.len() != rhs.len() || lhs.first().map(|r| r.len()) != rhs.first().map(|r| r.len()) {
             return Err(BcError::Error(
                 "matrix addition requires matrices of the same shape".to_string(),
@@ -545,7 +666,7 @@ impl BcExecuter {
         for (lhs_row, rhs_row) in lhs.iter().zip(rhs.iter()) {
             let mut row = Vec::with_capacity(lhs_row.len());
             for (lhs_value, rhs_value) in lhs_row.iter().zip(rhs_row.iter()) {
-                row.push(lhs_value.clone() + rhs_value.clone());
+                row.push(lhs_value.add(rhs_value));
             }
             result.push(row);
         }
@@ -553,9 +674,9 @@ impl BcExecuter {
     }
 
     pub(super) fn matrix_sub(
-        lhs: &[Vec<Decimal>],
-        rhs: &[Vec<Decimal>],
-    ) -> Result<Vec<Vec<Decimal>>, BcError> {
+        lhs: &[Vec<ComplexNumber>],
+        rhs: &[Vec<ComplexNumber>],
+    ) -> Result<Vec<Vec<ComplexNumber>>, BcError> {
         if lhs.len() != rhs.len() || lhs.first().map(|r| r.len()) != rhs.first().map(|r| r.len()) {
             return Err(BcError::Error(
                 "matrix subtraction requires matrices of the same shape".to_string(),
@@ -565,7 +686,7 @@ impl BcExecuter {
         for (lhs_row, rhs_row) in lhs.iter().zip(rhs.iter()) {
             let mut row = Vec::with_capacity(lhs_row.len());
             for (lhs_value, rhs_value) in lhs_row.iter().zip(rhs_row.iter()) {
-                row.push(lhs_value.clone() - rhs_value.clone());
+                row.push(lhs_value.sub(rhs_value));
             }
             result.push(row);
         }
@@ -573,9 +694,9 @@ impl BcExecuter {
     }
 
     pub(super) fn matrix_mul(
-        lhs: &[Vec<Decimal>],
-        rhs: &[Vec<Decimal>],
-    ) -> Result<Vec<Vec<Decimal>>, BcError> {
+        lhs: &[Vec<ComplexNumber>],
+        rhs: &[Vec<ComplexNumber>],
+    ) -> Result<Vec<Vec<ComplexNumber>>, BcError> {
         if lhs.is_empty() || rhs.is_empty() {
             return Err(BcError::Error(
                 "matrix multiplication requires non-empty matrices".to_string(),
@@ -593,12 +714,14 @@ impl BcExecuter {
             ));
         }
         let rhs_cols = rhs[0].len();
-        let mut result = vec![vec![Decimal::ZERO; rhs_cols]; lhs.len()];
+        let zero = ComplexNumber::from_real(Decimal::ZERO);
+        let mut result = vec![vec![zero.clone(); rhs_cols]; lhs.len()];
         for i in 0..lhs.len() {
             for j in 0..rhs_cols {
-                let mut sum = Decimal::ZERO;
+                let mut sum = ComplexNumber::from_real(Decimal::ZERO);
                 for k in 0..lhs_cols {
-                    sum += lhs[i][k].clone() * rhs[k][j].clone();
+                    let product = lhs[i][k].mul(&rhs[k][j]);
+                    sum = sum.add(&product);
                 }
                 result[i][j] = sum;
             }
@@ -606,14 +729,24 @@ impl BcExecuter {
         Ok(result)
     }
 
-    pub(super) fn promote_matrix_precision(&self, matrix: Vec<Vec<Decimal>>) -> Vec<Vec<Decimal>> {
+    pub(super) fn promote_matrix_precision(
+        &self,
+        matrix: Vec<Vec<ComplexNumber>>,
+    ) -> Vec<Vec<ComplexNumber>> {
         matrix
             .into_iter()
             .map(|row| {
                 row.into_iter()
-                    .map(|value| self.promote_precision(value))
+                    .map(|value| self.promote_complex(value))
                     .collect()
             })
             .collect()
+    }
+
+    pub(super) fn promote_complex(&self, value: ComplexNumber) -> ComplexNumber {
+        ComplexNumber {
+            real: self.promote_precision(value.real),
+            imag: self.promote_precision(value.imag),
+        }
     }
 }

@@ -17,11 +17,11 @@ fn filter_char_classifies_known_inputs() {
     );
     assert_eq!(
         d.filter_char(util::ASCII_CODE_SQUARELEFT),
-        FilterResult::CurLeft
+        FilterResult::Calculatable(util::ASCII_CODE_SQUARELEFT)
     );
     assert_eq!(
         d.filter_char(util::ASCII_CODE_SQUARERIGHT),
-        FilterResult::CurRight
+        FilterResult::Calculatable(util::ASCII_CODE_SQUARERIGHT)
     );
     assert_eq!(d.filter_char(util::ASCII_CODE_AT), FilterResult::Refresh);
     assert_eq!(d.filter_char(util::ASCII_CODE_ESCAPE), FilterResult::Esc);

@@ -41,8 +41,6 @@ pub(crate) enum FilterResult {
     Esc,
     Refresh,
     Delete,
-    CurLeft,
-    CurRight,
     Unknown(u8),
 }
 
@@ -79,8 +77,8 @@ impl Dntker {
             util::ASCII_CODE_NINE => FilterResult::Calculatable(util::ASCII_CODE_NINE),
             util::ASCII_CODE_ROUNDLEFT => FilterResult::Calculatable(util::ASCII_CODE_ROUNDLEFT),
             util::ASCII_CODE_ROUNDRIGHT => FilterResult::Calculatable(util::ASCII_CODE_ROUNDRIGHT),
-            util::ASCII_CODE_SQUARELEFT => FilterResult::CurLeft,
-            util::ASCII_CODE_SQUARERIGHT => FilterResult::CurRight,
+            util::ASCII_CODE_SQUARELEFT => FilterResult::Calculatable(util::ASCII_CODE_SQUARELEFT),
+            util::ASCII_CODE_SQUARERIGHT => FilterResult::Calculatable(util::ASCII_CODE_SQUARERIGHT),
             util::ASCII_CODE_BACKSLASH => FilterResult::Calculatable(util::ASCII_CODE_BACKSLASH),
             util::ASCII_CODE_CURLYLEFT => FilterResult::Calculatable(util::ASCII_CODE_CURLYLEFT),
             util::ASCII_CODE_CURLYRIGHT => FilterResult::Calculatable(util::ASCII_CODE_CURLYRIGHT),
@@ -314,12 +312,6 @@ impl Dntker {
                 }
                 FilterResult::Delete => {
                     self.delete_column();
-                }
-                FilterResult::CurLeft => {
-                    self.cursor_move_left();
-                }
-                FilterResult::CurRight => {
-                    self.cursor_move_right();
                 }
                 FilterResult::Calculatable(code) => {
                     self.insert_column(*code);

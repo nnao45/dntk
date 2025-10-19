@@ -99,7 +99,7 @@ impl super::BcExecuter {
         }
 
         if repr.sign() == Sign::Negative {
-            format!("-{}", digits)
+            format!("-{digits}")
         } else {
             digits
         }

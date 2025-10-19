@@ -1,9 +1,11 @@
 use std::fmt;
+use std::str::FromStr;
 
-use dashu::base::Sign;
+use dashu::base::{Abs, Sign};
 use dashu::Decimal;
 use fasteval::Parser;
 use num_traits::{ToPrimitive, Zero};
+use serde_json::Value;
 
 use super::error::BcError;
 use super::literals::LiteralTable;
@@ -41,6 +43,12 @@ impl BcExecuter {
         }
         if trimmed == "limits" {
             return Ok(self.show_limits());
+        }
+        if let Some(result) = self.try_eval_complex_expression(trimmed)? {
+            return Ok(result);
+        }
+        if let Some(result) = self.try_eval_matrix_expression(trimmed)? {
+            return Ok(result);
         }
 
         let statements = self.split_statements(trimmed);
@@ -396,5 +404,216 @@ impl BcExecuter {
             }
             _ => Ok(false),
         }
+    }
+
+    pub(super) fn format_complex_result(&self, real: Decimal, imag: Decimal) -> String {
+        if imag.is_zero() {
+            return self.format_result_decimal(&real);
+        }
+        let imag_abs = imag.clone().abs();
+        let imag_str = self.format_result_decimal(&imag_abs);
+        if real.is_zero() {
+            if imag.sign() == Sign::Negative {
+                format!("-{imag_str}i")
+            } else {
+                format!("{imag_str}i")
+            }
+        } else {
+            let real_str = self.format_result_decimal(&real);
+            let sign = if imag.sign() == Sign::Negative {
+                "-"
+            } else {
+                "+"
+            };
+            format!("{real_str} {sign} {imag_str}i")
+        }
+    }
+
+    pub(super) fn format_matrix(&self, matrix: &[Vec<Decimal>]) -> String {
+        let mut rows = Vec::with_capacity(matrix.len());
+        for row in matrix {
+            let formatted: Vec<String> = row
+                .iter()
+                .map(|value| self.format_result_decimal(value))
+                .collect();
+            rows.push(format!("[{}]", formatted.join(", ")));
+        }
+        format!("[{}]", rows.join("; "))
+    }
+
+    pub(super) fn extract_matrix_literal(input: &str) -> Result<(&str, &str), BcError> {
+        let trimmed = input.trim_start();
+        if !trimmed.starts_with('[') {
+            return Err(BcError::Error(
+                "matrix literal must start with '['".to_string(),
+            ));
+        }
+        let mut depth = 0_i32;
+        let mut end_index = None;
+        for (idx, ch) in trimmed.char_indices() {
+            match ch {
+                '[' => depth += 1,
+                ']' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        end_index = Some(idx);
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        let end = end_index
+            .ok_or_else(|| BcError::Error("matrix literal has unbalanced brackets".to_string()))?;
+        let literal = &trimmed[..=end];
+        let remainder = trimmed[end + 1..].trim_start();
+        Ok((literal, remainder))
+    }
+
+    pub(super) fn parse_matrix(literal: &str) -> Result<Vec<Vec<Decimal>>, BcError> {
+        let value: Value = serde_json::from_str(literal)
+            .map_err(|_| BcError::Error("failed to parse matrix literal".to_string()))?;
+        match value {
+            Value::Array(rows) => {
+                if rows.is_empty() {
+                    return Err(BcError::Error(
+                        "matrix must contain at least one row".to_string(),
+                    ));
+                }
+                let mut parsed = Vec::with_capacity(rows.len());
+                let mut expected_len = None;
+                for row in rows {
+                    match row {
+                        Value::Array(values) => {
+                            if values.is_empty() {
+                                return Err(BcError::Error(
+                                    "matrix rows must contain at least one element".to_string(),
+                                ));
+                            }
+                            if let Some(expected) = expected_len {
+                                if values.len() != expected {
+                                    return Err(BcError::Error(
+                                        "matrix rows must have consistent length".to_string(),
+                                    ));
+                                }
+                            } else {
+                                expected_len = Some(values.len());
+                            }
+                            let mut parsed_row = Vec::with_capacity(values.len());
+                            for value in values {
+                                if let Value::Number(num) = value {
+                                    let decimal =
+                                        Decimal::from_str(&num.to_string()).map_err(|_| {
+                                            BcError::Error(
+                                                "matrix entry is not a number".to_string(),
+                                            )
+                                        })?;
+                                    parsed_row.push(decimal);
+                                } else {
+                                    return Err(BcError::Error(
+                                        "matrix entries must be numeric".to_string(),
+                                    ));
+                                }
+                            }
+                            parsed.push(parsed_row);
+                        }
+                        _ => {
+                            return Err(BcError::Error(
+                                "matrix must be an array of arrays".to_string(),
+                            ));
+                        }
+                    }
+                }
+                Ok(parsed)
+            }
+            _ => Err(BcError::Error(
+                "matrix literal must be an array".to_string(),
+            )),
+        }
+    }
+
+    pub(super) fn matrix_add(
+        lhs: &[Vec<Decimal>],
+        rhs: &[Vec<Decimal>],
+    ) -> Result<Vec<Vec<Decimal>>, BcError> {
+        if lhs.len() != rhs.len() || lhs.first().map(|r| r.len()) != rhs.first().map(|r| r.len()) {
+            return Err(BcError::Error(
+                "matrix addition requires matrices of the same shape".to_string(),
+            ));
+        }
+        let mut result = Vec::with_capacity(lhs.len());
+        for (lhs_row, rhs_row) in lhs.iter().zip(rhs.iter()) {
+            let mut row = Vec::with_capacity(lhs_row.len());
+            for (lhs_value, rhs_value) in lhs_row.iter().zip(rhs_row.iter()) {
+                row.push(lhs_value.clone() + rhs_value.clone());
+            }
+            result.push(row);
+        }
+        Ok(result)
+    }
+
+    pub(super) fn matrix_sub(
+        lhs: &[Vec<Decimal>],
+        rhs: &[Vec<Decimal>],
+    ) -> Result<Vec<Vec<Decimal>>, BcError> {
+        if lhs.len() != rhs.len() || lhs.first().map(|r| r.len()) != rhs.first().map(|r| r.len()) {
+            return Err(BcError::Error(
+                "matrix subtraction requires matrices of the same shape".to_string(),
+            ));
+        }
+        let mut result = Vec::with_capacity(lhs.len());
+        for (lhs_row, rhs_row) in lhs.iter().zip(rhs.iter()) {
+            let mut row = Vec::with_capacity(lhs_row.len());
+            for (lhs_value, rhs_value) in lhs_row.iter().zip(rhs_row.iter()) {
+                row.push(lhs_value.clone() - rhs_value.clone());
+            }
+            result.push(row);
+        }
+        Ok(result)
+    }
+
+    pub(super) fn matrix_mul(
+        lhs: &[Vec<Decimal>],
+        rhs: &[Vec<Decimal>],
+    ) -> Result<Vec<Vec<Decimal>>, BcError> {
+        if lhs.is_empty() || rhs.is_empty() {
+            return Err(BcError::Error(
+                "matrix multiplication requires non-empty matrices".to_string(),
+            ));
+        }
+        let lhs_cols = lhs[0].len();
+        if lhs_cols == 0 || rhs[0].is_empty() {
+            return Err(BcError::Error(
+                "matrix multiplication requires non-empty matrices".to_string(),
+            ));
+        }
+        if rhs.len() != lhs_cols {
+            return Err(BcError::Error(
+                "matrix multiplication requires left columns to equal right rows".to_string(),
+            ));
+        }
+        let rhs_cols = rhs[0].len();
+        let mut result = vec![vec![Decimal::ZERO; rhs_cols]; lhs.len()];
+        for i in 0..lhs.len() {
+            for j in 0..rhs_cols {
+                let mut sum = Decimal::ZERO;
+                for k in 0..lhs_cols {
+                    sum += lhs[i][k].clone() * rhs[k][j].clone();
+                }
+                result[i][j] = sum;
+            }
+        }
+        Ok(result)
+    }
+
+    pub(super) fn promote_matrix_precision(&self, matrix: Vec<Vec<Decimal>>) -> Vec<Vec<Decimal>> {
+        matrix
+            .into_iter()
+            .map(|row| {
+                row.into_iter()
+                    .map(|value| self.promote_precision(value))
+                    .collect()
+            })
+            .collect()
     }
 }

@@ -174,4 +174,33 @@ mod bc_tests {
         let bounded: f64 = b.exec("rand(5)").unwrap().parse().unwrap();
         assert!(bounded >= 0.0 && bounded < 5.0);
     }
+
+    #[test]
+    fn test_complex_expression_operations() {
+        let mut exec: BcExecuter = Default::default();
+        assert_eq!(exec.exec("3+2i").unwrap(), "3 + 2i");
+        assert_eq!(exec.exec("2i").unwrap(), "2i");
+        assert_eq!(exec.exec("(1+2i)*(3-4i)").unwrap(), "11 + 2i");
+        assert_eq!(exec.exec("(4+2i)/(1-1i)").unwrap(), "1 + 3i");
+        assert_eq!(exec.exec("abs(3+4i)").unwrap(), "5");
+    }
+
+    #[test]
+    fn test_matrix_expression_operations() {
+        let mut exec: BcExecuter = Default::default();
+        assert_eq!(
+            exec.exec("[[1,2],[3,4]] + [[5,6],[7,8]]").unwrap(),
+            "[[6, 8]; [10, 12]]"
+        );
+        assert_eq!(
+            exec.exec("[[5,5],[5,5]] - [[1,2],[3,4]]").unwrap(),
+            "[[4, 3]; [2, 1]]"
+        );
+        assert_eq!(
+            exec.exec("[[1,2],[3,4]] * [[5,6],[7,8]]").unwrap(),
+            "[[19, 22]; [43, 50]]"
+        );
+        assert_eq!(exec.exec("2 * [[1,2],[3,4]]").unwrap(), "[[2, 4]; [6, 8]]");
+        assert_eq!(exec.exec("[[2,4],[6,8]] / 2").unwrap(), "[[1, 2]; [3, 4]]");
+    }
 }

@@ -44,6 +44,11 @@ Download Page: https://github.com/nnao45/dntk/releases/latest
 - Rich math library: trig/hyperbolic (`sin`, `cos`, `tan`, …), logarithms (`log`, `ln`, `log10`, …), powers (`pow`, `sqrt`, `cbrt`), aggregations (`min`, `max`, `hypot`) plus `length`, `scale`, and Bessel `j(n,x)` — short aliases like `s()`, `c()`, `a()`, `l()`, `e()` still work
 - Interactive REPL with cursor movement and editing
 
+### 🧮 Complex & Matrix Literals
+- Type complex numbers directly with `i`, e.g. `1+2i`, `(4-3i)/(1+2i)`, or `abs(3+4i)`
+- Multiply and add matrices inline using JSON-like brackets: `[[1,2],[3,4]] * [[5,6],[7,8]]`
+- For purely imaginary values, give the coefficient explicitly (`1i`, `-2i`) so regular bc identifiers like `i` keep their original meaning
+
 ### 🏳️‍🌈 Colorful output
 - write color means,
 <table>

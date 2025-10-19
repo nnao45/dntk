@@ -584,13 +584,9 @@ impl BcExecuter {
         Ok((entries, index))
     }
 
-    fn extract_matrix_entry<'a>(
-        literal: &'a str,
-        start: usize,
-    ) -> Result<(&'a str, usize), BcError> {
+    fn extract_matrix_entry(literal: &str, start: usize) -> Result<(&str, usize), BcError> {
         let mut depth = 0i32;
-        let mut chars = literal[start..].char_indices();
-        while let Some((offset, ch)) = chars.next() {
+        for (offset, ch) in literal[start..].char_indices() {
             match ch {
                 '[' => {
                     return Err(BcError::Error(
@@ -716,14 +712,14 @@ impl BcExecuter {
         let rhs_cols = rhs[0].len();
         let zero = ComplexNumber::from_real(Decimal::ZERO);
         let mut result = vec![vec![zero.clone(); rhs_cols]; lhs.len()];
-        for i in 0..lhs.len() {
-            for j in 0..rhs_cols {
+        for (result_row, lhs_row) in result.iter_mut().zip(lhs.iter()) {
+            for (j, result_cell) in result_row.iter_mut().enumerate() {
                 let mut sum = ComplexNumber::from_real(Decimal::ZERO);
-                for k in 0..lhs_cols {
-                    let product = lhs[i][k].mul(&rhs[k][j]);
+                for (lhs_value, rhs_row) in lhs_row.iter().zip(rhs.iter()) {
+                    let product = lhs_value.mul(&rhs_row[j]);
                     sum = sum.add(&product);
                 }
-                result[i][j] = sum;
+                *result_cell = sum;
             }
         }
         Ok(result)

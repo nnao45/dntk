@@ -11,11 +11,11 @@ dntk is command line's multi-platform ***Interactive*** calculator with bc-compa
 ![gjf](https://github.com/nnao45/naoGifRepo/blob/master/dntk_demo.gif)
 
 ✔︎ dntk means calculator in a japanese.
-✔︎ dntk is bc-compatible calculator with **28-digit precision** (no external bc required!)
+✔︎ dntk is bc-compatible calculator with bc-style configurable precision powered by `dashu-decimal` (no external bc required!)
 ✔︎ dntk syntax is compatible with [GNU bc](https://www.gnu.org/software/bc/). [learn syntax more](https://www.gnu.org/software/bc/manual/html_mono/bc.html)
 ✔︎ dntk is a NATIVE [The Rust Programming Language](https://rust-lang.org) application.
 ✔︎ dntk can move cursor, can delete char, can refresh buffer.
-✔︎ dntk provides **accurate decimal arithmetic** without floating-point errors.  
+✔︎ dntk provides **accurate decimal arithmetic** without floating-point errors.
 ✔︎ dntk write color means,  
 <table>
     <tr>
@@ -46,14 +46,15 @@ Download Page: https://github.com/nnao45/dntk/releases/latest
 ## ✨ Key Features
 
 ### 🎯 High-Precision Arithmetic
-- **28 decimal digits** of precision (exceeds bc's default 20 digits)
+- Powered by [`dashu-decimal`](https://crates.io/crates/dashu-decimal) for arbitrary-precision decimals with predictable bc semantics
+- Configurable scale (default **20** fractional digits) with faithful truncation just like GNU bc
 - **No floating-point errors**: `1 + 0.7 = 1.7` (not 1.69999...)
 - Accurate division: `1/3 = .33333333333333333333`
 
 ### ⚡ Fast & Lightweight
 - **No external dependencies** (bc command not required!)
 - Pure Rust implementation for maximum performance
-- Optimized expression evaluation with `fasteval` + `rust_decimal`
+- Optimized expression evaluation with `fasteval` + `dashu-decimal`
 
 ### 🌍 True Cross-Platform
 - Works out of the box on **Windows, Linux, macOS, and FreeBSD**

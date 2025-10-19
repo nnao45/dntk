@@ -44,7 +44,7 @@ mod bc_tests {
         let numerator = with_precision(Decimal::from(2), 200);
         let denominator = with_precision(Decimal::from(3), 200);
         let expected = numerator / denominator;
-        let expected = BcExecuter::round_decimal_to_scale(&expected, 50);
+        let expected = BcExecuter::truncate_decimal_to_scale(&expected, 50);
 
         assert_eq!(decimal_result, expected);
         let expected_string = exec.format_result_decimal(&expected);
@@ -61,9 +61,27 @@ mod bc_tests {
         let numerator = with_precision(Decimal::from(10), 200);
         let denominator = with_precision(Decimal::from(3), 200);
         let expected = numerator / denominator;
-        let expected = BcExecuter::round_decimal_to_scale(&expected, 40);
+        let expected = BcExecuter::truncate_decimal_to_scale(&expected, 40);
         assert_eq!(decimal_result, expected);
         assert_eq!(output, exec.format_result_decimal(&expected));
+    }
+
+    #[test]
+    fn test_scale_zero_truncates_results() {
+        let mut exec: BcExecuter = Default::default();
+        exec.exec("scale=0").unwrap();
+        assert_eq!(exec.exec("2/3").unwrap(), "0");
+        assert_eq!(exec.exec("-2/3").unwrap(), "0");
+        assert_eq!(exec.exec("5/2").unwrap(), "2");
+    }
+
+    #[test]
+    fn test_scale_padding_preserves_trailing_zeros() {
+        let mut exec: BcExecuter = Default::default();
+        exec.exec("scale=5").unwrap();
+        assert_eq!(exec.exec("1/2").unwrap(), ".50000");
+        assert_eq!(exec.exec("1/5").unwrap(), ".20000");
+        assert_eq!(exec.exec("10/5").unwrap(), "2");
     }
 
     #[test]

@@ -1472,14 +1472,14 @@ impl BcExecuter {
         }
     }
 
-    fn round_decimal_to_scale(value: &Decimal, scale: u32) -> Decimal {
+    fn truncate_decimal_to_scale(value: &Decimal, scale: u32) -> Decimal {
         if scale == 0 {
-            return value.round();
+            return value.trunc();
         }
 
         let factor = Decimal::from(10).powi(scale.into());
-        let rounded = (value.clone() * &factor).round();
-        rounded / factor
+        let truncated = (value.clone() * &factor).trunc();
+        truncated / factor
     }
 
     fn decimal_to_plain_string(value: &Decimal) -> String {
@@ -1519,14 +1519,19 @@ impl BcExecuter {
 
     fn format_result_decimal(&self, value: &Decimal) -> String {
         let scale = self.scale;
-        let rounded = Self::round_decimal_to_scale(value, scale);
-        let mut formatted = Self::decimal_to_plain_string(&rounded);
+        let truncated = Self::truncate_decimal_to_scale(value, scale);
+        let mut formatted = Self::decimal_to_plain_string(&truncated);
 
-        if formatted.contains('.') {
-            formatted = formatted
-                .trim_end_matches('0')
-                .trim_end_matches('.')
-                .to_string();
+        if let Some(point_index) = formatted.find('.') {
+            if scale == 0 {
+                formatted.truncate(point_index);
+            } else {
+                let frac_len = formatted.len() - point_index - 1;
+                if frac_len < scale as usize {
+                    formatted
+                        .extend(std::iter::repeat('0').take(scale as usize - frac_len));
+                }
+            }
         }
 
         if formatted.starts_with("0.") {

@@ -4,7 +4,7 @@ impl super::BcExecuter {
     pub(super) fn parse_branch<'a>(
         &self,
         input: &'a str,
-    ) -> Result<(Vec<String>, &'a str), BcError> {
+    ) -> Result<(Vec<&'a str>, &'a str), BcError> {
         let trimmed = input.trim_start();
         if trimmed.starts_with('{') {
             let end = Self::find_matching(trimmed, 0, '{', '}')?;
@@ -60,20 +60,20 @@ impl super::BcExecuter {
             let statements = if statement.is_empty() {
                 Vec::new()
             } else {
-                vec![statement.to_string()]
+                vec![statement]
             };
             Ok((statements, remainder))
         }
     }
 
-    pub(super) fn split_statements(&self, input: &str) -> Vec<String> {
+    pub(super) fn split_statements<'a>(&self, input: &'a str) -> Vec<&'a str> {
         let mut statements = Vec::new();
-        let mut current = String::new();
         let mut depth_round = 0;
         let mut depth_square = 0;
         let mut depth_curly = 0;
 
-        for ch in input.chars() {
+        let mut start = 0;
+        for (idx, ch) in input.char_indices() {
             match ch {
                 '(' => depth_round += 1,
                 ')' => {
@@ -94,33 +94,32 @@ impl super::BcExecuter {
                     }
                 }
                 ';' | '\n' if depth_round == 0 && depth_square == 0 && depth_curly == 0 => {
-                    let trimmed = current.trim();
+                    let trimmed = input[start..idx].trim();
                     if !trimmed.is_empty() {
-                        statements.push(trimmed.to_string());
+                        statements.push(trimmed);
                     }
-                    current.clear();
+                    start = idx + ch.len_utf8();
                     continue;
                 }
                 _ => {}
             }
-            current.push(ch);
         }
 
-        let trimmed = current.trim();
+        let trimmed = input[start..].trim();
         if !trimmed.is_empty() {
-            statements.push(trimmed.to_string());
+            statements.push(trimmed);
         }
 
         statements
     }
 
-    pub(super) fn detect_assignment(stmt: &str) -> Option<(String, String)> {
+    pub(super) fn detect_assignment(stmt: &str) -> Option<(&str, &str)> {
         let mut depth_round = 0;
         let mut depth_square = 0;
         let mut depth_curly = 0;
-        let chars: Vec<char> = stmt.chars().collect();
+        let mut prev_char: Option<char> = None;
 
-        for (index, ch) in chars.iter().enumerate() {
+        for (index, ch) in stmt.char_indices() {
             match ch {
                 '(' => depth_round += 1,
                 ')' => {
@@ -141,36 +140,38 @@ impl super::BcExecuter {
                     }
                 }
                 '=' if depth_round == 0 && depth_square == 0 && depth_curly == 0 => {
-                    let prev = index.checked_sub(1).and_then(|i| chars.get(i));
-                    let next = chars.get(index + 1);
-                    if matches!(prev, Some('<') | Some('>') | Some('!')) {
+                    if matches!(prev_char, Some('<') | Some('>') | Some('!')) {
+                        prev_char = Some('=');
                         continue;
                     }
-                    if matches!(next, Some('=')) {
+                    let rest = &stmt[index + ch.len_utf8()..];
+                    if rest.starts_with('=') {
+                        prev_char = Some('=');
                         continue;
                     }
 
                     let left = stmt[..index].trim();
-                    let right = stmt[index + 1..].trim();
+                    let right = rest.trim();
                     if left.is_empty() || right.is_empty() {
                         return None;
                     }
-                    return Some((left.to_string(), right.to_string()));
+                    return Some((left, right));
                 }
                 _ => {}
             }
+            prev_char = Some(ch);
         }
         None
     }
 
-    pub(super) fn split_top_level(input: &str, delimiter: char) -> Vec<String> {
+    pub(super) fn split_top_level(input: &str, delimiter: char) -> Vec<&str> {
         let mut parts = Vec::new();
-        let mut current = String::new();
         let mut depth_round = 0;
         let mut depth_square = 0;
         let mut depth_curly = 0;
 
-        for ch in input.chars() {
+        let mut start = 0;
+        for (idx, ch) in input.char_indices() {
             match ch {
                 '(' => depth_round += 1,
                 ')' => {
@@ -194,15 +195,15 @@ impl super::BcExecuter {
             }
 
             if ch == delimiter && depth_round == 0 && depth_square == 0 && depth_curly == 0 {
-                parts.push(current.trim().to_string());
-                current.clear();
-            } else {
-                current.push(ch);
+                let segment = &input[start..idx];
+                parts.push(segment.trim());
+                start = idx + ch.len_utf8();
             }
         }
 
-        if !current.trim().is_empty() {
-            parts.push(current.trim().to_string());
+        let tail = input[start..].trim();
+        if !tail.is_empty() {
+            parts.push(tail);
         }
 
         parts

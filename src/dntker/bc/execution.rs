@@ -47,7 +47,7 @@ impl BcExecuter {
         let mut last_value: Option<Decimal> = None;
 
         for stmt in statements {
-            match self.eval_statement(&stmt)? {
+            match self.eval_statement(stmt)? {
                 StatementOutcome::Return(value) => {
                     last_value = Some(value);
                     break;
@@ -74,7 +74,7 @@ impl BcExecuter {
             if let Some(rest) = remainder {
                 let mut last = StatementOutcome::None;
                 for extra in self.split_statements(&rest) {
-                    let outcome = self.eval_statement(&extra)?;
+                    let outcome = self.eval_statement(extra)?;
                     match outcome {
                         StatementOutcome::Return(_) => return Ok(outcome),
                         StatementOutcome::Value(value) => {
@@ -101,7 +101,7 @@ impl BcExecuter {
         }
 
         if let Some((name, expr)) = Self::detect_assignment(trimmed) {
-            let value = self.eval_assignment(&name, &expr)?;
+            let value = self.eval_assignment(name, expr)?;
             return Ok(StatementOutcome::value(value));
         }
 
@@ -125,7 +125,7 @@ impl BcExecuter {
         let (then_branch, after_then) = self.parse_branch(remainder)?;
         remainder = after_then.trim_start();
 
-        let mut else_branch: Vec<String> = Vec::new();
+        let mut else_branch: Vec<&str> = Vec::new();
         if remainder.starts_with("else") {
             remainder = remainder["else".len()..].trim_start();
             let (branch, after_else) = self.parse_branch(remainder)?;
@@ -140,10 +140,10 @@ impl BcExecuter {
         }
 
         if condition_true {
-            return self.eval_block(then_branch);
+            return self.eval_block(then_branch.iter().copied());
         }
         if !else_branch.is_empty() {
-            return self.eval_block(else_branch);
+            return self.eval_block(else_branch.iter().copied());
         }
 
         Ok(StatementOutcome::None)
@@ -175,7 +175,7 @@ impl BcExecuter {
                 break;
             }
 
-            match self.eval_block(body.clone())? {
+            match self.eval_block(body.iter().copied())? {
                 StatementOutcome::Return(value) => return Ok(StatementOutcome::Return(value)),
                 StatementOutcome::Value(value) => {
                     last_value = StatementOutcome::value(value);
@@ -232,7 +232,7 @@ impl BcExecuter {
                 break;
             }
 
-            match self.eval_block(body.clone())? {
+            match self.eval_block(body.iter().copied())? {
                 StatementOutcome::Return(value) => {
                     return Ok(StatementOutcome::Return(value));
                 }
@@ -258,13 +258,13 @@ impl BcExecuter {
         Ok(last_value)
     }
 
-    pub(super) fn eval_block(
-        &mut self,
-        statements: Vec<String>,
-    ) -> Result<StatementOutcome, BcError> {
+    pub(super) fn eval_block<'a, I>(&mut self, statements: I) -> Result<StatementOutcome, BcError>
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
         let mut last_value = StatementOutcome::None;
         for stmt in statements {
-            match self.eval_statement(&stmt)? {
+            match self.eval_statement(stmt)? {
                 StatementOutcome::Return(value) => {
                     return Ok(StatementOutcome::Return(value));
                 }
@@ -311,7 +311,7 @@ impl BcExecuter {
         }
         let params_end = Self::find_matching(rest, 0, '(', ')')?;
         let params_str = &rest[1..params_end];
-        let params = if params_str.trim().is_empty() {
+        let params: Vec<String> = if params_str.trim().is_empty() {
             Vec::new()
         } else {
             params_str
@@ -332,10 +332,19 @@ impl BcExecuter {
         while remainder.starts_with(';') {
             remainder = remainder[1..].trim_start();
         }
-        let body = self.split_statements(body_content);
+        let body: Vec<String> = self
+            .split_statements(body_content)
+            .into_iter()
+            .map(|stmt| stmt.to_string())
+            .collect();
 
-        self.runtime
-            .define_function(name.to_string(), FunctionDef { params, body });
+        self.runtime.define_function(
+            name.to_string(),
+            FunctionDef {
+                params: params.into(),
+                body: body.into(),
+            },
+        );
         if remainder.is_empty() {
             Ok(None)
         } else {

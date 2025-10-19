@@ -359,12 +359,12 @@ impl super::BcExecuter {
         }
 
         let mut local_scope = BTreeMap::new();
-        for (param, arg) in def.params.iter().zip(args.iter()) {
-            local_scope.insert(param.clone(), arg.clone());
+        for (param, arg) in def.params.iter().zip(args.into_iter()) {
+            local_scope.insert(param.clone(), arg);
         }
 
         self.runtime.push_scope(local_scope);
-        let outcome = self.eval_block(def.body)?;
+        let outcome = self.eval_block(def.body.iter().map(|s| s.as_str()))?;
         self.runtime.pop_scope();
 
         let result = match outcome {

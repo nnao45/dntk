@@ -1,12 +1,13 @@
 use std::collections::{BTreeMap, HashMap};
+use std::sync::Arc;
 
 use dashu::Decimal;
 use rand::{rngs::SmallRng, SeedableRng};
 
 #[derive(Clone, Debug)]
 pub struct FunctionDef {
-    pub params: Vec<String>,
-    pub body: Vec<String>,
+    pub params: Arc<[String]>,
+    pub body: Arc<[String]>,
 }
 
 #[derive(Clone, Debug)]
